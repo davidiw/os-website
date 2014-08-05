@@ -3,8 +3,8 @@ title: 'Lab Guide'
 position: 6
 ---
 
-6.828 lab tools guide
-=====================
+CS422/522 lab tools guide
+=========================
 
 Familiarity with your environment is crucial for productive development
 and debugging. This page gives a brief overview of the JOS environment
@@ -144,10 +144,9 @@ files that may prove useful while debugging:
 
 ### GDB
 
-See the [GDB manual](http://sourceware.org/gdb/current/onlinedocs/gdb/)
-for a full guide to GDB commands. Here are some particularly useful
-commands for 6.828, some of which don't typically come up outside of OS
-development.
+See the [GDB manual](http://sourceware.org/gdb/current/onlinedocs/gdb/) for a
+full guide to GDB commands. Here are some particularly useful commands for
+CS422/522, some of which don't typically come up outside of OS development.
 
 - `Ctrl-c`
   - Halt the machine and break in to GDB at the current instruction. If

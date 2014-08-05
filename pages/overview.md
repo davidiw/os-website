@@ -7,173 +7,115 @@ position: 1
 Description
 -----------
 
-Caffeinated 6.828 is a fast-paced whirlwind introduction to operating
-systems, aimed at giving students an as-close-as-possible to an
-authentic 6.828 experience during an IAP term.
+CS422/522 teaches the fundamentals of operating systems. You will study in
+detail, virtual memory, kernel and user mode, system calls, threads, context
+switches, interrupts, interprocess communication, coordination of concurrent
+activities, and the interface between software and hardware. Most importantly,
+you will study the interactions between these concepts, and how to manage the
+complexity introduced by interactions.
 
-The focus of this course will be on the lab assignments from the
-standard 6.828 term, in which students complete the implementation of an
-operating system kernel named JOS. Roughly two months' worth of lab
-assignments, according to the standard schedule, will be due in just
-three weeks. This will be an intensive class, and you should expect to
-commit a significant fraction of your IAP towards the lab work.
+**Prerequisites:** [CPSC 323 Introduction to Systems Programming and Computer
+Organization](http://zoo.cs.yale.edu/classes/cs323). For graduate students, an
+equivalent basic systems programming course or general knowledge covering C/C++
+programming, programming with pointers, Unix shells, pipes, fork/join, etc.
 
-Unlike a standard 6.828 term, we will not be covering many research
-topics or papers, nor will we be extensively covering xv6, the other
-teaching OS from a standard term. There will be an optional final
-mini-project, and no exams.
+**Textbooks:**
 
-Caffeinated 6.828 is primarily intended for graduating Seniors and
-M.Eng. students that did not have an opportunity to take the
-full-fledged 6.828 class in fall 2013. This offering is inspired by
-[6.037 "Zombies drink caffeinated
-6.001"](http://web.mit.edu/alexmv/6.037/), a similar alumni-led
-accelerated version of 6.001 offered after its cancellation. (Unlike
-6.001, 6.828 is not cancelled and is expected to be offered again in
-fall 2014; conversely, we expect not to offer caffeinated 6.828 next
-IAP.)
+* The course follows [6.828 xv6 textbook]
+  ({{ urls.production_url }}/readings/xv6/book-rev7.pdf)
+
+* Optional:
+  [Operating System Concepts by Silberschatz, Galvin, and Gagne]
+  (http://www.amazon.com/Operating-System-Concepts-Abraham-Silberschatz/dp/1118063333)
 
 Course content
 --------------
 
-Quoting the course catalog: "6.828 studies fundamental design and
-implementation ideas in the engineering of operating systems. Lectures
-are based on a study of UNIX and research papers. Topics include virtual
-memory, threads, context switches, kernels, interrupts, system calls,
-interprocess communication, coordination, and the interaction between
-software and hardware. Individual laboratory assignments involve
-implementation of a small operating system in C, with some x86
-assembly."
+To master the concepts, CS422/522 is organized in three parts: lectures,
+readings, and labs. The lectures and readings familiarize you with the main
+concepts. The labs force you to understand the concepts at a deep level, since
+you will build an operating system from the ground up. Upon completing the
+labs, you will appreciate the meaning of design goals such "reducing
+complexity" and "conceptual integrity".
 
-Caffeinated 6.828 will be structured around 4 lab assignments, due
-approximately weekly, plus an optional, ungraded open-ended assignment.
-The first three weeks of lectures will cover the material needed for
-these assignments; the final few lectures will cover additional current
-topics in operating systems research.
+The lectures are organized in two main blocks. The first block introduces [xv6
+(x86 version 6)]({{ urls.production_url }}/xv6), a re-implementation of Unix Version
+6 developed in the 1970s. In each lecture we will take one part of xv6 and
+study its source code; homework assignments will help you prepare for these
+lectures. At the end of the first block (about half-way the term), you will
+understand the source code for a well-designed operating system for an
+Intel-based PC, which will help you in building your own operating system.
 
-Relative to the [fall 2012
-schedule](http://pdos.csail.mit.edu/6.828/2012/schedule.html), we will
-cover, in accelerated form, roughly the first nine lectures and first
-four labs within the first three weeks.
+The second block of lectures covers important operating systems concepts
+invented after Unix v6. We will study the more modern concepts by reading
+research papers and discussing them in lecture. You will also implement some of
+these newer concepts in your operating system.
 
-Should I take this class?
--------------------------
+You may wonder why we are studying an operating system that resembles Unix v6
+instead of the latest and greatest version of Linux, Windows, or BSD Unix. xv6
+is big enough to illustrate the basic design and implementation ideas in
+operating systems. On the other hand, xv6 is far smaller than any modern
+production O/S, and correspondingly easier to understand. xv6 has a structure
+similar to many modern operating systems; once you've explored xv6 you will
+find much that is familiar inside kernels such as Linux.
 
-Prerequisites for the standard offering of 6.828 are 6.033, 6.170, and
-(recursively) 6.004. In other words, we expect a working familiarity
-with computer systems and architecture as well as practice with
-large-scale programming projects.
+There are 7 labs that build on each other, culminating in a primitive operating
+system on which you can run simple commands through your own shell.  The
+operating system you will build, called JOS, will have Unix-like functions
+(e.g., fork, exec), but is implemented in an exokernel style (i.e., the Unix
+functions are implemented mostly as user-level library instead of built-in to
+the kernel). The major parts of the JOS operating system are:
 
-We expect you either to know C already or to be able to pick it up
-quickly. We will be (briefly) teaching x86 assembly in lecture, and the
-the [references page](reference) has links to further material.
+1. Booting
+1. Memory management
+1. User-level environments
+1. Preemptive multitasking
+1. File system and spawn
+1. Networking
+1. A shell
 
-As mentioned above, expect the workload of this class to be significant.
-Even without the accelerated schedule, 6.828 during the semester is a
-significant commitment. The labs will take time to complete and to
-debug, so if you cannot commit to working on them every day, we
-do not recommend taking this class.
+The JOS skeleton code is provided for you, but you will have to do all the hard
+work.  You'll find that xv6 helps you understand many of the goals you're
+trying to achieve in JOS, but that JOS occupies a very different point in the
+design and implementation space from xv6.
 
-We encourage anyone that has the opportunity to take the full 6.828 at a
-later date to do so. You _are_ permitted to take this class for credit
-also take 6.828 in the future, if you would like. While the initial labs
-will be similar, the additional topics and coverage of research papers
-as well as the full-fledged final project -- not to mention the
-additional time allowed to debug and understand the initial labs -- will
-be invaluable.
+You will develop your JOS operating system for a standard x86-based personal
+computer, the same one used for xv6. To simplify development we will use a
+complete machine simulator (Qemu) in the class for development and debugging.
+This simulator is real enough, however, that you will be able to boot your own
+operating system on physical hardware if you wish.
 
-This class is available for 6 general elective credits (pass/no-record)
-under course number 6.S184. Members of the MIT community who want to
-follow along are welcome to attend lecture, provided that there is
-space; we strongly encourage you to follow along with the lab
-assignments. We are happy to grade and provide feedback for students not
-taking the class for credit, although students registered for credit
-will have priority.
-
-Communication
--------------
-
-We will distribute assignments on the [course web
-site](http://sipb.mit.edu/iap/6.828). All announcements will be posted
-on the course web site in addition to being sent via email.
+At the end of the lab you will be able to find your way around the source code
+of most operating systems, and more generally, be comfortable with system
+software. You will understand many operating systems concepts in detail and
+will be able to use them in other environments. You will also understand the
+x86 processor and the C programming language well.
 
 Grading policy
 --------------
 
-Grades in Caffeinated 6.828 will be awarded P/NR, based on the results
-the lab assignments. You must complete all lab assignments
-satisfactorily to receive a passing grade. There will be an optional,
-but highly recommended, final mini-project. There will be no exam.
+**Lectures (20% of grade):**
 
-Labs
-----
+**Homework (10% of grade):**
 
-To turn-in the labs, run `make handin` in your lab directory. The
-handin must be received by 11:59pm on the day that the lab is due. You
-can turn in as many times as you want. We will grade all your
-submissions and email the result to you within a few minutes.
+**Labs (50% of grade):**
 
-There will be no late hours. IAP leaves us with a very tight
-schedule. Please contact the course staff if you have extenuating
-cirumstances.
+**Midterm exam (15% of grade):**
 
-Code reviews
-------------
-
-Due to time constraints, there will be no peer code reviews.
-
-Homework
---------
-
-Other than the lab exercises, all homework assignments are **highly
-recommended**, but will not count towards the final grade.
+**Final exam (15% of grade):**
 
 Collaboration
 -------------
 
-You are welcome to discuss the homework and labs with other students,
-but all of your written work and code must be your own and must
-carefully acknowledge all contributions of ideas by others, whether
-from classmates or from sources you have read.
+You are welcome to discuss the homework and labs with other students, but all
+of your written work and code must be your own and must carefully acknowledge
+all contributions of ideas by others, whether from classmates or from sources
+you have read.  Do not post your lab or homework solutions on publicly
+accessible web sites (such as GitHub).
 
-Do not post your lab or homework solutions on publicly accessible web
-sites (such as GitHub) or file spaces (such as your Athena Public
-directory).
+Acknowledgements
+----------------
 
-Class meetings
---------------
-
-Lectures will be held on Tuesday and Thursday from 7:00pm to 9:00pm in
-37-212.
-
-Recitation
-----------
-
-There will be an optional recitation on C on Saturday, January 11,
-2014 from 1pm-2pm in the W20-5 Lounge.
-
-Staff
------
-
-**Course mailing list**: `sipb-iap-6.828@mit.edu`
-
-**Instructors**
-
-- Alex Chernyakhovsky
-- Geoffrey Thomas
-- Kata (Patrick Hurst)
-- Adam Glasgall
-- Nathan Arce
-- Paul Quimby
-- Alex Dehnert
-
-Office hours
-------------
-
-- Monday: 8pm-10pm, W20-5 Lounge (Alex Chernyakhovsky, Nathan Arce)
-- Tuesday: none
-- Wednesday: 2pm-4pm, 32-G9 (Kata); 6pm-8pm, W20-5 Lounge (Adam Glasgall)
-- Thursday: 2pm-4pm, 32-G9 (Kata)
-- Friday: none
-- Saturday: 1pm-3pm, W20-5 Lounge (Geoffrey Thomas)
-- Sunday: none
+The website is based on [Caffeinated 6.828](http://sipb.mit.edu/iap/6.828/).<br>
+The course contents derive from both Frans Kooshoek's course [6.828: Operating
+System Engineering](http://pdos.csail.mit.edu/6.828/2012/).
