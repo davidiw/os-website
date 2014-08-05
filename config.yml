@@ -1,55 +1,55 @@
-base_path : 'BASE_PATH'
-production_url : 'PRODUCTION_URL'
+"base_path" : ""
+"production_url" : ""
 
-pages :
-  permalink: '/:relative_path/:filename'
-  sort: ['position', 'asc']
-  paginator:
-    enable: false
-  rss:
-    enable: false
+"pages" :
+  "permalink" : '/:relative_path/:filename'
+  "sort" : ["position", "asc"]
+  "paginator" :
+    "enable" : "false"
+  "rss" :
+    "enable" : "false"
 
-lab:
-  paginator:
-    enable: false
-  rss:
-    enable: false
+"lab" :
+  "paginator" :
+    "enable" : "false"
+  "rss" :
+    "enable" : "false"
 
-_root:
-  paginator:
-    enable: false
-  rss:
-    enable: false
+"_root" :
+  "paginator" :
+    "enable" : "false"
+  "rss" :
+    "enable" : "false"
 
-files :
-  use: static
-  paginator:
-    enable: false
-  rss:
-    enable: false
+"files" :
+  "use" : "static"
+  "paginator" :
+    "enable" : "false"
+  "rss" :
+    "enable" : "false"
 
-readings :
-  use: static
-  paginator:
-    enable: false
-  rss:
-    enable: false
+"readings" :
+  "use" : "static"
+  "paginator" :
+    "enable" : "false"
+  "rss" :
+    "enable" : "false"
 
-lecture-notes:
-  paginator:
-    enable: false
-  rss:
-    enable: false
+"lecture-notes" :
+  "paginator" :
+    "enable" : "false"
+  "rss" :
+    "enable" : "false"
 
-slides :
-  use: static
-  paginator:
-    enable: false
-  rss:
-    enable: false
+"slides" :
+  "use" : "static"
+  "paginator" :
+    "enable" : "false"
+  "rss" :
+    "enable" : "false"
 
-widgets :
-  syntax :
-    use : prettify
-    linenums : false
-    cdn : false
+"widgets" :
+  "syntax" :
+    "use" : "prettify"
+    "linenums" : "false"
+    "cdn" : "false"
