@@ -1,5 +1,5 @@
 ---
-title: CS422/522
+title: CPSC422/522
 permalink: /index.html
 ---
 
@@ -35,14 +35,19 @@ permalink: /index.html
 &emsp;Office hours: MW 2:30-4:00PM or by appointment.
 </p>
 
+<p class="lead">
+All questions should be asked via
+<a href="http://piazza.com/yale/fall2014/cpsc422522">Piazza</a>
+unless they are of a private or personal nature.
+</p>
 </div>
 <div class="col-md-5">
 
 <h2>Announcements</h2>
 
 <dl>
-<dt>20 Aug</dt>
-<dd>Website is live!</dd>
+<dt>27 Aug</dt>
+<dd>First lecture</dd>
 </dl>
 
 </div>

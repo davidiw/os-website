@@ -26,13 +26,31 @@ dates are not final until announced in class.
     <span class="text-muted">26 Aug</span>
    </td>
    <td>
-    <span class="text-muted">27 Aug</span>
+    <span class="text-muted">27 Aug</span><br>
+    <span class="text-primary">
+     <b>Lecture 1: </b> Operating systems
+    </span><br>
+    <span class="text-success">
+     <b>Preparation: </b> Look over the xv6 book and source.
+    </span><br>
+    <span class="text-info">
+     <b>Assignment: </b><a href="{{ urls.production_url }}/lab/shell">shell exercise</a>
+    </span><br>
    </td>
    <td>
     <span class="text-muted">28 Aug</span>
    </td>
    <td>
-    <span class="text-muted">29 Aug</span>
+    <span class="text-muted">29 Aug</span><br>
+    <span class="text-primary">
+     <b>Lecture 2: </b> Operating systems
+    </span><br>
+    <span class="text-success">
+     <b>Preparation: </b> Look over the xv6 book and source.
+    </span><br>
+    <span class="text-info">
+     <b>Assignment: </b><a href="{{ urls.production_url }}/lab/shell">shell exercise</a>
+    </span><br>
    </td>
   </tr>
   <tr>
@@ -55,7 +73,16 @@ dates are not final until announced in class.
   </tr>
   <tr>
    <td>
-    <span class="text-muted">8 Sept</span>
+    <span class="text-muted">8 Sept</span><br>
+    <span class="text-primary">
+     <b>Lecture 2: </b> Operating systems
+    </span><br>
+    <span class="text-success">
+     <b>Preparation: </b> Look over the xv6 book and source.
+    </span><br>
+    <span class="text-info">
+     <b>Assignment: </b><a href="{{ urls.production_url }}/lab/shell">shell exercise</a>
+    </span><br>
    </td>
    <td>
     <span class="text-muted">9 Sept</span>
