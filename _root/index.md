@@ -4,7 +4,7 @@ permalink: /index.html
 ---
 
 <div class="jumbotron">
-<h1>CS422/522 - Fall 2014</h1>
+<h1>CPSC422/522 - Fall 2014</h1>
 <p>Operating System Design and Implementation / Engineering.</p>
 </div>
 

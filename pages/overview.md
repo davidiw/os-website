@@ -7,7 +7,7 @@ position: 1
 Description
 -----------
 
-CS422/522 teaches the fundamentals of operating systems. You will study in
+CPSC422/522 teaches the fundamentals of operating systems. You will study in
 detail, virtual memory, kernel and user mode, system calls, threads, context
 switches, interrupts, interprocess communication, coordination of concurrent
 activities, and the interface between software and hardware. Most importantly,
@@ -31,7 +31,7 @@ programming, programming with pointers, Unix shells, pipes, fork/join, etc.
 Course content
 --------------
 
-To master the concepts, CS422/522 is organized in three parts: lectures,
+To master the concepts, CPSC422/522 is organized in three parts: lectures,
 readings, and labs. The lectures and readings familiarize you with the main
 concepts. The labs force you to understand the concepts at a deep level, since
 you will build an operating system from the ground up. Upon completing the

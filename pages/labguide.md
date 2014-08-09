@@ -3,7 +3,7 @@ title: 'Lab Guide'
 position: 6
 ---
 
-CS422/522 lab tools guide
+CPSC422/522 lab tools guide
 =========================
 
 Familiarity with your environment is crucial for productive development
@@ -100,8 +100,7 @@ Exiting GDB will shut down QEMU.
 - `make qemu-nox`
   - Like `make qemu`, but run with only the serial console. To exit,
     press `Ctrl-a x`. This is particularly useful over SSH connections
-    to Athena dialups because the VGA window consumes a lot of
-    bandwidth.
+    to the Zoo because the VGA window consumes a lot of bandwidth.
 - `make gdb`
    - Start `gdb` with the settings in the JOS `.gdbinit`.
 - `make qemu-gdb`
@@ -146,7 +145,7 @@ files that may prove useful while debugging:
 
 See the [GDB manual](http://sourceware.org/gdb/current/onlinedocs/gdb/) for a
 full guide to GDB commands. Here are some particularly useful commands for
-CS422/522, some of which don't typically come up outside of OS development.
+CPSC422/522, some of which don't typically come up outside of OS development.
 
 - `Ctrl-c`
   - Halt the machine and break in to GDB at the current instruction. If

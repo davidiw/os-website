@@ -78,7 +78,7 @@ Xv6 does boot on real hardware, but typically
 we run it using the QEMU emulator.
 Both the GCC cross compiler and QEMU
 can be found on the
-[CS422/522 tools page]({{ urls.production_url }}/tools).
+[CPSC422/522 tools page]({{ urls.production_url }}/tools).
 
 ####**Unix Version 6**
 
