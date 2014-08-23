@@ -1,5 +1,5 @@
-"base_path" : ""
-"production_url" : ""
+"base_path" : "BASE_PATH"
+"production_url" : "PRODUCTION_URL"
 
 "pages" :
   "permalink" : '/:relative_path/:filename'
