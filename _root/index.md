@@ -31,7 +31,7 @@ permalink: /index.html
 <b>Teaching Assistant:</b><br/>
 &emsp;<a href="">Daniel Jackowitz</a>,
   AKW402,
-  <a href="mailto:daniel.jackowitz@yale.edu">daniel@jackowitz.edu</a><br/>
+  <a href="mailto:daniel.jackowitz@yale.edu">daniel.jackowitz@yale.edu</a><br/>
 &emsp;Office hours: R 2:00-3:30PM or by appointment.
 </p>
 
