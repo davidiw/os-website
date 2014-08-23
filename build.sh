@@ -8,3 +8,6 @@ sed "s#BASE_PATH#$base#g" -i config.yml
 sed "s#PRODUCTION_URL#$full#g" -i config.yml
 bundle exec ruhoh compile
 mv config.yml.bak config.yml
+mv -f live old
+mv compiled/$base live
+rm -rf old compiled
