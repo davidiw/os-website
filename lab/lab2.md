@@ -182,7 +182,7 @@ namely *segmentation* and *page translation*.
 > **Exercise 2**
 
 > Look at chapters 5 and 6 of the [Intel 80386 Reference Manual]
-> {{( urls.production_url }}//readings/i386/toc.htm),
+> ({{ urls.production_url }}//readings/i386/toc.htm),
 > if you haven't done so already.
 > Read the sections about page translation
 > and page-based protection closely (5.2 and 6.4).
