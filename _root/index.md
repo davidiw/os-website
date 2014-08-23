@@ -15,13 +15,13 @@ permalink: /index.html
 
 <p class="lead">
 <b>Lectures:</b><br/>
-&emsp;MW 1:00-2:15PM, Room
+&emsp;MW 1:00-2:15PM, Room AKW000
 </p>
 
 <p class="lead">
 <b>Instructor:</b><br/>
 &emsp;<a href="http://www.davidwolinsky.com">David Wolinsky</a>,
-  403 Watson,
+  AKW403,
   <a href="mailto:david.wolinsky@yale.edu">david.wolinsky@yale.edu</a><br/>
 &emsp;Office hours: MW 2:30-4:00PM or by appointment.
 </p>
@@ -30,9 +30,9 @@ permalink: /index.html
 <p class="lead">
 <b>Teaching Assistant:</b><br/>
 &emsp;<a href="">Daniel Jackowitz</a>,
-  402 Watson,
-  <a href="mailto:x@y.z">x@y.z</a><br/>
-&emsp;Office hours: MW 2:30-4:00PM or by appointment.
+  AKW402,
+  <a href="mailto:daniel.jackowitz@yale.edu">daniel@jackowitz.edu</a><br/>
+&emsp;Office hours: R 2:00-3:30PM or by appointment.
 </p>
 
 <p class="lead">
