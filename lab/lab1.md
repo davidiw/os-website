@@ -27,20 +27,47 @@ you may find this [CS-oriented overview of Git]
 (http://eagain.net/articles/git-for-computer-scientists/)
 useful.
 
-The URL for the course Git repository is
-`https://exokernel.scripts.mit.edu/joslab.git`.
-To install the files in your Zoo account,
-you need to *clone* the course repository,
-by running the commands below.
-You can log into Zoo remotely via [ssh](http://zoo.cs.yale.edu/)..
+The Git repository for the labs is in `/c/cs422/joslab.git` on the zoo
+machines. However you need to set up your own repository
+to hand in each lab. To install the files,
+use the commands below with the desired
+location.
+You can log into Zoo remotely via [ssh](http://zoo.cs.yale.edu/).
 
 ```lang-sh
-$ mkdir ~/cpsc422
-$ cd ~/cpsc422
-$ add git
-$ git clone https://exokernel.scripts.mit.edu/joslab.git lab
-Cloning into lab...
+$ mkdir ~/cs422
+$ cd ~/cs422
+$ /c/cs422/setrepo.sh lab
+Creating new repository /c/cs422/SUBMIT/lab/netid.git...
+.
+.
+.
+****
+Now you can use 'git commit' and 'git push' to submit your code!
+****
 $ cd lab
+$
+```
+
+If you want to clone the repository remotely onto a non-Zoo machine
+after you have configured it as above, first get the path of your
+remote directory by running, from your local directory:
+
+```lang-sh
+$ git remote show origin
+* remote origin
+  Fetch URL: /path/to/repo
+  Push  URL: /path/to/repo
+...
+$
+```
+
+Suppose it is `/path/to/repo`. You can use `git clone` on your
+own computer:
+
+```lang-sh
+$ git clone netid@node.zoo.cs.yale.edu:/path/to/repo lab
+Cloning into lab...
 $
 ```
 
@@ -65,7 +92,7 @@ Here, `origin/lab1` is the name of the git branch with the initial code
 you downloaded from our server for this assignment.
 
 We have set up the appropriate compilers and simulators for you on the Zoo.
-To use them, run `XXX`.
+To use them, run `source /c/cs422/env.sh`.
 You must run this command every time you log in
 (or add it to your `~/.environment` file).
 If you get obscure errors while compiling or running `qemu`,
@@ -85,24 +112,22 @@ Otherwise, follow the directions on the tools page.
 ### Hand-In Procedure
 
 When you are ready to hand in your lab, first commit your changes with
-git commit, and then type make handin in the `lab` directory. The latter
-will run git push handin HEAD, which pushes the current branch to the
-same name on the remote `handin` repository.
+`git commit`, and then type `git push` in the `lab` directory. The latter
+will propagate your changes to your remote repository.
 
 ```lang-sh
 $ git commit -am "ready to submit my lab"
 [lab1 c2e3c8b] ready to submit my lab
  2 files changed, 18 insertions(+), 2 deletions(-)
 
-$ make handin
-Handin to remote repository using 'git push handin HEAD' ...
+$ git push
 Counting objects: 59, done.
 Delta compression using up to 4 threads.
 Compressing objects: 100% (55/55), done.
 Writing objects: 100% (59/59), 49.75 KiB, done.
 Total 59 (delta 3), reused 0 (delta 0)
-To ssh://josgit@am.csail.mit.edu/joslab.git
- * [new branch]      HEAD -> lab1
+To /c/cs422/SUBMIT/lab/netid.git/
+ * 1adca11..e3a880d  HEAD -> lab1
 $
 ```
 
@@ -1220,4 +1245,4 @@ get rid of the `-O2` from `GNUMakefile`, the backtraces may make more
 sense (but your kernel will run more slowly).
 
 **This completes the lab.** In the `lab` directory, commit your changes
-with `git commit` and type `make handin` to submit your code.
+with `git commit` and type `git push` to submit your code.
