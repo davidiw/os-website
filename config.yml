@@ -30,19 +30,15 @@
 
 "readings" :
   "use" : "static"
+  "exclude" : "pdf$"
   "paginator" :
     "enable" : "false"
   "rss" :
     "enable" : "false"
 
-"lecture-notes" :
-  "paginator" :
-    "enable" : "false"
-  "rss" :
-    "enable" : "false"
-
-"slides" :
+"lectures" :
   "use" : "static"
+  "exclude" : "eot$"
   "paginator" :
     "enable" : "false"
   "rss" :
