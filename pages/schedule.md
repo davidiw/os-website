@@ -4,8 +4,35 @@ position: 2
 layout: default
 ---
 
-This is the anticipated schedule for lectures and assignments. Due
-dates are not final until announced in class.
+This is the anticipated schedule for lectures and assignments.
+Assignments and due dates will be officially announced during class
+at which point the calendar will be updated, if necessary.
+
+<!--
+Template:
+    <span class="text-primary">
+      <b>Lecture: </b>
+    </span>
+    <span class="text-success">
+      <b>Prepration: </b>
+    </span>
+    <span class="text-info">
+      <b>Assignment: </b>
+    </span>
+    <span class="text-warning">
+      <b>Special Day</b>
+    </span>
+    <span class ="text-danger">
+      <b>Due: </b>
+    </span>
+-->
+
+<script type="text/javascript">
+  var x = 1;
+  function lectnum() {
+    document.write(x++);
+  }
+</script>
 
 <table class="table">
  <thead>
@@ -26,31 +53,32 @@ dates are not final until announced in class.
     <span class="text-muted">26 Aug</span>
    </td>
    <td>
-    <span class="text-muted">27 Aug</span><br>
+    <span class="text-muted">27 Aug</span><br />
     <span class="text-primary">
-     <b>Lecture 1: </b> Operating systems
-    </span><br>
+     <b>Lecture <script type="text/javascript">lectnum()</script> </b>: Operating systems
+    </span><br />
     <span class="text-success">
      <b>Preparation: </b> Look over the xv6 book and source.
-    </span><br>
+    </span><br />
     <span class="text-info">
-     <b>Assignment: </b><a href="{{ urls.production_url }}/lab/shell">shell exercise</a>
-    </span><br>
+     <b>Assignment: </b><a href="{{ urls.production_url }}/lab/shell">shell exercise</a><br />
+     <b>Assignment: </b><a href="{{ urls.production_url }}/lab/lab1">Lab 1</a>
+    </span><br />
    </td>
    <td>
-    <span class="text-muted">28 Aug</span>
+    <span class="text-muted">28 Aug</span><br />
+    <span class="text-danger">
+      <b>Due: </b>shell assignment
+    </span><br />
    </td>
    <td>
-    <span class="text-muted">29 Aug</span><br>
+    <span class="text-muted">29 Aug</span><br />
     <span class="text-primary">
-     <b>Lecture 2: </b> Operating systems
-    </span><br>
+      <b>Lecture <script type="text/javascript">lectnum()</script>:</b>
+    </span><br />
     <span class="text-success">
-     <b>Preparation: </b> Look over the xv6 book and source.
-    </span><br>
-    <span class="text-info">
-     <b>Assignment: </b><a href="{{ urls.production_url }}/lab/shell">shell exercise</a>
-    </span><br>
+      <b>Preparation: </b>
+    </span><br />
    </td>
   </tr>
   <tr>
@@ -62,10 +90,19 @@ dates are not final until announced in class.
     <span class="text-muted">2 Sept</span>
    </td>
    <td>
-    <span class="text-muted">3 Sept</span>
+    <span class="text-muted">3 Sept</span><br />
+    <span class="text-primary">
+      <b>Lecture <script type="text/javascript">lectnum()</script>: </b>
+    </span><br />
+    <span class="text-info">
+      <b>Assignment: </b><a href="{{ urls.production_url }}/lab/lab2">Lab 2</a>
+    </span><br />
    </td>
    <td>
-    <span class="text-muted">4 Sept</span>
+    <span class="text-muted">4 Sept</span><br />
+    <span class ="text-danger">
+      <b>Due: </b> Lab 1
+    </span><br />
    </td>
    <td>
     <span class="text-muted">5 Sept</span>
@@ -73,25 +110,28 @@ dates are not final until announced in class.
   </tr>
   <tr>
    <td>
-    <span class="text-muted">8 Sept</span><br>
+    <span class="text-muted">8 Sept</span><br />
     <span class="text-primary">
-     <b>Lecture 2: </b> Operating systems
-    </span><br>
-    <span class="text-success">
-     <b>Preparation: </b> Look over the xv6 book and source.
-    </span><br>
-    <span class="text-info">
-     <b>Assignment: </b><a href="{{ urls.production_url }}/lab/shell">shell exercise</a>
-    </span><br>
+      <b>Lecture <script type="text/javascript">lectnum()</script>: </b>
+    </span>
    </td>
    <td>
     <span class="text-muted">9 Sept</span>
    </td>
    <td>
-    <span class="text-muted">10 Sept</span>
+    <span class="text-muted">10 Sept</span><br />
+    <span class="text-primary">
+      <b>Lecture <script type="text/javascript">lectnum()</script>: </b>
+    </span><br />
+    <span class="text-info">
+      <b>Assignment: </b><a href="{{ urls.production_url }}/lab/lab3">Lab 3a</a>
+    </span><br />
    </td>
    <td>
-    <span class="text-muted">11 Sept</span>
+    <span class="text-muted">11 Sept</span><br />
+    <span class="text-danger">
+      <b>Due: </b>Lab 2
+    </span><br />
    </td>
    <td>
     <span class="text-muted">12 Sept</span>
@@ -99,16 +139,28 @@ dates are not final until announced in class.
   </tr>
   <tr>
    <td>
-    <span class="text-muted">15 Sept</span>
+    <span class="text-muted">15 Sept</span><br />
+    <span class="text-primary">
+      <b>Lecture <script type="text/javascript">lectnum()</script>: </b>
+    </span>
    </td>
    <td>
     <span class="text-muted">16 Sept</span>
    </td>
    <td>
-    <span class="text-muted">17 Sept</span>
+    <span class="text-muted">17 Sept</span><br />
+    <span class="text-primary">
+      <b>Lecture <script type="text/javascript">lectnum()</script>: </b>
+    </span><br />
+    <span class="text-info">
+      <b>Assignment: </b><a href="{{ urls.production_url }}/lab/lab3">Lab 3b</a>
+    </span><br />
    </td>
    <td>
-    <span class="text-muted">18 Sept</span>
+    <span class="text-muted">18 Sept</span><br />
+    <span class ="text-danger">
+      <b>Due: </b> Lab 3a
+    </span><br />
    </td>
    <td>
     <span class="text-muted">19 Sept</span>
@@ -117,17 +169,27 @@ dates are not final until announced in class.
   <tr>
    <td>
     <span class="text-muted">22 Sept</span><br />
-    <span class="text-muted">special day</span>
+    <span class="text-primary">
+      <b>Code review: </b>Shell, Lab 1, Lab 2</b>
+    </span>
    </td>
    <td>
     <span class="text-muted">23 Sept</span>
    </td>
    <td>
     <span class="text-muted">24 Sept</span><br />
-    <span class="text-muted">special day</span>
+    <span class="text-primary">
+      <b>Paper review: </b>
+    </span><br />
+    <span class="text-info">
+      <b>Assignment: </b> <a href="{{ urls.production_url }}/lab/lab4">Lab 4a</a>
+    </span><br />
    </td>
    <td>
-    <span class="text-muted">25 Sept</span>
+    <span class="text-muted">25 Sept</span><br />
+    <span class ="text-danger">
+      <b>Due: </b> Lab 3b
+    </span><br />
    </td>
    <td>
     <span class="text-muted">26 Sept</span>
@@ -135,16 +197,28 @@ dates are not final until announced in class.
   </tr>
   <tr>
    <td>
-    <span class="text-muted">29 Sept</span>
+    <span class="text-muted">29 Sept</span><br />
+    <span class="text-primary">
+      <b>Lecture <script type="text/javascript">lectnum()</script>: </b>
+    </span>
    </td>
    <td>
     <span class="text-muted">30 Sept</span>
    </td>
    <td>
-    <span class="text-muted">1 Oct</span>
+    <span class="text-muted">1 Oct</span><br />
+    <span class="text-primary">
+      <b>Lecture <script type="text/javascript">lectnum()</script>: </b>
+    </span><br />
+    <span class="text-info">
+      <b>Assignment: </b> <a href="{{ urls.production_url }}/lab/lab4">Lab 4b</a>
+    </span><br />
    </td>
    <td>
-    <span class="text-muted">2 Oct</span>
+    <span class="text-muted">2 Oct</span><br />
+    <span class ="text-danger">
+      <b>Due: </b> Lab 4a
+    </span><br />
    </td>
    <td>
     <span class="text-muted">3 Oct</span>
@@ -153,17 +227,27 @@ dates are not final until announced in class.
   <tr>
    <td>
     <span class="text-muted">6 Oct</span><br />
-    <span class="text-muted">special day</span>
+    <span class="text-primary">
+      <b>Code review: </b> Lab 3
+    </span>
    </td>
    <td>
     <span class="text-muted">7 Oct</span>
    </td>
    <td>
     <span class="text-muted">8 Oct</span><br />
-    <span class="text-muted">special day</span>
+    <span class="text-primary">
+      <b>Hacking day</b>
+    </span><br />
+    <span class="text-info">
+      <b>Assignment: </b> <a href="{{ urls.production_url }}/lab/lab4">Lab 4c</a>
+    </span><br />
    </td>
    <td>
-    <span class="text-muted">9 Oct</span>
+    <span class="text-muted">9 Oct</span><br />
+    <span class ="text-danger">
+      <b>Due: </b> Lab 4b
+    </span><br />
    </td>
    <td>
     <span class="text-muted">10 Oct</span>
@@ -171,16 +255,28 @@ dates are not final until announced in class.
   </tr>
   <tr>
    <td>
-    <span class="text-muted">13 Oct</span>
+    <span class="text-muted">13 Oct</span><br />
+    <span class="text-primary">
+      <b>Lecture <script type="text/javascript">lectnum()</script>: </b>
+    </span><br />
    </td>
    <td>
     <span class="text-muted">14 Oct</span>
    </td>
    <td>
-    <span class="text-muted">15 Oct</span>
+    <span class="text-muted">15 Oct</span><br />
+    <span class="text-primary">
+      <b>Lecture <script type="text/javascript">lectnum()</script>: </b>
+    </span><br />
+    <span class="text-info">
+      <b>Assignment: </b> <a href="{{ urls.production_url }}/lab/lab5">Lab 5</a>
+    </span><br />
    </td>
    <td>
-    <span class="text-muted">16 Oct</span>
+    <span class="text-muted">16 Oct</span><br />
+    <span class ="text-danger">
+      <b>Due: </b> Lab 4c
+    </span><br />
    </td>
    <td>
     <span class="text-muted">17 Oct</span>
@@ -188,7 +284,10 @@ dates are not final until announced in class.
   </tr>
   <tr>
    <td>
-    <span class="text-muted">20 Oct</span>
+    <span class="text-muted">20 Oct</span><br />
+    <span class="text-primary">
+      <b>Lecture <script type="text/javascript">lectnum()</script>: </b>
+    </span><br />
    </td>
    <td>
     <span class="text-muted">21 Oct</span>
@@ -206,16 +305,28 @@ dates are not final until announced in class.
   </tr>
   <tr>
    <td>
-    <span class="text-muted">27 Oct</span>
+    <span class="text-muted">27 Oct</span><br />
+    <span class="text-primary">
+      <b>Lecture <script type="text/javascript">lectnum()</script>: </b>
+    </span><br />
    </td>
    <td>
     <span class="text-muted">28 Oct</span>
    </td>
    <td>
-    <span class="text-muted">29 Oct</span>
+    <span class="text-muted">29 Oct</span><br />
+    <span class="text-primary">
+      <b>Lecture <script type="text/javascript">lectnum()</script>: </b>
+    </span><br />
+    <span class="text-info">
+      <b>Assignment: </b> <a href="{{ urls.production_url }}/lab/lab6">Lab 6a</a>
+    </span><br />
    </td>
    <td>
-    <span class="text-muted">30 Oct</span>
+    <span class="text-muted">30 Oct</span><br />
+    <span class ="text-danger">
+      <b>Due: </b> Lab 5
+    </span><br />
    </td>
    <td>
     <span class="text-muted">31 Oct</span>
@@ -223,16 +334,28 @@ dates are not final until announced in class.
   </tr>
    <tr>
    <td>
-    <span class="text-muted">3 Nov</span>
+    <span class="text-muted">3 Nov</span><br />
+    <span class="text-primary">
+      <b>Lecture <script type="text/javascript">lectnum()</script>: </b>
+    </span><br />
    </td>
    <td>
     <span class="text-muted">4 Nov</span>
    </td>
    <td>
-    <span class="text-muted">5 Nov</span>
+    <span class="text-muted">5 Nov</span><br />
+    <span class="text-primary">
+      <b>Lecture <script type="text/javascript">lectnum()</script>: </b>
+    </span><br />
+    <span class="text-info">
+      <b>Assignment: </b> <a href="{{ urls.production_url }}/lab/lab6">Lab 6b</a>
+    </span><br />
    </td>
    <td>
-    <span class="text-muted">6 Nov</span>
+    <span class="text-muted">6 Nov</span><br />
+    <span class ="text-danger">
+      <b>Due: </b> Lab 6a
+    </span><br />
    </td>
    <td>
     <span class="text-muted">7 Nov</span>
@@ -240,16 +363,28 @@ dates are not final until announced in class.
    </tr>
    <tr>
    <td>
-    <span class="text-muted">10 Nov</span>
+    <span class="text-muted">10 Nov</span><br />
+    <span class="text-primary">
+      <b>Lecture <script type="text/javascript">lectnum()</script>: </b>
+    </span><br />
    </td>
    <td>
     <span class="text-muted">11 Nov</span>
    </td>
    <td>
-    <span class="text-muted">12 Nov</span>
+    <span class="text-muted">12 Nov</span><br />
+    <span class="text-primary">
+      <b>Lecture <script type="text/javascript">lectnum()</script>: </b>
+    </span><br />
+    <span class="text-info">
+      <b>Assignment: </b> <a href="{{ urls.production_url }}/lab/lab7">Lab 7</a>
+    </span><br />
    </td>
    <td>
-    <span class="text-muted">13 Nov</span>
+    <span class="text-muted">13 Nov</span><br />
+    <span class ="text-danger">
+      <b>Due: </b> Lab 6b
+    </span><br />
    </td>
    <td>
     <span class="text-muted">14 Nov</span>
@@ -257,13 +392,19 @@ dates are not final until announced in class.
   </tr>
   <tr>
    <td>
-    <span class="text-muted">17 Nov</span>
+    <span class="text-muted">17 Nov</span><br />
+    <span class="text-primary">
+      <b>Lecture <script type="text/javascript">lectnum()</script>: </b>
+    </span><br />
    </td>
    <td>
     <span class="text-muted">18 Nov</span>
    </td>
    <td>
-    <span class="text-muted">19 Nov</span>
+    <span class="text-muted">19 Nov</span><br />
+    <span class="text-primary">
+      <b>Lecture <script type="text/javascript">lectnum()</script>: </b>
+    </span><br />
    </td>
    <td>
     <span class="text-muted">20 Nov</span>
@@ -294,16 +435,24 @@ dates are not final until announced in class.
   <tr>
    <td>
     <span class="text-muted">1 Dec</span><br />
-    <span class="text-muted">special day</span>
+    <span class="text-primary">
+      <b>Paper review:</b>
+    </span>
    </td>
    <td>
     <span class="text-muted">2 Dec</span>
    </td>
    <td>
-    <span class="text-muted">3 Dec</span>
+    <span class="text-muted">3 Dec</span><br />
+    <span class="text-primary">
+      <b>Lecture <script type="text/javascript">lectnum()</script>: </b>
+    </span>
    </td>
    <td>
-    <span class="text-muted">4 Dec</span>
+    <span class="text-muted">4 Dec</span><br />
+    <span class="text-danger">
+      <b>Due: </b> Lab 7
+    </span><br />
    </td>
    <td>
     <span class="text-muted">5 Dec</span>
