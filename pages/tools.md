@@ -7,7 +7,7 @@ Tools Used in CPSC422/522
 
 If you use a Zoo machine that runs Linux,
 then most of the software needed will be installed locally.
-To set the correct paths run `XXX`. 
+To set the correct paths run `source /c/cs422/env.sh`. 
 
 If you're using a personal machine running Debian/Ubuntu,
 you can install the necessary tools by running:
@@ -90,7 +90,8 @@ QEMU Emulator
 [QEMU](http://www.nongnu.org/qemu/) is a modern and fast PC emulator.
 A special version of QEMU version 1.7.0,
 as described below,
- is set up on the Zoo by executing `XXX`.
+ is set up on the Zoo. Add it to your path by executing
+`source /c/cs422/env.sh`.
 
 Unfortunately, QEMU's debugging facilities,
 while powerful, are somewhat immature,
