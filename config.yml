@@ -30,7 +30,6 @@
 
 "readings" :
   "use" : "static"
-  "exclude" : "pdf$"
   "paginator" :
     "enable" : "false"
   "rss" :
@@ -49,3 +48,9 @@
     "use" : "prettify"
     "linenums" : "false"
     "cdn" : "false"
+
+"live" :
+    "exclude" : "*"
+
+"old" :
+    "exclude" : "*"
