@@ -1,6 +1,6 @@
 ---
 title: 'Lab 1: Booting a PC'
-due_date: '2014-1-10'
+due_date: '2014-9-4'
 ---
 
 Introduction
@@ -27,7 +27,7 @@ you may find this [CS-oriented overview of Git]
 (http://eagain.net/articles/git-for-computer-scientists/)
 useful.
 
-The Git repository for the labs is in `/c/cs422/joslab.git` on the zoo
+The Git repository for the labs is in `/c/cs422/repo/joslab.git` on the zoo
 machines. However you need to set up your own repository
 to hand in each lab. To install the files,
 use the commands below with the desired
@@ -37,11 +37,8 @@ You can log into Zoo remotely via [ssh](http://zoo.cs.yale.edu/).
 ```lang-sh
 $ mkdir ~/cs422
 $ cd ~/cs422
-$ /c/cs422/setrepo.sh lab
+$ /c/cs422/apps/setrepo.sh lab
 Creating new repository /c/cs422/SUBMIT/lab/netid.git...
-.
-.
-.
 ****
 Now you can use 'git commit' and 'git push' to submit your code!
 ****
@@ -1053,6 +1050,22 @@ is located in the separate `lib` directory.
 >     How would you have to change `cprintf`
 >     or its interface so that it would still be possible
 >     to pass it a variable number of arguments?
+
+<p />
+
+> <span class="label-warning">**Challenge 1**</span>
+>
+>  Enhance the console to allow text to be printed in different colors.
+>  The traditional way to do this is to make it interpret
+>  [ANSI escape sequences](http://www.dee.ufcg.edu.br/~rrbrandt/tools/ansi.html)
+>  embedded in the text strings printed to the console,
+>  but you may use any mechanism you like.
+>  There is plenty of information on
+>  [the reference page]({{ urls.production_url }}/reference)
+>  and elsewhere on the web on programming the VGA display hardware.
+>  If you're feeling really adventurous,
+>  you could try switching the VGA hardware into a graphics mode
+>  and making the console draw text onto the graphical frame buffer.
 
 ### The Stack
 
