@@ -32,6 +32,18 @@ Template:
   function lectnum() {
     document.write(x++);
   }
+
+  var cd = new Date("August 25, 2014 12:00:00");
+  var day_in_ms = 24 * 60 * 60 * 1000;
+  var months = ["Jan", "Feb", "Mar", "Apr", "May", "June", "July", "Aug", "Sept", "Oct", "Nov", "Dec"];
+
+  function getDate() {
+    d = cd;
+    cd = new Date(cd.getTime() + day_in_ms);
+    while(cd.getDay() == 0 || cd.getDay() == 6)
+      cd = new Date(cd.getTime() + day_in_ms);
+    document.write(d.getDate() + " " + months[d.getMonth()]);
+  }
 </script>
 
 <table class="table">
@@ -47,18 +59,19 @@ Template:
  <tbody>
   <tr>
    <td>
-    <span class="text-muted">25 Aug</span>
+    <span class="text-muted"><script type="text/javascript">getDate()</script></span><br />
    </td>
    <td>
-    <span class="text-muted">26 Aug</span>
+    <span class="text-muted"><script type="text/javascript">getDate()</script></span><br />
    </td>
    <td>
-    <span class="text-muted">27 Aug</span><br />
+    <span class="text-muted"><script type="text/javascript">getDate()</script></span><br />
     <span class="text-primary">
      <b>Lecture <script type="text/javascript">lectnum()</script> </b>: Operating systems
     </span><br />
     <span class="text-success">
-     <b>Preparation: </b> Look over the xv6 book and source.
+     <b>Preparation: </b> xv6 book ch 0, <br />
+        Operating system concepts (osc) ch [1], 2
     </span><br />
     <span class="text-info">
      <b>Assignment: </b><a href="{{ urls.production_url }}/lab/shell">shell exercise</a><br />
@@ -66,118 +79,133 @@ Template:
     </span><br />
    </td>
    <td>
-    <span class="text-muted">28 Aug</span><br />
+    <span class="text-muted"><script type="text/javascript">getDate()</script></span><br />
     <span class="text-danger">
       <b>Due: </b>shell assignment
     </span><br />
    </td>
    <td>
-    <span class="text-muted">29 Aug</span><br />
+    <span class="text-muted"><script type="text/javascript">getDate()</script></span><br />
     <span class="text-primary">
-      <b>Lecture <script type="text/javascript">lectnum()</script>:</b>
+      <b>Lecture <script type="text/javascript">lectnum()</script>:</b> Booting a PC
     </span><br />
     <span class="text-success">
-      <b>Preparation: </b>
+      <b>Preparation: </b> xv6 book ch 1, app. B
     </span><br />
    </td>
   </tr>
   <tr>
    <td>
-    <span class="text-muted">1 Sept</span><br />
+    <span class="text-muted"><script type="text/javascript">getDate()</script></span><br />
     <span class="text-warning">Labor Day</span>
    </td>
    <td>
-    <span class="text-muted">2 Sept</span>
+    <span class="text-muted"><script type="text/javascript">getDate()</script></span><br />
    </td>
    <td>
-    <span class="text-muted">3 Sept</span><br />
+    <span class="text-muted"><script type="text/javascript">getDate()</script></span><br />
     <span class="text-primary">
-      <b>Lecture <script type="text/javascript">lectnum()</script>: </b>
+      <b>Lecture <script type="text/javascript">lectnum()</script>: </b> Virtual memory
+    </span><br />
+    <span class="text-success">
+      <b>Preparation: </b> xv6 book ch 2, osc ch 8
     </span><br />
     <span class="text-info">
       <b>Assignment: </b><a href="{{ urls.production_url }}/lab/lab2">Lab 2</a>
     </span><br />
    </td>
    <td>
-    <span class="text-muted">4 Sept</span><br />
+    <span class="text-muted"><script type="text/javascript">getDate()</script></span><br />
     <span class ="text-danger">
       <b>Due: </b> Lab 1
     </span><br />
    </td>
    <td>
-    <span class="text-muted">5 Sept</span>
+    <span class="text-muted"><script type="text/javascript">getDate()</script></span><br />
    </td>
   </tr>
   <tr>
    <td>
-    <span class="text-muted">8 Sept</span><br />
+    <span class="text-muted"><script type="text/javascript">getDate()</script></span><br />
     <span class="text-primary">
-      <b>Lecture <script type="text/javascript">lectnum()</script>: </b>
-    </span>
+      <b>Lecture <script type="text/javascript">lectnum()</script>: </b> Memory Management
+    </span><br />
+    <span class="text-success">
+      <b>Preparation: </b> osc ch 9
+    </span><br />
    </td>
    <td>
-    <span class="text-muted">9 Sept</span>
+    <span class="text-muted"><script type="text/javascript">getDate()</script></span><br />
    </td>
    <td>
-    <span class="text-muted">10 Sept</span><br />
+    <span class="text-muted"><script type="text/javascript">getDate()</script></span><br />
     <span class="text-primary">
-      <b>Lecture <script type="text/javascript">lectnum()</script>: </b>
+      <b>Lecture <script type="text/javascript">lectnum()</script>: </b> Traps and interrupts
+    </span><br />
+    <span class="text-success">
+      <b>Preparation: </b> xv6 book ch 3 up to drivers
     </span><br />
     <span class="text-info">
       <b>Assignment: </b><a href="{{ urls.production_url }}/lab/lab3">Lab 3a</a>
     </span><br />
    </td>
    <td>
-    <span class="text-muted">11 Sept</span><br />
+    <span class="text-muted"><script type="text/javascript">getDate()</script></span><br />
     <span class="text-danger">
       <b>Due: </b>Lab 2
     </span><br />
    </td>
    <td>
-    <span class="text-muted">12 Sept</span>
+    <span class="text-muted"><script type="text/javascript">getDate()</script></span><br />
    </td>
   </tr>
   <tr>
    <td>
-    <span class="text-muted">15 Sept</span><br />
+    <span class="text-muted"><script type="text/javascript">getDate()</script></span><br />
     <span class="text-primary">
-      <b>Lecture <script type="text/javascript">lectnum()</script>: </b>
-    </span>
+      <b>Lecture <script type="text/javascript">lectnum()</script>: </b> Processes and Threads
+    </span><br />
+    <span class="text-success">
+      <b>Preparation: </b>osc ch 3.1-3.3, ch 4
+    </span><br />
    </td>
    <td>
-    <span class="text-muted">16 Sept</span>
+    <span class="text-muted"><script type="text/javascript">getDate()</script></span><br />
    </td>
    <td>
-    <span class="text-muted">17 Sept</span><br />
+    <span class="text-muted"><script type="text/javascript">getDate()</script></span><br />
     <span class="text-primary">
-      <b>Lecture <script type="text/javascript">lectnum()</script>: </b>
+      <b>Lecture <script type="text/javascript">lectnum()</script>: </b> Synchronization
+    </span><br />
+    <span class="text-success">
+      <b>Preparation: </b>xv6 book ch 4, osc ch 5
     </span><br />
     <span class="text-info">
       <b>Assignment: </b><a href="{{ urls.production_url }}/lab/lab3">Lab 3b</a>
     </span><br />
    </td>
    <td>
-    <span class="text-muted">18 Sept</span><br />
+    <span class="text-muted"><script type="text/javascript">getDate()</script></span><br />
     <span class ="text-danger">
       <b>Due: </b> Lab 3a
     </span><br />
    </td>
    <td>
-    <span class="text-muted">19 Sept</span>
+    <span class="text-muted"><script type="text/javascript">getDate()</script></span><br />
    </td>
   </tr>
   <tr>
    <td>
-    <span class="text-muted">22 Sept</span><br />
+    <span class="text-muted"><script type="text/javascript">getDate()</script></span><br />
     <span class="text-primary">
       <b>Code review: </b>Shell, Lab 1, Lab 2</b>
     </span>
    </td>
    <td>
-    <span class="text-muted">23 Sept</span>
+    <span class="text-muted"><script type="text/javascript">getDate()</script></span><br />
    </td>
    <td>
-    <span class="text-muted">24 Sept</span><br />
+    <span class="text-muted"><script type="text/javascript">getDate()</script></span><br />
     <span class="text-primary">
       <b>Paper review: </b>
     </span><br />
@@ -186,56 +214,62 @@ Template:
     </span><br />
    </td>
    <td>
-    <span class="text-muted">25 Sept</span><br />
+    <span class="text-muted"><script type="text/javascript">getDate()</script></span><br />
     <span class ="text-danger">
       <b>Due: </b> Lab 3b
     </span><br />
    </td>
    <td>
-    <span class="text-muted">26 Sept</span>
+    <span class="text-muted"><script type="text/javascript">getDate()</script></span><br />
    </td>
   </tr>
   <tr>
    <td>
-    <span class="text-muted">29 Sept</span><br />
+    <span class="text-muted"><script type="text/javascript">getDate()</script></span><br />
     <span class="text-primary">
-      <b>Lecture <script type="text/javascript">lectnum()</script>: </b>
-    </span>
+      <b>Lecture <script type="text/javascript">lectnum()</script>: </b> Scheduling
+    </span><br />
+    <span class="text-success">
+      <b>Preparation: </b>xv6 book ch 5, osc ch 6
+    </span><br />
    </td>
    <td>
-    <span class="text-muted">30 Sept</span>
+    <span class="text-muted"><script type="text/javascript">getDate()</script></span><br />
    </td>
    <td>
-    <span class="text-muted">1 Oct</span><br />
+    <span class="text-muted"><script type="text/javascript">getDate()</script></span><br />
     <span class="text-primary">
-      <b>Lecture <script type="text/javascript">lectnum()</script>: </b>
+      <b>Lecture <script type="text/javascript">lectnum()</script>: </b> Interprocess Communication
+    </span><br />
+    <span class="text-success">
+      <b>Preparation: </b>osc ch 3.4-3.6
     </span><br />
     <span class="text-info">
       <b>Assignment: </b> <a href="{{ urls.production_url }}/lab/lab4">Lab 4b</a>
     </span><br />
    </td>
    <td>
-    <span class="text-muted">2 Oct</span><br />
+    <span class="text-muted"><script type="text/javascript">getDate()</script></span><br />
     <span class ="text-danger">
       <b>Due: </b> Lab 4a
     </span><br />
    </td>
    <td>
-    <span class="text-muted">3 Oct</span>
+    <span class="text-muted"><script type="text/javascript">getDate()</script></span><br />
    </td>
   </tr>
   <tr>
    <td>
-    <span class="text-muted">6 Oct</span><br />
+    <span class="text-muted"><script type="text/javascript">getDate()</script></span><br />
     <span class="text-primary">
       <b>Code review: </b> Lab 3
     </span>
    </td>
    <td>
-    <span class="text-muted">7 Oct</span>
+    <span class="text-muted"><script type="text/javascript">getDate()</script></span><br />
    </td>
    <td>
-    <span class="text-muted">8 Oct</span><br />
+    <span class="text-muted"><script type="text/javascript">getDate()</script></span><br />
     <span class="text-primary">
       <b>Hacking day</b>
     </span><br />
@@ -244,253 +278,267 @@ Template:
     </span><br />
    </td>
    <td>
-    <span class="text-muted">9 Oct</span><br />
+    <span class="text-muted"><script type="text/javascript">getDate()</script></span><br />
     <span class ="text-danger">
       <b>Due: </b> Lab 4b
     </span><br />
    </td>
    <td>
-    <span class="text-muted">10 Oct</span>
+    <span class="text-muted"><script type="text/javascript">getDate()</script></span><br />
    </td>
   </tr>
   <tr>
    <td>
-    <span class="text-muted">13 Oct</span><br />
+    <span class="text-muted"><script type="text/javascript">getDate()</script></span><br />
     <span class="text-primary">
-      <b>Lecture <script type="text/javascript">lectnum()</script>: </b>
+      <b>Lecture <script type="text/javascript">lectnum()</script>: </b> File systems
+    </span><br />
+    <span class="text-success">
+      <b>Preparation: </b>xv6 book ch 6, osc ch 11 and 12
     </span><br />
    </td>
    <td>
-    <span class="text-muted">14 Oct</span>
+    <span class="text-muted"><script type="text/javascript">getDate()</script></span><br />
    </td>
    <td>
-    <span class="text-muted">15 Oct</span><br />
+    <span class="text-muted"><script type="text/javascript">getDate()</script></span><br />
     <span class="text-primary">
-      <b>Lecture <script type="text/javascript">lectnum()</script>: </b>
+      <b>Lecture <script type="text/javascript">lectnum()</script>: </b> I/O and Drivers
+    </span><br />
+    <span class="text-success">
+      <b>Preparation: </b>xv6 book ch 3 Drivers, osc ch 13
     </span><br />
     <span class="text-info">
       <b>Assignment: </b> <a href="{{ urls.production_url }}/lab/lab5">Lab 5</a>
     </span><br />
    </td>
    <td>
-    <span class="text-muted">16 Oct</span><br />
+    <span class="text-muted"><script type="text/javascript">getDate()</script></span><br />
     <span class ="text-danger">
       <b>Due: </b> Lab 4c
     </span><br />
    </td>
    <td>
-    <span class="text-muted">17 Oct</span>
+    <span class="text-muted"><script type="text/javascript">getDate()</script></span><br />
    </td>
   </tr>
   <tr>
    <td>
-    <span class="text-muted">20 Oct</span><br />
+    <span class="text-muted"><script type="text/javascript">getDate()</script></span><br />
     <span class="text-primary">
-      <b>Lecture <script type="text/javascript">lectnum()</script>: </b>
+      <b>Lecture <script type="text/javascript">lectnum()</script>: </b> I/O and Drivers
+    </span><br />
+    <span class="text-success">
+      <b>Preparation: </b>xv6 book ch 3 Drivers, osc ch 13
     </span><br />
    </td>
    <td>
-    <span class="text-muted">21 Oct</span>
+    <span class="text-muted"><script type="text/javascript">getDate()</script></span><br />
    </td>
    <td>
-    <span class="text-muted">22 Oct</span><br />
+    <span class="text-muted"><script type="text/javascript">getDate()</script></span><br />
     <span class="text-warning">October recess</span>
    </td>
    <td>
-    <span class="text-muted">23 Oct</span>
+    <span class="text-muted"><script type="text/javascript">getDate()</script></span><br />
    </td>
    <td>
-    <span class="text-muted">24 Oct</span>
+    <span class="text-muted"><script type="text/javascript">getDate()</script></span><br />
    </td>
   </tr>
   <tr>
    <td>
-    <span class="text-muted">27 Oct</span><br />
-    <span class="text-primary">
-      <b>Lecture <script type="text/javascript">lectnum()</script>: </b>
+    <span class="text-muted"><script type="text/javascript">getDate()</script></span><br />
+    <span class ="text-danger">
+      <b>Midterm Exam</b>
     </span><br />
    </td>
    <td>
-    <span class="text-muted">28 Oct</span>
+    <span class="text-muted"><script type="text/javascript">getDate()</script></span><br />
    </td>
    <td>
-    <span class="text-muted">29 Oct</span><br />
+    <span class="text-muted"><script type="text/javascript">getDate()</script></span><br />
     <span class="text-primary">
-      <b>Lecture <script type="text/javascript">lectnum()</script>: </b>
+      <b>Lecture <script type="text/javascript">lectnum()</script>: </b> Networking
+    </span><br />
+    <span class="text-success">
+      <b>Preparation: </b> osc ch 17
     </span><br />
     <span class="text-info">
       <b>Assignment: </b> <a href="{{ urls.production_url }}/lab/lab6">Lab 6a</a>
     </span><br />
    </td>
    <td>
-    <span class="text-muted">30 Oct</span><br />
+    <span class="text-muted"><script type="text/javascript">getDate()</script></span><br />
     <span class ="text-danger">
       <b>Due: </b> Lab 5
     </span><br />
    </td>
    <td>
-    <span class="text-muted">31 Oct</span>
+    <span class="text-muted"><script type="text/javascript">getDate()</script></span><br />
    </td>
   </tr>
    <tr>
    <td>
-    <span class="text-muted">3 Nov</span><br />
+    <span class="text-muted"><script type="text/javascript">getDate()</script></span><br />
     <span class="text-primary">
-      <b>Lecture <script type="text/javascript">lectnum()</script>: </b>
+      <b>Lecture <script type="text/javascript">lectnum()</script>: </b> Distributed systems
     </span><br />
    </td>
    <td>
-    <span class="text-muted">4 Nov</span>
+    <span class="text-muted"><script type="text/javascript">getDate()</script></span><br />
    </td>
    <td>
-    <span class="text-muted">5 Nov</span><br />
+    <span class="text-muted"><script type="text/javascript">getDate()</script></span><br />
     <span class="text-primary">
-      <b>Lecture <script type="text/javascript">lectnum()</script>: </b>
+      <b>Lecture <script type="text/javascript">lectnum()</script>: </b> Virtualization
     </span><br />
     <span class="text-info">
       <b>Assignment: </b> <a href="{{ urls.production_url }}/lab/lab6">Lab 6b</a>
     </span><br />
    </td>
    <td>
-    <span class="text-muted">6 Nov</span><br />
+    <span class="text-muted"><script type="text/javascript">getDate()</script></span><br />
     <span class ="text-danger">
       <b>Due: </b> Lab 6a
     </span><br />
    </td>
    <td>
-    <span class="text-muted">7 Nov</span>
+    <span class="text-muted"><script type="text/javascript">getDate()</script></span><br />
    </td>
    </tr>
    <tr>
    <td>
-    <span class="text-muted">10 Nov</span><br />
+    <span class="text-muted"><script type="text/javascript">getDate()</script></span><br />
     <span class="text-primary">
-      <b>Lecture <script type="text/javascript">lectnum()</script>: </b>
+      <b>Lecture <script type="text/javascript">lectnum()</script>: </b>OS Organization
     </span><br />
    </td>
    <td>
-    <span class="text-muted">11 Nov</span>
+    <span class="text-muted"><script type="text/javascript">getDate()</script></span><br />
    </td>
    <td>
-    <span class="text-muted">12 Nov</span><br />
+    <span class="text-muted"><script type="text/javascript">getDate()</script></span><br />
     <span class="text-primary">
-      <b>Lecture <script type="text/javascript">lectnum()</script>: </b>
+      <b>Lecture <script type="text/javascript">lectnum()</script>: </b> Race conditions
     </span><br />
     <span class="text-info">
       <b>Assignment: </b> <a href="{{ urls.production_url }}/lab/lab7">Lab 7</a>
     </span><br />
    </td>
    <td>
-    <span class="text-muted">13 Nov</span><br />
+    <span class="text-muted"><script type="text/javascript">getDate()</script></span><br />
     <span class ="text-danger">
       <b>Due: </b> Lab 6b
     </span><br />
    </td>
    <td>
-    <span class="text-muted">14 Nov</span>
+    <span class="text-muted"><script type="text/javascript">getDate()</script></span><br />
    </td>
   </tr>
   <tr>
    <td>
-    <span class="text-muted">17 Nov</span><br />
+    <span class="text-muted"><script type="text/javascript">getDate()</script></span><br />
     <span class="text-primary">
       <b>Lecture <script type="text/javascript">lectnum()</script>: </b>
+        Multi-processor coordination: scalable locks
     </span><br />
    </td>
    <td>
-    <span class="text-muted">18 Nov</span>
+    <span class="text-muted"><script type="text/javascript">getDate()</script></span><br />
    </td>
    <td>
-    <span class="text-muted">19 Nov</span><br />
+    <span class="text-muted"><script type="text/javascript">getDate()</script></span><br />
     <span class="text-primary">
       <b>Lecture <script type="text/javascript">lectnum()</script>: </b>
+        Multi-processor coordination: lock free
     </span><br />
    </td>
    <td>
-    <span class="text-muted">20 Nov</span>
+    <span class="text-muted"><script type="text/javascript">getDate()</script></span><br />
    </td>
    <td>
-    <span class="text-muted">21 Nov</span>
-   </td>
-  </tr>
-  <tr>
-   <td>
-    <span class="text-muted">24 Nov</span><br />
-    <span class="text-warning">November recess</span>
-   </td>
-   <td>
-    <span class="text-muted">25 Nov</span>
-   </td>
-   <td>
-    <span class="text-muted">26 Nov</span><br />
-    <span class="text-warning">November recess</span>
-   </td>
-   <td>
-    <span class="text-muted">27 Nov</span>
-   </td>
-   <td>
-    <span class="text-muted">28 Nov</span>
+    <span class="text-muted"><script type="text/javascript">getDate()</script></span><br />
    </td>
   </tr>
   <tr>
    <td>
-    <span class="text-muted">1 Dec</span><br />
+    <span class="text-muted"><script type="text/javascript">getDate()</script></span><br />
+    <span class="text-warning">November recess</span>
+   </td>
+   <td>
+    <span class="text-muted"><script type="text/javascript">getDate()</script></span><br />
+   </td>
+   <td>
+    <span class="text-muted"><script type="text/javascript">getDate()</script></span><br />
+    <span class="text-warning">November recess</span>
+   </td>
+   <td>
+    <span class="text-muted"><script type="text/javascript">getDate()</script></span><br />
+   </td>
+   <td>
+    <span class="text-muted"><script type="text/javascript">getDate()</script></span><br />
+   </td>
+  </tr>
+  <tr>
+   <td>
+    <span class="text-muted"><script type="text/javascript">getDate()</script></span><br />
     <span class="text-primary">
       <b>Paper review:</b>
     </span>
    </td>
    <td>
-    <span class="text-muted">2 Dec</span>
+    <span class="text-muted"><script type="text/javascript">getDate()</script></span><br />
    </td>
    <td>
-    <span class="text-muted">3 Dec</span><br />
+    <span class="text-muted"><script type="text/javascript">getDate()</script></span><br />
     <span class="text-primary">
-      <b>Lecture <script type="text/javascript">lectnum()</script>: </b>
-    </span>
+      <b>Lecture <script type="text/javascript">lectnum()</script>: </b> Language / OS co-design
+    </span><br />
    </td>
    <td>
-    <span class="text-muted">4 Dec</span><br />
+    <span class="text-muted"><script type="text/javascript">getDate()</script></span><br />
     <span class="text-danger">
       <b>Due: </b> Lab 7
     </span><br />
    </td>
    <td>
-    <span class="text-muted">5 Dec</span>
+    <span class="text-muted"><script type="text/javascript">getDate()</script></span><br />
    </td>
   </tr>
   <tr>
    <td>
-    <span class="text-muted">8 Dec</span>
+    <span class="text-muted"><script type="text/javascript">getDate()</script></span><br />
    </td>
    <td>
-    <span class="text-muted">9 Dec</span>
+    <span class="text-muted"><script type="text/javascript">getDate()</script></span><br />
    </td>
    <td>
-    <span class="text-muted">10 Dec</span>
+    <span class="text-muted"><script type="text/javascript">getDate()</script></span><br />
    </td>
    <td>
-    <span class="text-muted">11 Dec</span>
+    <span class="text-muted"><script type="text/javascript">getDate()</script></span><br />
    </td>
    <td>
-    <span class="text-muted">12 Dec</span>
+    <span class="text-muted"><script type="text/javascript">getDate()</script></span><br />
    </td>
   </tr>
   <tr>
    <td>
-    <span class="text-muted">15 Dec</span>
+    <span class="text-muted"><script type="text/javascript">getDate()</script></span><br />
    </td>
    <td>
-    <span class="text-muted">16 Dec</span><br />
+    <span class="text-muted"><script type="text/javascript">getDate()</script></span><br />
     <span class="text-warning">Final exam 7 PM</span>
    </td>
    <td>
-    <span class="text-muted">17 Dec</span>
+    <span class="text-muted"><script type="text/javascript">getDate()</script></span><br />
    </td>
    <td>
-    <span class="text-muted">18 Dec</span>
+    <span class="text-muted"><script type="text/javascript">getDate()</script></span><br />
    </td>
    <td>
-    <span class="text-muted">19 Dec</span>
+    <span class="text-muted"><script type="text/javascript">getDate()</script></span><br />
    </td>
   </tr>
  </tbody>
