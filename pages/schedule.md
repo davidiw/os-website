@@ -75,7 +75,7 @@ Template:
         Operating system concepts (osc) ch [1], 2
     </span><br />
     <span class="text-info">
-     <b>Assignment: </b><a href="{{ urls.production_url }}/lab/shell">shell exercise</a><br />
+     <b>Assignment: </b><a href="{{ urls.production_url }}/lab/lab0">Lab 0</a><br />
      <b>Assignment: </b><a href="{{ urls.production_url }}/lab/lab1">Lab 1</a>
     </span><br />
    </td>
