@@ -14,79 +14,33 @@ which resides in the `boot` directory of the `lab` tree.
 Finally, the third part delves into the initial template
 for our kernel itself, named JOS, which resides in the `kernel` directory.
 
-### Software Setup
+### Getting started
 
-The files you will need for this
-and subsequent lab assignments in this course are distributed
-using the [Git](http://www.git-scm.com/) version control system.
-To learn more about Git, take a look at the
-[Git user's manual]
-(http://www.kernel.org/pub/software/scm/git/docs/user-manual.html),
-or, if you are already familiar with other version control systems,
-you may find this [CS-oriented overview of Git]
-(http://eagain.net/articles/git-for-computer-scientists/)
-useful.
-
-The Git repository for the labs is in `/c/cs422/repo/joslab.git` on the zoo
-machines. However you need to set up your own repository
-to hand in each lab. To install the files,
-use the commands below with the desired
-location.
-You can log into Zoo remotely via [ssh](http://zoo.cs.yale.edu/).
+We have provided you with a starting point for
+your kernel source code. To fetch that source,
+use Git to commit changes you've made since handing in your shell (if any),
+fetch the latest version of the course repository,
+and then create a local branch called `lab1` based on our lab1 branch,
+`origin/lab1`:
 
 ```lang-sh
-$ mkdir ~/cs422
-$ cd ~/cs422
-$ /c/cs422/apps/setrepo.sh lab
-Creating new repository /c/cs422/SUBMIT/lab/netid.git...
-****
-Now you can use 'git commit' and 'git push' to submit your code!
-****
-$ cd lab
+$ cd ~/cpsc422/lab
+$ git pull
+Already up-to-date.
+$ git checkout -b lab1 origin/lab1
+Branch lab1 set up to track remote branch refs/remotes/origin/lab1.
+Switched to a new branch "lab1"
 $
 ```
-
-If you want to clone the repository remotely onto a non-Zoo machine
-after you have configured it as above, first get the path of your
-remote directory by running, from your local directory:
-
-```lang-sh
-$ git remote show origin
-* remote origin
-  Fetch URL: /path/to/repo
-  Push  URL: /path/to/repo
-...
-$
-```
-
-Suppose it is `/path/to/repo`. You can use `git clone` on your
-own computer:
-
-```lang-sh
-$ git clone netid@node.zoo.cs.yale.edu:/path/to/repo lab
-Cloning into lab...
-$
-```
-
-Git allows you to keep track of the changes you make to the code.
-For example, if you are finished with one of the exercises,
-and want to checkpoint your progress,
-you can *commit* your changes by running:
-
-```lang-sh
-$ git commit -am 'my solution for lab1 exercise 9'
-Created commit 60d2135: my solution for lab1 exercise 9
- 1 files changed, 1 insertions(+), 0 deletions(-)
-$
-```
-
-You can keep track of your changes by using the `git diff` command.
-Running `git diff` will display the changes to your code
-since your last commit,
-and `git diff origin/lab1` will display the changes
-relative to the initial code supplied for this lab.
-Here, `origin/lab1` is the name of the git branch with the initial code
-you downloaded from our server for this assignment.
+The `git checkout -b` command shown above actually does two things:
+it first creates a local branch `lab1`
+that is based on the `origin/lab1`, the course's branch,
+and second, it changes the contents of your `lab` directory
+to reflect the files stored on the `lab1` branch.
+Git allows switching between existing branches
+using git checkout *branch-name*,
+though you should commit any outstanding changes
+on one branch before switching to a different one.
 
 We have set up the appropriate compilers and simulators for you on the Zoo.
 To use them, run `source /c/cs422/env.sh`.
@@ -108,31 +62,21 @@ Otherwise, follow the directions on the tools page.
 
 ### Hand-In Procedure
 
-When you are ready to hand in your lab, first commit your changes with
-`git commit`, and then type `git push` in the `lab` directory. The latter
-will propagate your changes to your remote repository.
+When you are ready to hand in your lab code and write-up,
+add your `answers-lab1.txt` to the Git repository,
+commit your changes, and then run `git push` in the `lab`
+directory just as you did for the shell exercise.
 
 ```lang-sh
-$ git commit -am "ready to submit my lab"
-[lab1 c2e3c8b] ready to submit my lab
- 2 files changed, 18 insertions(+), 2 deletions(-)
-
+$ git add answers-lab1.txt
+$ git commit -am "my answer to lab1"
+[lab2 a823de9] my answer to lab2
+ 4 files changed, 87 insertions(+), 10 deletions(-)
 $ git push
-Counting objects: 59, done.
-Delta compression using up to 4 threads.
-Compressing objects: 100% (55/55), done.
-Writing objects: 100% (59/59), 49.75 KiB, done.
-Total 59 (delta 3), reused 0 (delta 0)
-To /c/cs422/SUBMIT/lab/netid.git/
- * 1adca11..e3a880d  HEAD -> lab1
-$
 ```
 
-For Lab 1, you do not need to turn in answers to any of the questions below.
-(Do answer them for yourself though! They will help with the rest of the lab.)
-
 We will be grading your solutions with a grading program.
-You can run make grade to test your solutions with the grading program.
+You can run `make grade` to test your solutions with the grading program.
 
 Part 1: PC Bootstrap
 --------------------
@@ -663,16 +607,16 @@ Find out what code will run when the loop is finished,
 set a breakpoint there, and continue to that breakpoint.
 Then step through the remainder of the boot loader.
 
-Be able to answer the following questions:
-
--   At what point does the processor start executing 32-bit code?
-    What exactly causes the switch from 16- to 32-bit mode?
--   What is the *last* instruction of the boot loader executed,
-    and what is the *first* instruction of the kernel it just loaded?
--   *Where* is the first instruction of the kernel?
--   How does the boot loader decide how many sectors it must read
-    in order to fetch the entire kernel from disk?
-    Where does it find this information?
+> **Question**
+>
+> 1.  At what point does the processor start executing 32-bit code?
+>    What exactly causes the switch from 16- to 32-bit mode?
+> 2.  What is the *last* instruction of the boot loader executed,
+>    and what is the *first* instruction of the kernel it just loaded?
+> 3.  *Where* is the first instruction of the kernel?
+> 4.  How does the boot loader decide how many sectors it must read
+>    in order to fetch the entire kernel from disk?
+>    Where does it find this information?
 
 ### Loading the Kernel
 
@@ -975,8 +919,8 @@ is located in the separate `lib` directory.
 > one option is to modify monitor.c and insert one or more
 > additional commands.
 >
-> Be able to answer the following questions:
->
+> **Question**
+
 > 1.  Explain the interface between `printf.c` and `console.c`.
 >     Specifically, what function does `console.c` export?
 >     How is this function used by `printf.c`?
@@ -1113,9 +1057,13 @@ offending function.
 > To become familiar with the C calling conventions on the x86, find
 > the address of the `test_backtrace` function in
 > `obj/kern/kernel.asm`, set a breakpoint there, and examine what
-> happens each time it gets called after the kernel starts. How many
-> 32-bit words does each recursive nesting level of `test_backtrace`
-> push on the stack, and what are those words?
+> happens each time it gets called after the kernel starts.
+
+> **Question**
+
+> 1.  How many
+>   32-bit words does each recursive nesting level of `test_backtrace`
+>   push on the stack, and what are those words?
 
 The above exercise should give you the information you need to implement
 a stack backtrace function, which you should call `mon_backtrace()`. A
@@ -1257,5 +1205,9 @@ Other optimizations may cause you to see unexpected line numbers. If you
 get rid of the `-O2` from `GNUMakefile`, the backtraces may make more
 sense (but your kernel will run more slowly).
 
-**This completes the lab.** In the `lab` directory, commit your changes
-with `git commit` and type `git push` to submit your code.
+**This completes the lab.**
+Make sure you pass all of the `make grade` tests
+and don't forget to write up your answers
+to the questions in `answers-lab1.txt`.
+Commit your changes (including adding `answers-lab1.txt`)
+and type `git push` in the `lab` directory to submit your code.

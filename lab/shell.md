@@ -9,7 +9,7 @@ by implementing several features in a small shell.
 You can do this assignment on any operating system
 that supports the Unix API (a Zoo machine,
 your laptop with Linux or Mac OS, etc.).
-Please submit your shell to the XXX
+Please submit your shell using the instructions below
 at any time before the end of the shopping period (9/10).
 However, the course assumes that students
 have completed this assignment prior to the second class (8/29).
@@ -28,7 +28,106 @@ If you're not very familiar with C,
 consider this a quick check to see how familiar you are.
 Again, do feel encouraged to ask us for help if you have any questions.
 
-Download the [skeleton]({{ urls.production_url }}/files/sh.c) of the xv6 shell,
+### Software Setup
+
+The files you will need for this
+and subsequent lab assignments in this course are distributed
+using the [Git](http://www.git-scm.com/) version control system.
+To learn more about Git, take a look at the
+[Git user's manual]
+(http://www.kernel.org/pub/software/scm/git/docs/user-manual.html),
+or, if you are already familiar with other version control systems,
+you may find this [CS-oriented overview of Git]
+(http://eagain.net/articles/git-for-computer-scientists/)
+useful.
+
+The Git repository for the labs is in `/c/cs422/repo/joslab.git` on the zoo
+machines. However you need to set up your own repository
+to hand in each lab. To install the files,
+use the commands below with the desired
+location.
+You can log into Zoo remotely via [ssh](http://zoo.cs.yale.edu/).
+
+```lang-sh
+$ mkdir ~/cs422
+$ cd ~/cs422
+$ /c/cs422/apps/setrepo.sh lab
+Creating new repository /c/cs422/SUBMIT/lab/netid.git...
+****
+Now you can use 'git commit' and 'git push' to submit your code!
+****
+$ cd lab
+$
+```
+
+If you want to clone the repository remotely onto a non-Zoo machine
+after you have configured it as above, first get the path of your
+remote directory by running, from your local directory:
+
+```lang-sh
+$ git remote show origin
+* remote origin
+  Fetch URL: /path/to/repo
+  Push  URL: /path/to/repo
+...
+$
+```
+
+Suppose it is `/path/to/repo`. You can use `git clone` on your
+own computer:
+
+```lang-sh
+$ git clone netid@node.zoo.cs.yale.edu:/path/to/repo lab
+Cloning into lab...
+$
+```
+
+Git allows you to keep track of the changes you make to the code.
+For example, if you are finished with one of the exercises,
+and want to checkpoint your progress,
+you can *commit* your changes by running:
+
+```lang-sh
+$ git commit -am 'got I/O redirection working'
+Created commit 60d2135: my solution for shell exercise
+ 1 files changed, 1 insertions(+), 0 deletions(-)
+$
+```
+
+You can keep track of your changes by using the `git diff` command.
+Running `git diff` will display the changes to your code
+since your last commit,
+and `git diff origin/shell` will display the changes
+relative to the initial code supplied for this lab.
+Here, `origin/shell` is the name of the git branch with the initial code
+you downloaded from our server for this assignment.
+
+### Hand-In Procedure
+
+When you are ready to hand in your lab, first commit your changes with
+`git commit`, and then type `git push` in the `lab` directory. The latter
+will propagate your changes to your remote repository.
+
+```lang-sh
+$ git commit -am "ready to submit my shell"
+[shell e3a880d] ready to submit my shell
+ 2 files changed, 18 insertions(+), 2 deletions(-)
+
+$ git push
+Counting objects: 59, done.
+Delta compression using up to 4 threads.
+Compressing objects: 100% (55/55), done.
+Writing objects: 100% (59/59), 49.75 KiB, done.
+Total 59 (delta 3), reused 0 (delta 0)
+To /c/cs422/SUBMIT/lab/netid.git/
+ * 1adca11..e3a880d  shell -> shell
+$
+```
+
+The xv6 shell
+---------
+
+Open the skeleton of the xv6 shell in `sh.c`,
 and look it over.
 The skeleton shell contains two main parts:
 parsing shell commands and implementing them.
@@ -133,3 +232,7 @@ You might try one of the following suggestions:
  - Implement quoting of arguments
 
 All of these require making changing to the parser and the `runcmd` function.
+
+**This completes the exercise.**
+Commit your changes using `git commit` and type `git push` in the `lab`
+directory to submit your code.

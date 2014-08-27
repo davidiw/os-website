@@ -46,15 +46,6 @@ Branch lab2 set up to track remote branch refs/remotes/origin/lab2.
 Switched to a new branch "lab2"
 $
 ```
-The git checkout -b command shown above actually does two things:
-it first creates a local branch `lab2`
-that is based on the `origin/lab2`, the course's branch,
-and second, it changes the contents of your `lab` directory
-to reflect the files stored on the `lab2` branch.
-Git allows switching between existing branches
-using git checkout *branch-name*,
-though you should commit any outstanding changes
-on one branch before switching to a different one.
 
 You will now need to merge the changes you made in your `lab1` branch
 into the `lab2` branch, as follows:
@@ -111,14 +102,14 @@ as it also contains a number of definitions that will be useful for this lab.
 
 When you are ready to hand in your lab code and write-up,
 add your `answers-lab2.txt` to the Git repository,
-commit your changes, and then run `make handin`.
+commit your changes, and then run `git push`.
 
 ```lang-sh
 $ git add answers-lab2.txt
 $ git commit -am "my answer to lab2"
 [lab2 a823de9] my answer to lab2
  4 files changed, 87 insertions(+), 10 deletions(-)
-$ make handin
+$ git push
 ```
 
 As before, we will be grading your solutions with a grading program.
