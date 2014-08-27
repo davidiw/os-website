@@ -114,13 +114,13 @@ $ git commit -am "ready to submit my shell"
  2 files changed, 18 insertions(+), 2 deletions(-)
 
 $ git push
-Counting objects: 59, done.
-Delta compression using up to 4 threads.
-Compressing objects: 100% (55/55), done.
-Writing objects: 100% (59/59), 49.75 KiB, done.
-Total 59 (delta 3), reused 0 (delta 0)
-To /c/cs422/SUBMIT/lab/netid.git/
- * 1adca11..e3a880d  shell -> shell
+Counting objects: 5, done.
+Delta compression using up to 8 threads.
+Compressing objects: 100% (3/3), done.
+Writing objects: 100% (3/3), 509 bytes | 0 bytes/s, done.
+Total 3 (delta 1), reused 0 (delta 0)
+To /c/cs422/SUBMIT/lab/netid.git
+   f5ab5f6..3da3b46  shell -> shell
 $
 ```
 
@@ -215,9 +215,6 @@ Now you should be able the following command correctly:
 ```
 $ ./a.out < t.sh
 ```
-
-Don't forget to submit your solution to XXX,
-with or without challenge solutions.
 
 Challenge exercises
 -------------------
