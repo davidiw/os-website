@@ -11,4 +11,4 @@ mv config.yml.bak config.yml
 mv -f live old
 mv compiled/$base live
 rm -rf old compiled
-chmod g+w -R $PWD
+chmod g+w -R $PWD 2> /dev/null
