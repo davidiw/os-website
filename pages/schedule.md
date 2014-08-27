@@ -67,7 +67,8 @@ Template:
    <td>
     <span class="text-muted"><script type="text/javascript">getDate()</script></span><br />
     <span class="text-primary">
-     <b>Lecture <script type="text/javascript">lectnum()</script> </b>: Operating systems
+      <b>Lecture <script type="text/javascript">lectnum()</script> </b>:
+      <a href="{{ urls.production_url }}/lectures/lec1.html">Operating systems</a>
     </span><br />
     <span class="text-success">
      <b>Preparation: </b> xv6 book ch 0, <br />
@@ -87,7 +88,7 @@ Template:
    <td>
     <span class="text-muted"><script type="text/javascript">getDate()</script></span><br />
     <span class="text-primary">
-      <b>Lecture <script type="text/javascript">lectnum()</script>:</b> Booting a PC
+      <b>Lecture <script type="text/javascript">lectnum()</script>:</b> x86 architecture
     </span><br />
     <span class="text-success">
       <b>Preparation: </b> xv6 book ch 1, app. B
