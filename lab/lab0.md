@@ -127,22 +127,16 @@ $
 The xv6 shell
 ---------
 
-First, checkout the shell code from the git repository:
+If you are runnning this on a non-zoo machine,
+you probably did not run setrepo.sh.
+Therefore you need to checkout the shell branch:
+
 ```lang-sh
 $ git checkout -b shell origin/shell
 Branch shell set up to track remote branch shell from origin.
 Switched to a new branch 'shell'
 $
 ```
-The `git checkout -b` command shown above actually does two things:
-it first creates a local branch `lab1`
-that is based on the `origin/lab1`, the course's branch,
-and second, it changes the contents of your `lab` directory
-to reflect the files stored on the `lab1` branch.
-Git allows switching between existing branches
-using git checkout *branch-name*,
-though you should commit any outstanding changes
-on one branch before switching to a different one.
 
 Open the skeleton of the xv6 shell in `sh.c`,
 and look it over.
