@@ -48,12 +48,3 @@
     "use" : "prettify"
     "linenums" : "false"
     "cdn" : "false"
-
-"compiled" :
-    "exclude" : "*"
-
-"live" :
-    "exclude" : "*"
-
-"old" :
-    "exclude" : "*"
