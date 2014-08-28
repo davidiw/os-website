@@ -60,7 +60,7 @@ run the following commands as root:
 
 ```lang-sh
 $ cd binutils-2.21.1
-$ ./configure --target=i386-jos-elf --disable-nls
+$ ./configure --target=i386-jos-elf --disable-werror --disable-nls
 $ make
 $ make install
 $ cd ../gcc-4.5.1
