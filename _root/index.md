@@ -47,7 +47,7 @@ unless they are of a private or personal nature.
 
 <dl>
 <dt>27 Aug</dt>
-<dd>First lecture</dd>
+<dd>First lecture, Lab 0 and Lab 1 assigned</dd>
 </dl>
 
 </div>

@@ -1,0 +1,641 @@
+<!doctype html>
+<html lang="en">
+
+	<head>
+		<meta charset="utf-8">
+
+    <title>CS422/522 - Lecture 1 - Introduction to Operating Systems</title>
+
+    <meta name="description" content="Lecture 1 - Introduction to Operating Systems">
+    <meta name="author" content="David Wolinsky">
+
+		<meta name="apple-mobile-web-app-capable" content="yes" />
+		<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+		<link rel="stylesheet" href="reveal.js/css/reveal.min.css">
+		<link rel="stylesheet" href="reveal.js/css/theme/serif.css" id="theme">
+
+		<!-- For syntax highlighting -->
+		<link rel="stylesheet" href="reveal.js/lib/css/zenburn.css">
+
+		<!-- If the query includes 'print-pdf', include the PDF print sheet -->
+		<script>
+			if( window.location.search.match( /print-pdf/gi ) ) {
+				var link = document.createElement( 'link' );
+				link.rel = 'stylesheet';
+				link.type = 'text/css';
+				link.href = 'reveal.js/css/print/pdf.css';
+				document.getElementsByTagName( 'head' )[0].appendChild( link );
+			}
+		</script>
+
+		<!--[if lt IE 9]>
+		<script src="reveal.js/lib/js/html5shiv.js"></script>
+		<![endif]-->
+	</head>
+
+	<body>
+
+		<div class="reveal">
+
+			<!-- Any section element inside of this container is displayed as a slide -->
+			<div class="slides">
+				<section>
+          <h2>Introduction to Operating Systems</h2>
+          <h3>CS422/522 Lecture 1</h3>
+          <h3>27 August 2014</h3>
+          <h4>Last updated: 27 August 2014</h4>
+				</section>
+
+        <section>
+          <h2>Outline</h2>
+          <ol>
+            <li>Course Layout</li>
+            <li style="opacity: 0.4;">Introduction to Operating Systems</li>
+            <li style="opacity: 0.4;">The Shell</li>
+            <li style="opacity: 0.4;">Assignments: Shell and Booting a PC</li>
+            <li style="opacity: 0.4;">Next Time</li>
+          </ol>
+        </section>
+
+        <section>
+          <h2>Organization</h2>
+          <ul>
+            <li>Based on MIT's 6.828 "Operating Systems Engineering"</li>
+            <li>Lecturer: David Wolinsky <br /> office hours: AKW 403 - MW 2:30-4:00PM</li>
+            <li>TF: Danny Jackowitz <br /> office hours: AKW 402 - R 2:00-3:30PM</li>
+            <li>Lectures: MW 1:00-2:15PM</li>
+            <li>Main site: <a href="http://zoo.cs.yale.edu/classes/cs422/">zoo.cs.yale.edu/classes/cs422</a></li>
+            <li>Piazza: <a href="https://piazza.com/class#fall2014/cpsc422522">https://piazza.com/class#fall2014/cpsc422522</a></li>
+          </ul>
+        </section>
+
+        <section>
+          <section>
+            <h2>Course Objectives</h2>
+            <ul>
+              <li>Understand operating systems</li>
+              <li>Lectures: xv6</li>
+              <li>Build your own OS: JOS</li>
+              <li>Time commitment: approximately 10 hours a week</li>
+            </ul>
+          </section>
+
+          <section>
+            <h2>xv6</h2>
+            <ul>
+              <li>Monolithic kernel</li>
+              <li>Based on Unix V6</li>
+              <li>Complete / Operational OS</li>
+            </ul>
+          </section>
+
+          <section>
+            <h2>JOS</h2>
+            <ul>
+              <li>Exokernel</li>
+              <li>Skeleton code provided for you</li>
+              <li>Goal: functional OS by end of semester</li>
+            </ul>
+          </section>
+        </section>
+
+        <section>
+          <h2>Course Layout</h2>
+          <ul>
+            <li>Attendance quiz - 10% grade</li>
+            <li>8 labs / homeworks - 60%</li>
+            <ul>
+              <li>Introduction lab: shell code</li>
+              <li>6 labs building JOS</li>
+              <li>Final lab: do something fun</li>
+              <li>Late policy: lose 10% per day for up to 3 days</li>
+            </ul>
+            <li>Two exams - 30%</li>
+          </ul>
+        </section>
+
+        <section>
+          <h2>Prerequisites</h2>
+          <ul>
+            <li>Expected experience</li>
+            <ul>
+              <li>Patience and determination</li>
+              <li>C (C++) especially pointers</li>
+              <li>Zoo machines / SSH</li>
+              <li>Command-line interfaces</li>
+            </ul>
+            <li>Beneficial experience</li>
+            <ul>
+              <li>Large code bases</li>
+              <li>Familiarity with system calls</li>
+            </ul>
+          </ul>
+        </section>
+
+        <section>
+          <h2>Expectations for Students</h2>
+          <p> Students' submissions should be their own.  </p>
+          <p> Freely discuss ideas before deadlines.  </p>
+          <p> Freely discuss solutions after deadlines.  </p>
+          <p> Projects should be started early.  </p>
+        </section>
+
+        <section>
+          <h2>Course Topics</h2>
+            <ol>
+              <li>Hardware / Software Boundary</li>
+              <li>Memory Management</li>
+              <li>Processes</li>
+              <li>System calls / Interrupts</li>
+              <li>Multitasking / IPC</li>
+              <li>Multiprocessors</li>
+              <li>Networking</li>
+              <li>Modern OS Facets</li>
+            </ol>
+        </section>
+
+        <section>
+          <h2>Outline</h2>
+          <ol>
+            <li style="opacity: 0.4;">Course Layout</li>
+            <li>Introduction to Operating Systems</li>
+            <li style="opacity: 0.4;">The Shell</li>
+            <li style="opacity: 0.4;">Assignments: Shell and Booting a PC</li>
+            <li style="opacity: 0.4;">Next Time</li>
+          </ol>
+        </section>
+
+        <section>
+          <h2>What is an OS</h2>
+          <ul>
+            <li>Layers of abstractions</li>
+            <ul>
+              <li>User has common interface regardless of hardware</li>
+              <li>Core OS is written to be portable</li>
+              <li>Shim layer of device specific code</li>
+            </ul>
+            <li>Application (User) multiplexer</li>
+            <ul>
+              <li>Isolation / protection</li>
+              <li>Communication across</li>
+            </ul>
+            <li>Examples: Linux, Android, Windows, Mac OS X, iOS</li>
+          </ul>
+        </section>
+
+        <section>
+          <section>
+            <h3>Structure of an Operating System</h3>
+            A Monolithic Kernel (Windows, Linux, xv6)
+            <img src="images/os-structure.png" />
+          </section>
+
+          <section>
+            <h3>An Example: Diablo 3</h3>
+            <div style="width: 100%">
+              <div style="width: 50%; float: left;">
+                <ol class="fragment">
+                  <li>User clicks mouse (hardware)</li>
+                  <li>Triggers hardware interrupt (hardware specific code)</li>
+                  <li>Passes to a mouse driver</li>
+                  <li>Passes through I/O channel to the game</li>
+                  <li>Game registers for keyboard / mouse events</li>
+                </ol>
+              </div>
+              <div style="width: 50%; float: left;">
+                <img style="height: 100px;" src="images/d3.png" /> <br />
+                <img src="images/os-structure.png" />
+              </div>
+            </div>
+          </section>
+
+          <section>
+            <h3>An Example: Diablo 3</h3>
+            <div style="width: 100%">
+              <div style="width: 50%; float: left;">
+                <ol class="fragment">
+                  <li>Game does processing and updates player position</li>
+                  <li>Sends graphics update through library</li>
+                  <li>Library sends call to driver via system call</li>
+                  <li>Driver speaks to hardware to update display</li>
+                </ol>
+              </div>
+              <div style="width: 50%; float: left;">
+                <img style="height: 100px;" src="images/d3.png" /> <br />
+                <img src="images/os-structure.png" />
+              </div>
+            </div>
+          </section>
+
+          <section>
+            <h3>Another Example: Facebook</h3>
+            <div style="width: 100%">
+              <div style="width: 50%; float: left;">
+                <ol class="fragment">
+                  <li>User enters facebook.com into browser</li>
+                  <li>Browser opens a socket to Facebook through system call</li>
+                  <li>Network stack begins TCP connection</li>
+                  <li>Driver pushes TCP data to NIC</li>
+                  <li>NIC converts to electrical signals</li>
+                </ol>
+              </div>
+              <div style="width: 50%; float: left;">
+                <img style="height: 100px;" src="images/fb.png" /> <br />
+                <img src="images/os-structure.png" />
+              </div>
+            </div>
+          </section>
+
+        </section>
+
+        <section>
+          <h3>OS Abstractions / System Calls</h3>
+          <ul>
+            <li>fd = open("out", 1)</li>
+            <li>write(fd, "hello\n", 6)</li>
+            <li>pid = fork()</li>
+          </ul>
+          <div class="fragment">These, relatively, simple interfaces are inherently hard to design</div>
+        </section>
+
+        <section>
+          <h2>Benefits of this class</h2>
+          <ul>
+            <li>Learn about hardware / software interactions</li>
+            <li>High demand at big tech companies</li>
+            <li>Necessity for systems research in graduate school</li>
+            <li>Solve more challenging computer issues for relatives</li>
+          </ul>
+        </section>
+          
+        <section>
+          <h2>Outline</h2>
+          <ol>
+            <li style="opacity: 0.4;">Course Layout</li>
+            <li style="opacity: 0.4;">Introduction to Operating Systems</li>
+            <li>The Shell</li>
+            <li style="opacity: 0.4;">Assignments: Shell and Booting a PC</li>
+            <li style="opacity: 0.4;">Next Time</li>
+          </ol>
+        </section>
+
+        <section>
+          <h2>The Shell</h2>
+          <ul>
+            <li>Command-line user interface</li>
+            <li>Example: Zoo uses bash</li>
+            <li>Programming language: shell scripts</li>
+            <li>In command-line world: fundamental user session</li>
+            <li>Offers convenient access to O/S and Hardware interaction</li>
+          </ul>
+
+        </section>
+        <section>
+          <h2>Basic Shell Structure</h2>
+          <pre>
+while (1) {
+  write(1, "$ ", 2);
+  readcmd (cmd, argc, argv); // parse user input
+  if ((pid = fork()) == 0) // child
+    exec(cmd, args);
+  else if (pid > 0) // parent
+    wait(0);
+  else
+    perror("fork");
+}
+          </pre>
+          <div class="fragment">
+          Lot's of system calls: <br />
+          write, read, fork, exec, wait
+          </div>
+        </section>
+        <section>
+          <h2>Process Interaction</h2>
+          <ul>
+            <li>fork</li>
+            <ul>
+              <li>Creates a new process</li>
+              <li>Child gets a copy of process state: user memory, kernel state</li>
+              <li>Child gets a different, unique PID</li>
+              <li>Parent learns child's PID</li>
+            </ul>
+            <div class="fragment">
+            <li>exec</li>
+            <ul>
+              <li>Replaces user memory from file</li>
+              <li>Retains same PID and most other kernel state</li>
+            </ul>
+            </div>
+            <div class="fragment">
+            <li>wait</li>
+            <ul>
+              <li>Waits for a child to exit</li>
+              <li>Zombie process -- child dies before parent calls wait</li>
+              <li>Returns immediately if child already exited, zombie leaves</li>
+            </ul>
+            </div>
+          </ul>
+
+        </section>
+        <section>
+          <h2>Fork / Exec</h2>
+          <p>The shell or UI always forks itself an execs a new application. </p>
+          <p>This may seem wasteful, in lab 4b, we will learn how to mitigate this overhead. </p>
+          <p>In 4c, we'll see how sharing common memory can be beneficial. </p>
+          <p>Later in this lecture, we'll see why separating fork and exec is beneficial</p>
+        </section>
+
+        <section>
+          <h2>System Call Return Value</h2>
+          <ul>
+            <li>0 or greater upon success</li>
+            <li>error -1 or some other value &lt 0</li>
+            <li>In the latter, that is the error code</li>
+            <li>Use perror() to print a descriptive error message</li>
+          </ul>
+        </section>
+
+        <section>
+          <h2>Input / Output (I/O)</h2>
+          <ul>
+            <li>Each open file is represented as a file descriptor: <br /> fd = open("out", 1);</li>
+            <li>Kernel stores fd for each process</li>
+            <li>open registers the file with the lowest available fd</li>
+            <li>close frees a fd</li>
+            <li>a child inherits open fds from parent</li>
+            <li>exec retains fds</li>
+          </ul>
+        </section>
+
+        <section>
+          <h2>Terminal I/O</h2>
+          <ul>
+            <li>Terminal has standard in and out as well as error</li>
+            <ul>
+              <li>fd(standard in) = 0, keyboard</li>
+              <li>fd(standard out) = 1, terminal</li>
+              <li>fd(standard error) = 2, terminal</li>
+            </ul>
+            <div class="fragment">
+            <li>Replace standard out: <br />
+              close(1); <br />
+              fd = open(...); <br />
+              assert(fd == 1);</li>
+            </div>
+          </ul>
+        </section>
+
+        <section>
+          <h2>Redirection</h2>
+          <ul>
+            <li>Write current directories contents to the file named out <br />
+              ls &gt out</li>
+            <div class="fragment">
+            <li>After fork, before exec <br />
+              close(1);<br />
+              creat("out", 0666); // fd == 1</li>
+            </div>
+          </ul>
+        </section>
+
+        <section>
+          <section>
+            <h2>Pipes</h2>
+            Consider the set of operations on the data in "in":
+            <ul>
+              $ sort &lt in &gt out <br />
+              $ uniq out &gt out <br />
+              $ wc out2 <br />
+              $ rm out out2 <br />
+            </ul>
+            <div class="fragment">
+            This can be done more concisely using pipes: <br />
+            $ sort &lt in | uniq | wc
+            </div>
+          </section>
+
+          <section>
+          <h2>Pipes in C</h2>
+          <pre>
+int fds[2];
+char buf[512];
+int n;
+
+pipe(fds);
+write(fds[1], "hello", 5);
+n = read(fds[0], buf, sizeof(buf));
+// buf[] now contains 'h', 'e', 'l', 'l', 'o'
+            </pre>
+          </section>
+          <section>
+            <h2>Fun with Pipes</h2>
+            <pre>
+int fds[2];
+char buf[512];
+int n, pid;
+
+pipe(fds);
+pid = fork();
+if(pid > 0){
+  write(fds[1], "hello", 5);
+} else {
+  n = read(fds[0], buf, sizeof(buf));
+  exit(0);
+}
+            </pre>
+          </section>
+        </section>
+
+        <section>
+          <h2>Background Jobs</h2>
+          Use &amp: $ sleep &amp 10
+          <pre>
+while (1) {
+  write(1, "$ ", 2);
+  readcmd (cmd, argc, argv); // parse user input
+  if ((pid = fork()) == 0) // child
+    exec(cmd, argv, argc);
+  else if (pid > 0) // parent
+    if (argv[argc - 1][0] != '&') // wait unless sent to bg
+      wait(0);
+  else
+    perror("fork");
+}
+          </pre>
+        </section>
+
+        <section>
+          <section>
+            <h2>Man Pages</h2>
+            <ul>
+              <li>When all else fails</li>
+              <li>Better to use local man pages not Internet</li>
+              <li>Usage: man $SECTION page</li>
+              <div class="fragment">
+              <li>Sections:</li>
+              <pre>
+1   Executable programs or shell commands
+2   System calls (functions provided by the kernel)
+3   Library calls (functions within program libraries)
+4   Special files (usually found in /dev)
+5   File formats and conventions eg /etc/passwd
+6   Games
+7   Miscellaneous (including macro packages and conventions), e.g. man(7), groff(7)
+8   System administration commands (usually only for root)
+9   Kernel routines [Non standard]
+              </pre>
+              </div>
+              <div class="fragment">
+              <li>You will make most use of 2 and 3</li>
+              </div>
+            </ul>
+          </section>
+          <section>
+            <h2>man 2 fork</h2>
+            <pre>
+FORK(2)                                       Linux Programmer's Manual                                       FORK(2)
+
+NAME
+       fork - create a child process
+
+SYNOPSIS
+       #include &ltunistd.h&gt
+
+       pid_t fork(void);
+
+DESCRIPTION
+       fork()  creates  a new process by duplicating the calling process.
+       The new process, referred to as the child, is an exact duplicate of
+       the calling process, referred to as the parent, except for the
+       following points:
+...
+RETURN VALUE
+       On success, the PID of the child process is returned in the parent,
+       and 0 is returned in the child.  On  failure, -1 is returned in the
+       parent, no child process is created, and errno is set appropriately.
+...
+EXAMPLE
+...
+            </pre>
+          </section>
+        </section>
+
+        <section>
+          <h2>Graphical User Interfaces</h2>
+          <ul>
+            <li>Emphasizes user-friendliness</li>
+            <li>Rarely require intimate knowledge of system</li>
+            <li>More difficult for automated administration</li>
+            <li class="fragment">This class will not investigate GUIs,
+              <emph>though</emph> you are encouraged to consider them
+              as an option for your final lab.</li>
+          </ul>
+        </section>
+
+        <section>
+          <h2>Outline</h2>
+          <ol>
+            <li style="opacity: 0.4;">Course Layout</li>
+            <li style="opacity: 0.4;">Introduction to Operating Systems</li>
+            <li style="opacity: 0.4;">The Shell</li>
+            <li>Assignments: Shell and Booting a PC</li>
+          </ol>
+        </section>
+
+        <section>
+          <h2>Lab Overview</h2>
+          <ul>
+            <li>Put into practice course material</li>
+            <li>Skeleton and instructions provided</li>
+            <li>Review instructions, complete code</li>
+            <li>test: make grade</li>
+            <li>Requires: Unix and ELF compatible environment</li>
+            <ul>
+              <li>The zoo machines</li>
+              <li>Linux, Unix, BSD</li>
+              <li>Mac OS X requires installation of cross compiler</li>
+            </ul>
+          </ul>
+        </section>
+
+        <section>
+          <h2>Lab 0: Shell code</h2>
+          <ul>
+            <li>"Due:" 8/28 @ 11:59 PM</li>
+            <li>Officially due: 9/3 @ 11:59 PM</li>
+            <li>Test knowledge of C, system calls, pointers, and git</li>
+            <li>If you can handle this, you'll be fine in the class</li>
+          </ul>
+        </section>
+
+        <section>
+          <h2>Lab 1: Booting a PC</h2>
+          <ul>
+            <li>Due: 9/4 @ 11:59 PM</li>
+            <li>Experience with assembly, bootstrapping, memory, and debugging interfaces</li>
+            <li>Each lab builds upon the previous, critical that you complete each lab</li>
+            <li>Start early and ask questions on Piazza and during office hours</li>
+          </ul>
+        </section>
+
+        <section>
+          <h2>Outline</h2>
+          <ol>
+            <li style="opacity: 0.4;">Course Layout</li>
+            <li style="opacity: 0.4;">Introduction to Operating Systems</li>
+            <li style="opacity: 0.4;">The Shell</li>
+            <li style="opacity: 0.4;">Assignments: Shell and Booting a PC</li>
+            <li>Next Time</li>
+          </ol>
+        </section>
+
+        <section>
+          <h2>Next Time</h2>
+          Friday 1:00PM <br />
+          x86 architecture and assembly<br />
+          BIOS and UEFI<br />
+        </section>
+
+			</div>
+
+		</div>
+
+		<script src="reveal.js/lib/js/head.min.js"></script>
+		<script src="reveal.js/js/reveal.min.js"></script>
+
+		<script>
+
+			// Full list of configuration options available here:
+			// https://github.com/hakimel/reveal.js#configuration
+			Reveal.initialize({
+				controls: true,
+				progress: true,
+				history: true,
+				center: true,
+        slideNumber: true,
+
+				theme: Reveal.getQueryHash().theme, // available themes are in /css/theme
+				transition: Reveal.getQueryHash().transition || 'default', // default/cube/page/concave/zoom/linear/fade/none
+
+				// Parallax scrolling
+				// parallaxBackgroundImage: 'https://s3.amazonaws.com/hakim-static/reveal-js/reveal-parallax-1.jpg',
+				// parallaxBackgroundSize: '2100px 900px',
+
+				// Optional libraries used to extend on reveal.js
+				dependencies: [
+					{ src: 'reveal.js/lib/js/classList.js', condition: function() { return !document.body.classList; } },
+					{ src: 'reveal.js/plugin/markdown/marked.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+					{ src: 'reveal.js/plugin/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+					{ src: 'reveal.js/plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
+					{ src: 'reveal.js/plugin/zoom-js/zoom.js', async: true, condition: function() { return !!document.body.classList; } },
+					{ src: 'reveal.js/plugin/notes/notes.js', async: true, condition: function() { return !!document.body.classList; } }
+				]
+			});
+
+		</script>
+
+	</body>
+</html>

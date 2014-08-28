@@ -67,14 +67,15 @@ Template:
    <td>
     <span class="text-muted"><script type="text/javascript">getDate()</script></span><br />
     <span class="text-primary">
-     <b>Lecture <script type="text/javascript">lectnum()</script> </b>: Operating systems
+      <b>Lecture <script type="text/javascript">lectnum()</script> </b>:
+      <a href="{{ urls.production_url }}/lectures/lec1.html">Operating systems</a>
     </span><br />
     <span class="text-success">
      <b>Preparation: </b> xv6 book ch 0, <br />
         Operating system concepts (osc) ch [1], 2
     </span><br />
     <span class="text-info">
-     <b>Assignment: </b><a href="{{ urls.production_url }}/lab/shell">shell exercise</a><br />
+     <b>Assignment: </b><a href="{{ urls.production_url }}/lab/lab0">Lab 0</a><br />
      <b>Assignment: </b><a href="{{ urls.production_url }}/lab/lab1">Lab 1</a>
     </span><br />
    </td>
@@ -87,7 +88,7 @@ Template:
    <td>
     <span class="text-muted"><script type="text/javascript">getDate()</script></span><br />
     <span class="text-primary">
-      <b>Lecture <script type="text/javascript">lectnum()</script>:</b> Booting a PC
+      <b>Lecture <script type="text/javascript">lectnum()</script>:</b> x86 architecture
     </span><br />
     <span class="text-success">
       <b>Preparation: </b> xv6 book ch 1, app. B
