@@ -77,7 +77,7 @@ Suppose it is `/path/to/repo`. You can use `git clone` on your
 own computer:
 
 ```lang-sh
-$ git clone netid@node.zoo.cs.yale.edu:/path/to/repo lab
+$ git clone -b shell netid@node.zoo.cs.yale.edu:/path/to/repo lab
 Cloning into lab...
 $
 ```
