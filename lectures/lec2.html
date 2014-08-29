@@ -1,0 +1,682 @@
+<!doctype html>
+<html lang="en">
+
+	<head>
+		<meta charset="utf-8">
+
+    <title>CS422/522 - Lecture 2 - Introduction to x86</title>
+
+    <meta name="description" content="Lecture 1 - Introduction to Operating Systems">
+    <meta name="author" content="David Wolinsky">
+
+		<meta name="apple-mobile-web-app-capable" content="yes" />
+		<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+		<link rel="stylesheet" href="reveal.js/css/reveal.min.css">
+		<link rel="stylesheet" href="reveal.js/css/theme/serif.css" id="theme">
+
+		<!-- For syntax highlighting -->
+		<link rel="stylesheet" href="reveal.js/lib/css/zenburn.css">
+
+		<!-- If the query includes 'print-pdf', include the PDF print sheet -->
+		<script>
+			if( window.location.search.match( /print-pdf/gi ) ) {
+				var link = document.createElement( 'link' );
+				link.rel = 'stylesheet';
+				link.type = 'text/css';
+				link.href = 'reveal.js/css/print/pdf.css';
+				document.getElementsByTagName( 'head' )[0].appendChild( link );
+			}
+		</script>
+
+		<!--[if lt IE 9]>
+		<script src="reveal.js/lib/js/html5shiv.js"></script>
+		<![endif]-->
+	</head>
+
+	<body>
+
+		<div class="reveal">
+
+			<!-- Any section element inside of this container is displayed as a slide -->
+			<div class="slides">
+				<section>
+          <h2>Introduction to x86</h2>
+          <h3>CS422/522 Lecture 2</h3>
+          <h3>29 August 2014</h3>
+          <h4>Last updated: 29 August 2014</h4>
+				</section>
+
+        <section>
+          <h2>Recap from Wednesday</h2>
+          <ul>
+            <li>Shell code -- Done</li>
+            <li>Started poking at Lab 1</li>
+            <li><a href="http://zoo.cs.yale.edu/classes/cs422/2014fa/xv6/">xv6, required</a></li>
+            <li><a href="http://www.amazon.com/Operating-System-Concepts-Abraham-Silberschatz/dp/1118063333">optional textbook</a></li>
+            <li><a href="http://zoo.cs.yale.edu/classes/cs422/2014fa/">The website</a></li>
+          </ul>
+        </section>
+
+        <section>
+          <h2>Outline</h2>
+          <ol>
+            <li>x86 Architecture</li>
+            <li style="opacity: 0.4;">The Boot Process</li>
+            <li style="opacity: 0.4;">Protection</li>
+            <li style="opacity: 0.4;">Wrap-Up</li>
+          </ol>
+        </section>
+
+        <section>
+          <section>
+            <h2>Defining a PC</h2>
+            <div style="width: 100%">
+              <div style="width: 50%; float: left;">
+                Outside: <br />
+                <ul>
+                  <li>A box</li>
+                  <li>monitor</li>
+                  <li>keyboard</li>
+                  <li>mouse</li>
+                  <li>Other I/O devices</li>
+                </ul>
+              </div>
+              <div style="width: 50%; float: left;">
+                <img src="images/pc.png" />
+              </div>
+            </div>
+          </section>
+          <section>
+            <h2>Defining a PC</h2>
+            <div style="width: 100%">
+              <div style="width: 50%; float: left;">
+                Inside that box:
+                <ul>
+                  <li>CPU</li>
+                  <li>Motherboard</li>
+                  <li>Memory</li>
+                  <li>Disk drives</li>
+                  <li>I/O cards: Network, Video</li>
+                  <li>Power supply</li>
+                </ul>
+              </div>
+              <div style="width: 50%; float: left;">
+                <img src="images/pc-guts.jpg" />
+              </div>
+            </div>
+          </section>
+        </section>
+        <section>
+          <h2>Abstract Model</h2>
+          <img src="images/cpu.png" /><br />
+          <ul>
+            <li>I/O: Communicating data to and from devices</li>
+            <li>CPU: Logic for performing computation</li>
+            <li>Memory: Storage</li>
+          </ul>
+        </section>
+        <section>
+          <h2>CPU / Memory Interaction</h2>
+          <img src="images/cpu-memory.png" /><br />
+          <ul>
+            <li>Memory stores instructions and data</li>
+            <li>CPU interprets instructions</li>
+          </ul>
+        </section>
+        <section>
+          <h2>x86 Implementation</h2>
+          <img src="images/x86-eip.png" /><br />
+          <ul>
+            <li>EIP points to next instruction</li>
+            <li>Incremented after each instruction</li>
+            <li>x86 instructions are not fixed length</li>
+            <li>EIP modified by CALL, RET, JMP, and conditional JMP</li>
+          </ul>
+        </section>
+        <section>
+          <section>
+            <h2>General Purpose Registers (GPR)</h2>
+            <img src="images/general-regs.png" /><br />
+            <ul>
+              <li>Temporary registers</li>
+              <li>Contents may be changed by instructions</li>
+              <li>Contents not changed by interrupts / exceptions / traps</li>
+              <li>EDI/ESI used by string ops but also as GPR</li>
+            </ul>
+          </section>
+          <section>
+            <h2>Using GPRs</h2>
+            <pre>
+mov $0x10, %eax <span class="fragment"># eax = 0x10</span>
+add $0x10, %eax <span class="fragment"># eax = 0x20</span>
+sub $0x5, %eax <span class="fragment"># eax = 0x1b</span>
+mov $0x2, %ebx
+mul %ebx <span class="fragment"># eax = 0x36</span>
+            </pre>
+          </section>
+        </section>
+        <section>
+          <section>
+            <h2>Segmentation Registers</h2>
+            <ul>
+              <li>8086 registers 16-bit w/ 20-bit bus addresses</li>
+              <li>Solution: segment registers:</li>
+              <ul>
+                <li>CS: code segment, EIP</li>
+                <li>SS: stack segment, ESP and EBP</li>
+                <li>DS: data segment, register mem ops</li>
+                <li>ES: string segment, string ops</li>
+              </ul>
+              <div class="fragment">
+              <li>Linear address computation:</li>
+              <ul>
+                <li>EIP =&gt CS:EIP = 0x8000:0x1000 = 0x81000</li>
+                <li>ESP =&gt SS:ESP = 0xF800:0x1000 = 0xF9000</li>
+                <li>(EAX) =&gt DS:EAX = 0xC123:0x1000 = 0xC2230</li>
+              </ul>
+              </div>
+            </ul>
+          </section>
+          <section>
+            <h2>Even More Segmentation</h2>
+            <ul>
+              <li>In protected mode:</li>
+              <ul>
+                <li>Segment registers point to descriptors</li>
+                <li>Descriptors contain offsets, sizes, and permissions</li>
+                <li class="fragment">We'll talk about this a little bit more later</li>
+              </ul>
+              <li class="fragment">In 32-bit and 64-bit mode, we don't need them. <br />
+                <div class="fragment">Why?</div>
+              <li class="fragment">Let's disable them! (shown later)</li>
+            </ul>
+          </section>
+          <section>
+            <h2>x86 Memory Operations</h2>
+            <pre>
+mov $4, %eax <span class="fragment"># eax = 4</span>
+mov $4, (%eax) <span class="fragment"># phys addr 4 = *4 = 4</span>
+mov $8, -4(%eax) <span class="fragment"># *0 = 8</span>
+mov (%eax), %ebx <span class="fragment"># ebx = 4</span>
+mov (%eax), (%ebx) <span class="fragment"># cannot do memory to memory</span>
+mov -4(%eax, %ebx, 1), %ecx <span class="fragment"># ecx = *(eax - 4 + (ebx * 1)) = *4 = 4</span>
+mov $0x10, 4 <span class="fragment"># *4 = 0x10</span>
+          </section>
+        </section>
+        <section>
+          <section>
+            <h2>The Stack</h2>
+            <ul>
+              <li>Additional (temporary) storage</li>
+              <li>Stack registers -- 32-bits long</li>
+              <li>ESP - stack pointer</li>
+              <li>EBP - base pointer</li>
+            </ul>
+          </section>
+          <section>
+            <h2>Using the Stack</h2>
+            <pre>
+_start: # esp = 0xffffdad0
+push $0x50 <span class="fragment"># esp = 0xffffdacc *= 0x50</span>
+mov $0x10, %eax
+push %eax <span class="fragment"># esp = 0xffffdac8 *= 0x10</span>
+pop %ebx <span class="fragment"># esp = 0xffffdacc, ebx = 0x10</span>
+push $0x422 <span class="fragment"># esp = 0xffffdac8 *= 0x422</span>
+sub $4, %esp <span class="fragment"># esp = 0xffffdac4 *= ?</span>
+mov %eax, (%esp) <span class="fragment"># esp = 0xffffdac4 *= 0x10</span>
+            </pre>
+          </section>
+          <section>
+            <h2>Using EBP</h2>
+            Commonly used by functions for backtrace:
+            <pre>
+push %ebp
+mov %esp, %ebp
+            </pre>
+          </section>
+          <section>
+            <h2>GCC calling convention</h2>
+            example: cprintf(char *fmt, ...)
+            <pre>
+            +------------+
+            | arg 2      |
+            +------------+
+            | arg 1      |
+            +------------+
+            | ret %eip   |
+            +------------+
+            | saved %ebp |
+  %ebp-&gt    +------------+
+            |            |
+            |            |
+            |   local    |
+            | variables  |
+            |            |
+            |            |
+  %esp-&gt    +------------+
+            </pre>
+          </section>
+        </section>
+        <section>
+          <section>
+            <h2>(E)FLAGS Register</h2>
+            <img src="images/eflags.png" /><br />
+            <div class="fragment">Conditional jumps!</div>
+          </section>
+          </section>
+          <section>
+            <h2>Using (E)FLAGS Register</h2>
+            <pre>
+mov $5, %ecx
+mov $5, %edx
+cmp %ecx, %edx # ZF = 1
+je equal
+...
+equal:
+...
+            </pre>
+            Lot's of conditional jumps:
+            <a href="http://en.wikibooks.org/wiki/X86_Assembly/Control_Flow">
+              en.wikibooks.org/wiki/X86_Assembly/Control_Flow
+            </a>
+          </section>
+        </section>
+        <section>
+          <h2>What's Remaining?</h2>
+          <ul>
+            <li>I/O interaction</li>
+            <li>x86 protected mode</li>
+            <li>x86 boot process</li>
+          </ul> <br />
+          <div class="fragment">Let's take a look at xv6!</div>
+        </section>
+
+        <section>
+          <h2>Outline</h2>
+          <ol>
+            <li style="opacity: 0.4;">x86 Architecture</li>
+            <li>The Boot Process</li>
+            <li style="opacity: 0.4;">Protection</li>
+            <li style="opacity: 0.4;">Wrap-Up</li>
+          </ol>
+        </section>
+
+        <section>
+          <section>
+            <h2>Starting an OS</h2>
+            <ul>
+              <li>Computer turns on, BIOS loads</li>
+              <ul style="visibility: hidden;">
+                <li>BIOS searches for disks</li>
+                <li>Copies boot loader into 0x7c00</li>
+                <li>Sets processor EIP to 0x7c00</li>
+              </ul>
+              <li style="visibility: hidden;">OS starts loading</li>
+              <li style="visibility: hidden;">Problem: CPU starts executing in real mode: <br />
+                simulated 8088 / 16-bit</li>
+            </ul>
+          </section>
+          <section>
+            <h2>What is a BIOS?</h2>
+            <ul>
+              <li>The bootstrapper -- finds and initializes hardware</li>
+              <li>Offers a common interface to hardware</li>
+              <li>BIOS typically 16-bit</li>
+              <li>BIOS exists on an EEPROM and not very big</li>
+            </ul>
+          </section>
+          <section>
+            <h2>Starting an OS</h2>
+            <ul>
+              <li>Computer turns on, BIOS loads</li>
+              <ul>
+                <li>BIOS searches for disks</li>
+                <li>Copies boot loader into 0x7c00</li>
+                <li>Sets processor EIP to 0x7c00</li>
+              </ul>
+              <li>OS (bootloader) starts executing</li>
+              <li>Problem: CPU starts executing in real mode: <br />
+                simulated 8088 / 16-bit</li>
+            </ul>
+          </section>
+        </section>
+        <section>
+          <section>
+            <h2>Setting up 32-bit Mode</h2>
+            <ul>
+              <li>Open xv6/bootasm.S: page 91 of
+                <a href="http://zoo.cs.yale.edu/classes/cs422/2014fa/readings/xv6/xv6-rev7.pdf">xv6-rev7.pdf</a>
+              </li>
+              <li>Disable interrupts: cli sets EFLAGS_IF = 0</li>
+              <li>Create a Global Descriptor Table</li>
+              <li>Enable protected mode in CRO_PE</li>
+              <li>Load a new value into segment register</li>
+            </ul>
+          </section>
+          <section>
+            <h2>Global Descriptor Table</h2>
+            <pre>
+8441 lgdt gdtdesc
+
+8480 # Bootstrap GDT
+8481 .p2align 2 # force 4 byte alignment
+8482 gdt:
+8483 SEG_NULLASM # null seg
+8484 SEG_ASM(STA_X|STA_R, 0x0, 0xffffffff) # code seg
+8485 SEG_ASM(STA_W, 0x0, 0xffffffff) # data seg
+8486
+8487 gdtdesc:
+8488 .word (gdtdesc − gdt − 1) # sizeof(gdt) − 1
+8489 .long gdt # address gdt
+            </pre>
+          </section>
+          <section>
+            <h2>Enable Protection</h2>
+            <pre>
+8442 movl %cr0, %eax
+8443 orl $CR0_PE, %eax
+8444 movl %eax, %cr0
+            </pre>
+          </section>
+          <section>
+            <h2>Load the new segment</h2>
+            <pre>
+1150 ljmpl $(SEG_KCODE&lt&lt3), $(start32) # load gdt[1]
+1151
+1152 .code32
+1153 start32:
+            </pre>
+          </section>
+        </section>
+        <section>
+          <section>
+            <h2>Starting the Kernel</h2>
+            <ul>
+              <li>Setup a stack: <br /> 8467 movl $start, %esp</li>
+              <li>Call into C loader: <br /> 8468 call bootmain</li>
+              <li>Load and start the kernel<br />
+              xv6/bootmain.c or page 92 of xv6-rev7.pdf </li>
+            </ul>
+          </section>
+          <section>
+            <h2>Load and Start the Kernel</h2>
+            <pre>
+8516 void
+8517 bootmain(void)
+...
+8524 elf = (struct elfhdr*)0x10000; // scratch space
+8525
+8526 // Read 1st page off disk
+8527 readseg((uchar*)elf, 4096, 0);
+...
+8543 // Call the entry point from the ELF header.
+8544 // Does not return!
+8545 entry = (void(*)(void))(elf−&gtentry);
+8546 entry();
+            </pre>
+          </section>
+        </section>
+        <section>
+          <section>
+            <h2>I/O Devices</h2>
+            readseg reads from disk! How? <br />
+            <div class="fragment">
+              Reading a sector (512 bytes) from the disk at a time:
+            </div>
+            <pre>
+  8560 readsect(void *dst, uint offset)
+  ...
+  8563 waitdisk();
+  8564 outb(0x1F2, 1); // count = 1
+  8565 outb(0x1F3, offset);
+  ....
+  8569 outb(0x1F7, 0x20); // cmd 0x20 − read sectors
+  ...
+  8572 waitdisk();
+  8573 insl(0x1F0, dst, SECTSIZE/4);
+            </pre>
+          </section>
+          <section>
+            <h2>outb and insl</h2>
+            Wrappers around assembly: <p />
+            outb(port, data) - out data, port - out %eax, %ebx <p />
+            insl is a string wrapper around in <p />
+            in(port, &ampdata) - in data, port - in %eax, %ebx
+          </section>
+        </section>
+        <section>
+          <h2>Memory Mapped I/O</h2>
+          Alternative to using in / out instructions: <br />
+          Use traditional instructions, like mov,
+          on locations in memory<br />
+        </section>
+        <section>
+          <h2>Assembly</h2>
+          We have spoken <emph>only</emph> about AT&ampT assembly syntax!
+          <div class="fragment">We will only use AT&ampT syntx in class</div>
+          <div class="fragment">Reading / using Intel syntax will not work</div>
+        </section>
+        <section>
+          <h2>Example</h2>
+          <div style="width: 100%">
+            <div style="width: 50%; float: left;">
+              <pre>
+int main(void)
+{
+  return f(3) + 1;
+}
+
+int f(int x)
+{
+  return x + 4;
+}
+              </pre>
+            </div>
+            <div style="width: 50%; float: left;">
+              <pre>
+_main:
+  pushl %ebp # prologue
+  movl %esp, %ebp
+
+  pushl $3 % body
+  call _f
+  addl $1, %eax
+
+  movl %ebp, %esp
+  popl %ebp
+  ret
+
+_f:
+  pushl %ebp
+  movl %esp, %ebp
+
+  pushl %ebx # don't clobber registers
+
+  movl 8(%ebp), %ebx # access argument
+  addl $4, %ebx
+  movl %ebx, %eax
+
+  popl %ebx # restore 
+
+  movl %ebp, %esp %epilogue
+  popl %ebp
+  ret
+              </pre>
+            </div>
+          </div>
+        </section>
+        <section>
+          <h2>Outline</h2>
+          <ol>
+            <li style="opacity: 0.4;">x86 Architecture</li>
+            <li style="opacity: 0.4;">The Boot Process</li>
+            <li>Protection</li>
+            <li style="opacity: 0.4;">Wrap-Up</li>
+          </ol>
+        </section>
+
+        <section>
+          <h2>x86 Protected Mode</h2>
+          We entered to turn on 32-bit mode. <p />
+          What else might it be useful for? <p />
+          <ul class="fragment">
+            <li>Process / code separation!</li>
+            <li>Low privilege level cannot escape to higher privilege</li>
+            <li>Cannot access other's memory</li>
+            <li>Cannot change global PC state</li>
+            <li>Limits instruction calls</li>
+          </ul>
+          <div class="fragment">
+            What does it look like? How is that enforced?
+          </div>
+          <div class="fragment">
+            Lower two bits of CS register
+          </div>
+          <div class="fragment">
+            ... and a topic for a later lecture ...
+          </div>
+        </section>
+        <section>
+          <h2>Observing Protected Mode</h2>
+          4 privilege levels: 0 - 3, highest to lowest <br />
+          x86 checks privilege level: <br />
+          <ul>
+            <li>I/O and privileged instructions</li>
+            <li>Interrupts / Traps</li>
+            <li>Accessing memory</li>
+          </ul> <p />
+          Privilege can be increased for well-defined special cases: system calls <br />
+        </section>
+        <section>
+          <h2>But...</h2>
+          Segmentation has flaws, especially with memory holes for MM/IO... <br />
+          <div class="fragment">Our first descriptors define flat address at privilege level 0</div>
+          <div class="fragment">Later we define a second set for users for a flat address space</div>
+          <div class="fragment">Next Lecture: Page Tables, better management of memory</div>
+        </section>
+
+        <section>
+          <h2>Outline</h2>
+          <ol>
+            <li style="opacity: 0.4;">x86 Architecture</li>
+            <li style="opacity: 0.4;">The Boot Process</li>
+            <li style="opacity: 0.4;">Protection</li>
+            <li>Wrap-Up</li>
+          </ol>
+        </section>
+
+        <section>
+          <h2>UEFI</h2>
+          <ul>
+            <li>BIOS issues:</li>
+            <ul>
+              <li>Old and 16-bits</li>
+              <li>Limited support for hard disk sizes (&lt 2TB)</li>
+              <li>Limited to EEPROM -- small in size</li>
+            </ul>
+            <li class="fragment">UEFI advantages:
+              <ul>
+                <li>Support for rich pre-boot environment</li>
+                <li>Modern support for hard drives</li>
+                <li>Secure boot</li>
+              </ul>
+            </li>
+          </ul>
+        </section>
+
+        <section>
+          <h2>x86 Architecture in Qemu</h2>
+          <ul>
+            <li>Qemu is an x86 emulator / virtual machine</li>
+            <li>Qemu focuses on state not simulation <br />
+              We won't be worrying about pipelines, superscalar, etc
+            </li>
+            <li>Restricted to x86 instructions, CPU state,
+              and memory</li>
+          </ul>
+        </section>
+
+        <section>
+          <section>
+            <h2>Testing Assembly Code</h2>
+            <ul>
+              <li> In JOS: <br />
+                Make your own monitor call and use asm volatile instructions
+              </li>
+              <li> In Linux: ...</li>
+            </ul>
+          </section>
+          <section>
+            <ul>
+              $ vim test.as <br />
+              <pre>
+.global _start
+
+.text
+_start:
+  mov $0x10, %eax
+  mov %eax, %ebx
+  movl  $1, %eax
+  int $0x80
+              </pre> <br />
+              $ as --386 -o test.o test.as
+              $ ld -m elf_i386 -o test test.o 
+              $ ./test
+              $ echo $? <br />
+              16 <br />
+              $ <br />
+              <li>Return value can only be between 0 and 255</li>
+            </ul>
+          </section>
+        </section>
+
+        <section>
+          <h2>Next Time</h2>
+          Wednesday 1:00PM <br />
+          Page Tables and Virtual Memory<br />
+        </section>
+			</div>
+
+		</div>
+
+		<script src="reveal.js/lib/js/head.min.js"></script>
+		<script src="reveal.js/js/reveal.min.js"></script>
+
+		<script>
+
+			// Full list of configuration options available here:
+			// https://github.com/hakimel/reveal.js#configuration
+			Reveal.initialize({
+				controls: true,
+				progress: true,
+				history: true,
+				center: true,
+        slideNumber: true,
+
+				theme: Reveal.getQueryHash().theme, // available themes are in /css/theme
+				transition: Reveal.getQueryHash().transition || 'default', // default/cube/page/concave/zoom/linear/fade/none
+
+				// Parallax scrolling
+				// parallaxBackgroundImage: 'https://s3.amazonaws.com/hakim-static/reveal-js/reveal-parallax-1.jpg',
+				// parallaxBackgroundSize: '2100px 900px',
+
+				// Optional libraries used to extend on reveal.js
+				dependencies: [
+					{ src: 'reveal.js/lib/js/classList.js', condition: function() { return !document.body.classList; } },
+					{ src: 'reveal.js/plugin/markdown/marked.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+					{ src: 'reveal.js/plugin/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+          { src: 'reveal.js/plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
+					{ src: 'reveal.js/plugin/zoom-js/zoom.js', async: true, condition: function() { return !!document.body.classList; } },
+					{ src: 'reveal.js/plugin/notes/notes.js', async: true, condition: function() { return !!document.body.classList; } }
+				]
+			});
+
+		</script>
+
+    <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.2/styles/default.min.css">
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.2/highlight.min.js"></script>
+	</body>
+</html>
