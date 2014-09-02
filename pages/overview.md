@@ -117,6 +117,7 @@ you forfeit that quiz, there are no makeups.
 Approved absences will result your overall grade computed
 without the inclusion of the quiz.
 
+<!--
 **Homework (10% of grade):**
 Some of the lab assignments have questions that must be submitted along
 with your solutions to the lab.
@@ -127,6 +128,7 @@ and hence your submission must be dated no later than the due date.
 If you miss the deadline,
 you forfeit that homework grade.
 Approved absences will allow for a delayed submission date.
+-->
 
 **Labs (60% of grade):**
 There are a total of 6 core labs and a final challenge lab.
