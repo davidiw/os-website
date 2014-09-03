@@ -107,7 +107,8 @@ Template:
    <td>
     <span class="text-muted"><script type="text/javascript">getDate()</script></span><br />
     <span class="text-primary">
-      <b>Lecture <script type="text/javascript">lectnum()</script>: </b> Virtual memory
+      <b>Lecture <script type="text/javascript">lectnum()</script>: </b>
+      <a href="{{ urls.production_url }}/lectures/lec3.html">Virtual memory</a>
     </span><br />
     <span class="text-success">
       <b>Preparation: </b> xv6 book ch 2, osc ch 8
