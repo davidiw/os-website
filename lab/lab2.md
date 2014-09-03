@@ -33,17 +33,40 @@ In this and future labs you will progressively build up your kernel.
 We will also provide you with some additional source.
 To fetch that source,
 use Git to commit changes you've made since handing in lab 1 (if any),
-fetch the latest version of the course repository,
-and then create a local branch called `lab2` based on our lab2 branch,
-`origin/lab2`:
+fetch the latest version of the course repository.
+Then add a new remote to get our latest updates to JOS:
+
+```lang-sh
+$ git remote add jos /c/cs422/repo/joslab.git
+$ git fetch jos
+From /c/cs422/repo/joslab
+ * [new branch]      lab1       -> jos/lab1
+ * [new branch]      lab2       -> jos/lab2
+ * [new branch]      master     -> jos/master
+ * [new branch]      shell      -> jos/shell
+$
+```
+
+Next create a local branch called `lab2` based on our lab2 branch,
+`jos/lab2`:
 
 ```lang-sh
 $ cd ~/cpsc422/lab
 $ git pull
 Already up-to-date.
-$ git checkout -b lab2 origin/lab2
-Branch lab2 set up to track remote branch refs/remotes/origin/lab2.
+$ git checkout --no-track -b lab2 jos/lab2
 Switched to a new branch "lab2"
+$
+```
+
+Now push your new `lab2` branch to your Zoo repository, configuring it
+as your upstream for future pushes and pulls:
+
+```lang-sh
+$ git push --set-upstream origin lab2
+Total 0 (delta 0), reused 0 (delta 0)
+To /c/cs422/SUBMIT/lab/netid.git
+ * [new branch]      lab2 -> lab2
 $
 ```
 
