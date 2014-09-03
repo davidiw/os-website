@@ -31,7 +31,7 @@ Use Git to commit your changes after your Lab 2 submission (if any),
 fetch the latest version of the course repository,
 and then create a
 local branch called `lab3` based on our lab3 branch,
-`origin/lab3`:
+`jos/lab3`:
 
 ```lang-sh
 $ cd ~/cs422/lab
