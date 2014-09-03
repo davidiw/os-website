@@ -67,6 +67,7 @@ $ git push --set-upstream origin lab2
 Total 0 (delta 0), reused 0 (delta 0)
 To /c/cs422/SUBMIT/lab/netid.git
  * [new branch]      lab2 -> lab2
+Branch lab2 set up to track remote branch refs/remotes/origin/lab2.
 $
 ```
 

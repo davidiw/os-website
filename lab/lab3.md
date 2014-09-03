@@ -40,9 +40,13 @@ Created commit 734fab7: changes to lab2 after handin
  4 files changed, 42 insertions(+), 9 deletions(-)
 $ git pull
 Already up-to-date.
-$ git checkout -b lab3 origin/lab3
-Branch lab3 set up to track remote branch refs/remotes/origin/lab3.
+$ git checkout --no-track -b lab3 jos/lab3
 Switched to a new branch "lab3"
+$ git push --set-upstream origin lab3
+Total 0 (delta 0), reused 0 (delta 0)
+To /c/cs422/SUBMIT/lab/netid.git
+ * [new branch]      lab3 -> lab3
+Branch lab3 set up to track remote branch refs/remotes/origin/lab3.
 $ git merge lab2
 Merge made by recursive.
  kern/pmap.c |   42 +++++++++++++++++++
