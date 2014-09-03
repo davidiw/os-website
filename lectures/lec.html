@@ -31,6 +31,12 @@
 			}
 		</script>
 
+    <style>
+      .reveal pre code { max-height: 700px; }
+      .reveal pre { font-size: 70%; }
+      .reveal p { text-align: left; }
+    </style>
+
 		<!--[if lt IE 9]>
 		<script src="reveal.js/lib/js/html5shiv.js"></script>
 		<![endif]-->
@@ -58,6 +64,16 @@
           </ol>
         </section>
 
+        <section>
+          <h3>Divided</h3>
+          <div style="width: 100%">
+            <div style="width: 50%; float: left;">
+            </div>
+            <div style="width: 50%; float: left;">
+            </div>
+          </div>
+        </section>
+
 			</div>
 
 		</div>
@@ -75,6 +91,9 @@
 				history: true,
 				center: true,
         slideNumber: true,
+        margin: 0.0,
+        minScale: 0.5,
+        maxScale: 5.0,
 
 				theme: Reveal.getQueryHash().theme, // available themes are in /css/theme
 				transition: Reveal.getQueryHash().transition || 'default', // default/cube/page/concave/zoom/linear/fade/none
