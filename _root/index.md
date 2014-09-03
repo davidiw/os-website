@@ -46,6 +46,9 @@ unless they are of a private or personal nature.
 <h2>Announcements</h2>
 
 <dl>
+<dt>3 Sept</dt>
+<dd>Lab 2 assigned, Lab 0 due tonight, Lab 1 due tomorrow night</dd>
+</dl>
 <dt>27 Aug</dt>
 <dd>First lecture, Lab 0 and Lab 1 assigned</dd>
 </dl>
