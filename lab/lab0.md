@@ -3,6 +3,8 @@ title: 'Exercise: Shell'
 due_date: '2014-8-29'
 ---
 
+Note: Due to shopping period, we will implement a grace period up until 9/10 @ 11:59 PM.
+
 This assignment will make you more familiar
 with the Unix system call interface and the shell
 by implementing several features in a small shell.

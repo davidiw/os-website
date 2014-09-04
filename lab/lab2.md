@@ -1,6 +1,6 @@
 ---
 title: 'Lab 2: Memory Management'
-due_date: '2014-1-14'
+due_date: '2014-9-11'
 ---
 
 Introduction

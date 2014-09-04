@@ -3,6 +3,8 @@ title: 'Lab 1: Booting a PC'
 due_date: '2014-9-4'
 ---
 
+Note: Due to shopping period, we will implement a grace period up until 9/10 @ 11:59 PM.
+
 Introduction
 ------------
 
@@ -640,9 +642,7 @@ this is a good time to stop and review some of the basics of C programming.
 > *The C Programming Language* by Brian Kernighan and Dennis Ritchie
 > (known as 'K&R') is a good reference.
 > You can purchase [this book]
-> (http://www.amazon.com/The-Programming-Language-2nd-Edition/dp/0131103628)
-> or find one of
-> [XXX Yale's copies](XXX).
+> (http://www.amazon.com/The-Programming-Language-2nd-Edition/dp/0131103628).
 
 > [A tutorial by Ted Jensen]({{ urls.production_url}}/readings/pointers.pdf)
 > that cites K&R heavily is available in the course readings.
