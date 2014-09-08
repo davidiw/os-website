@@ -1,0 +1,781 @@
+<!doctype html>
+<html lang="en">
+
+	<head>
+		<meta charset="utf-8">
+
+    <title>CS422/522 - Lecture 1 - Introduction to Operating Systems</title>
+
+    <meta name="description" content="Lecture 1 - Introduction to Operating Systems">
+    <meta name="author" content="David Wolinsky">
+
+		<meta name="apple-mobile-web-app-capable" content="yes" />
+		<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+		<link rel="stylesheet" href="reveal.js/css/reveal.min.css">
+		<link rel="stylesheet" href="reveal.js/css/theme/serif.css" id="theme">
+
+		<!-- For syntax highlighting -->
+		<link rel="stylesheet" href="reveal.js/lib/css/zenburn.css">
+
+		<!-- If the query includes 'print-pdf', include the PDF print sheet -->
+		<script>
+			if( window.location.search.match( /print-pdf/gi ) ) {
+				var link = document.createElement( 'link' );
+				link.rel = 'stylesheet';
+				link.type = 'text/css';
+				link.href = 'reveal.js/css/print/pdf.css';
+				document.getElementsByTagName( 'head' )[0].appendChild( link );
+			}
+		</script>
+
+    <style>
+      .reveal pre code { max-height: 700px; }
+      .reveal pre { font-size: 70%; }
+      .reveal p { text-align: left; }
+    </style>
+
+		<!--[if lt IE 9]>
+		<script src="reveal.js/lib/js/html5shiv.js"></script>
+		<![endif]-->
+	</head>
+
+  <!--
+        <section>
+          <h3>Divided</h3>
+          <div style="width: 100%">
+            <div style="width: 50%; float: left;">
+            </div>
+            <div style="width: 50%; float: left;">
+            </div>
+          </div>
+        </section>
+
+        <section>
+          <h2>Outline</h2>
+          <ol>
+            <li style="opacity: 0.4;"></li>
+          </ol>
+        </section>
+
+        <section>
+          <h3>Memory Allocation</h3>
+          <ul>
+            <li>Allocate memory at load
+              <ul class="fragment">
+                <li>Boot loader - Kernel</li>
+                <li>exec - xv6</li>
+                <li>spawn - JOS</li>
+              </ul>
+            </li>
+            <li>Allocate memory on demand
+              <ul class="fragment">
+                <li>sbrk (malloc)</li>
+              </ul>
+            </li>
+            <li>Over allocation
+              <ul class="fragment">
+                <li>swap (page) file</li>
+              </ul>
+            </li>
+          </ul>
+        </section>
+
+  -->
+	<body>
+
+		<div class="reveal">
+
+			<!-- Any section element inside of this container is displayed as a slide -->
+			<div class="slides">
+				<section>
+          <h2>Memory Management</h2>
+          <h3>CS422/522 Lecture 4</h3>
+          <h3>8 September 2014</h3>
+          <h4>Last updated: 7 September 2014</h4>
+				</section>
+
+        <section>
+          <h2>Outline</h2>
+          <ol>
+            <li>Recap</li>
+            <li style="opacity: 0.4;">Page Table Performance / Overheads</li>
+            <li style="opacity: 0.4;">Xv6 Code Walkthrough</li>
+            <li style="opacity: 0.4;">Page Faults</li>
+            <li style="opacity: 0.4;">Page Files</li>
+            <li style="opacity: 0.4;">Wrap-Up</li>
+          </ol>
+        </section>
+
+        <section>
+          <h3>Recap</h3>
+          <ul>
+            <li>Segmentation</li>
+            <li>Page Tables</li>
+            <li>Page Sharing</li>
+          </ul><br />
+          <img width="400" src="images/compilation.png" /><br />
+          Compiler, assembler, linking, loading
+        </section>
+
+        <section>
+          <h2>Outline</h2>
+          <ol>
+            <li style="opacity: 0.4;">Recap</li>
+            <li>Page Table Performance / Overheads</li>
+            <li style="opacity: 0.4;">Xv6 Code Walkthrough</li>
+            <li style="opacity: 0.4;">Page Faults</li>
+            <li style="opacity: 0.4;">Page Files</li>
+            <li style="opacity: 0.4;">Wrap-Up</li>
+          </ol>
+        </section>
+
+        <section>
+          <h3>Page Table Overhead</h3>
+          Each memory action requires multilevel page walking. <br />
+          How to speed up? <br />
+          <div class="fragment">Cache virtual to physical addresses</div>
+        </section>
+
+        <section>
+          <h3>Translation Lookaside BUffer</h3>
+          <img width="450" src="images/tlb.png" /> <br />
+          <ul>
+            <li>Maps virtual to physical</li>
+            <li>x86 hardware managed</li>
+            <li>Any challenges?</li>
+            <ul class="fragment">
+              <li>Page directory changes</li>
+              <li>Deleting mapped pages</li>
+            </ul>
+          </ul>
+        </section>
+
+        <section>
+          <h3>Limited Memory / Large Addresses</h3>
+          <ul>
+            <li>64-bit address space</li>
+            <li>4KB page</li>
+            <li>Potentially large page table!</li>
+            <li>2^12*2^10*2^10*2*10*2^10 bytes</li>
+          </ul>
+        </section>
+
+        <section>
+          <h3>Inverted Page Tables</h3>
+          <img width="400" src="images/inverted-pt.png" /> <br />
+          How to speed up?
+          <div class="fragment">Hash upper bits of linear address to fixed location</div>
+          OS handles misses.
+
+        </section>
+
+        <section>
+          <h3>Inverted vs Normal</h3>
+          <ul>
+            <li>Inverted</li>
+            <ul class="fragment">
+              <li>Fixed size</li>
+              <li>Potentially more time for lookups</li>
+              <li>Requires a means to handle page table faults</li>
+            </ul>
+            <li>Normal</li>
+            <ul class="fragment">
+              <li>OS can enforce a ratio of PT to physical memory</li>
+              <li>Scales with memory</li>
+              <li>Quicker look ups</li>
+            </ul>
+          </ul>
+        </section>
+
+        <section>
+          <h2>Outline</h2>
+          <ol>
+            <li style="opacity: 0.4;">Recap</li>
+            <li style="opacity: 0.4;">Page Table Performance / Overheads</li>
+            <li style="opacity: 1.0;">Xv6 Code Walkthrough</li>
+            <li style="opacity: 0.4;">Page Faults</li>
+            <li style="opacity: 0.4;">Page Files</li>
+            <li style="opacity: 0.4;">Wrap-Up</li>
+          </ol>
+        </section>
+
+        <section>
+          <h3>Last time</h3>
+          <ul>
+            <li>Loaded flat memory code and data descriptors</li>
+            <li>Entered 32-bit protected mode</li>
+            <li>Loaded kernel data into memory</li>
+            <li>Called kernel entry point</li>
+          </h3>
+        </section>
+
+        <section>
+          <h3>Code Overview</h3>
+          <ul>
+            <li>Start paging with a temporary allocation</li>
+            <li>Create real memory mapping in a new page table</li>
+            <li>Enter new page table</li>
+            <li>Enter new gdt with user and system descriptors</li>
+          </ul>
+        </section>
+
+        <section>
+          <section>
+            <h3>Bootstrapping</h3>
+            The first thing a kernel does is turn on paging...
+            <pre><code data-noescape="true" data-trim="true">
+1032 # By convention, the _start symbol specifies the ELF entry point.
+1033 # Since we haven’t set up virtual memory yet, our entry point is
+1034 # the physical address of ’entry’.
+1035 .globl _start
+1036 _start = V2P_WO(entry)
+1037
+1038 # Entering xv6 on boot processor, with paging off.
+1039 .globl entry
+1040 entry:
+            </code></pre>
+          </section>
+          <section>
+            <h3>Bootstrapping</h3>
+            <pre><code data-noescape="true" data-trim="true">
+1041 # Turn on page size extension for 4Mbyte pages
+1042 movl %cr4, %eax
+1043 orl $(CR4_PSE), %eax
+1044 movl %eax, %cr4
+1045 # Set page directory
+1046 movl $(V2P_WO(entrypgdir)), %eax
+1047 movl %eax, %cr3
+1048 # Turn on paging.
+1049 movl %cr0, %eax
+1050 orl $(CR0_PG|CR0_WP), %eax
+1051 movl %eax, %cr0
+            </code></pre>
+          </section>
+          <section>
+            <h3>Bootstrapping</h3>
+            <pre><code data-noescape="true" data-trim="true">
+1270 pde_t entrypgdir[]; // For entry.S
+...
+1306 // Boot page table used in entry.S and entryother.S.
+1307 // Page directories (and page tables), must start on a page boundary,
+1308 // hence the "__aligned__" attribute.
+1309 // Use PTE_PS in page directory entry to enable 4Mbyte pages.
+1310 __attribute__((__aligned__(PGSIZE)))
+1311 pde_t entrypgdir[NPDENTRIES] = {
+1312   // Map VA’s [0, 4MB) to PA’s [0, 4MB)
+1313   [0] = (0) | PTE_P | PTE_W | PTE_PS,
+1314   // Map VA’s [KERNBASE, KERNBASE+4MB) to PA’s [0, 4MB)
+1315   [KERNBASE>>PDXSHIFT] = (0) | PTE_P | PTE_W | PTE_PS,
+1316 };
+            </code></pre>
+          </section>
+          <section>
+            <h3>Bootstrapping</h3>
+            <pre><code data-noescape="true">
+1053 # Set up the stack pointer.
+1054 movl $(stack + KSTACKSIZE), %esp
+1055
+1056 # Jump to main(), and switch to executing at
+1057 # high addresses. The indirect call is needed because
+1058 # the assembler produces a PC−relative instruction
+1059 # for a direct jump.
+1060 mov $main, %eax
+1061 jmp *%eax
+1062
+1063 .comm stack, KSTACKSIZE
+            </code></pre>
+          </section>
+        </section>
+      </section>
+
+        <section>
+          <section>
+            <h3>Setting up Virtual Memory</h3>
+            <pre><code data-noescape="true" data-trim="true">
+1211 extern char end[]; // first address after kernel loaded from ELF file
+...
+1216 int
+1217 main(void)
+1218 {
+1219   kinit1(end, P2V(4*1024*1024)); // phys page allocator
+1220   kvmalloc(); // kernel page table
+...
+1223   seginit(); // set up segments
+...
+1238   kinit2(P2V(4*1024*1024), P2V(PHYSTOP)); // must come after startothers()
+...
+            </code></pre>
+          </section>
+          <section>
+            <h3>Setting up Virtual Memory</h3>
+            <pre><code data-noescape="true" data-trim="true">
+2774 // Initialization happens in two phases.
+2775 // 1. main() calls kinit1() while still using entrypgdir to place just
+2776 // the pages mapped by entrypgdir on free list.
+2777 // 2. main() calls kinit2() with the rest of the physical pages
+2778 // after installing a full page table that maps them on all cores.
+2779 void
+2780 kinit1(void *vstart, void *vend)
+2781 {
+2782   initlock(&kmem.lock, "kmem");
+2783   kmem.use_lock = 0;
+2784   freerange(vstart, vend);
+2785 }
+            </code></pre>
+          </section>
+          <section>
+            <h3>Setting up Virtual Memory</h3>
+            <pre><code data-noescape="true" data-trim="true">
+2800 void
+2801 freerange(void *vstart, void *vend)
+2802 {
+2803   char *p;
+2804   p = (char*)PGROUNDUP((uint)vstart);
+2805   for(; p + PGSIZE <= (char*)vend; p += PGSIZE)
+2806     kfree(p);
+2807 }
+            </code></pre>
+          </section>
+          <section>
+            <h3>Setting up Virtual Memory</h3>
+            <pre><code data-noescape="true" data-trim="true">
+2810 // Free the page of physical memory pointed at by v,
+2811 // which normally should have been returned by a
+2812 // call to kalloc(). (The exception is when
+2813 // initializing the allocator; see kinit above.)
+2814 void
+2815 kfree(char *v)
+2816 {
+2817   struct run *r;
+2819   if((uint)v % PGSIZE || v < end || v2p(v) >= PHYSTOP)
+2820     panic("kfree");
+...
+2827   r = (struct run*)v;
+2828   r−>next = kmem.freelist;
+2829   kmem.freelist = r;
+...
+2832 }
+            </code></pre>
+          </section>
+          <section>
+            <h3>Setting up Virtual Memory</h3>
+            <pre><code data-noescape="true" data-trim="true">
+1754 // Allocate one page table for the machine for the kernel address
+1755 // space for scheduler processes.
+1756 void
+1757 kvmalloc(void)
+1758 {
+1759   kpgdir = setupkvm();
+1760   switchkvm();
+1761 }
+            </code></pre>
+          </section>
+          <section>
+            <h3>Setting up Virtual Memory</h3>
+            <pre><code data-noescape="true" data-trim="true">
+1735 // Set up kernel part of a page table.
+1736 pde_t*
+1737 setupkvm(void)
+1738 {
+1739   pde_t *pgdir;
+1740   struct kmap *k;
+1741
+1742   if((pgdir = (pde_t*)kalloc()) == 0)
+1743     return 0;
+            </code></pre>
+          </section>
+          <section>
+            <h3>Setting up Virtual Memory</h3>
+            <pre><code data-noescape="true" data-trim="true" >
+2834 // Allocate one 4096−byte page of physical memory.
+2835 // Returns a pointer that the kernel can use.
+2836 // Returns 0 if the memory cannot be allocated.
+2837 char*
+2838 kalloc(void)
+2839 {
+2840   struct run *r;
+...
+2844   r = kmem.freelist;
+2845   if(r)
+2846     kmem.freelist = r−>next;
+...
+2849   return (char*)r;
+2850 }
+            </code></pre>
+          </section>
+          <section>
+            <h3>Setting up Virtual Memory</h3>
+            <pre><code data-noescape="true" data-trim="true">
+1736 pde_t*
+1737 setupkvm(void)
+...
+1744   memset(pgdir, 0, PGSIZE);
+1745   if (p2v(PHYSTOP) > (void*)DEVSPACE)
+1746     panic("PHYSTOP too high");
+1747   for(k = kmap; k < &kmap[NELEM(kmap)]; k++)
+1748     if(mappages(pgdir, k−>virt,
+             k−>phys_end − k−>phys_start,
+1749         (uint)k−>phys_start, k−>perm) < 0)
+1750       return 0;
+1751   return pgdir;
+1752 }
+            </code></pre>
+          </section>
+          <section>
+            <h3>Setting up Virtual Memory</h3>
+            <pre><code data-noescape="true" data-trim="true">
+1723 static struct kmap {
+1724   void *virt;
+1725   uint phys_start;
+1726   uint phys_end;
+1727   int perm;
+1728 } kmap[] = {
+1729   { (void*)KERNBASE, 0, EXTMEM, PTE_W}, // I/O space
+1730   { (void*)KERNLINK, V2P(KERNLINK), V2P(data), 0}, // kern text+rodata
+1731   { (void*)data, V2P(data), PHYSTOP, PTE_W}, // kern data+memory
+1732   { (void*)DEVSPACE, DEVSPACE, 0, PTE_W}, // more devices
+1733 };
+            </code></pre>
+          </section>
+          <section>
+            <h3>Setting up Virtual Memory</h3>
+            <pre><code data-noescape="true" data-trim="true">
+1675 // Create PTEs for virtual addresses starting at va that refer to
+1676 // physical addresses starting at pa. va and size might not
+1677 // be page−aligned.
+1678 static int
+1679 mappages(pde_t *pgdir, void *va, uint size,
+        uint pa, int perm)
+1680 {
+1681   char *a, *last;
+1682   pte_t *pte;
+1683
+1684   a = (char*)PGROUNDDOWN((uint)va);
+1685   last = (char*)PGROUNDDOWN(((uint)va) + size − 1);
+1686   for(;;){
+1687     if((pte = walkpgdir(pgdir, a, 1)) == 0)
+1688     return −1;
+...
+            </code></pre>
+          </section>
+          <section>
+            <h3>Setting up Virtual Memory</h3>
+            <pre><code data-noescape="true" data-trim="true">
+1650 // Return the address of the PTE in page table pgdir
+1651 // that corresponds to virtual address va. If alloc!=0,
+1652 // create any required page table pages.
+1653 static pte_t *
+1654 walkpgdir(pde_t *pgdir, const void *va, int alloc)
+1655 {
+1656   pde_t *pde;
+1657   pte_t *pgtab;
+1659   pde = &pgdir[PDX(va)];
+1660   if(*pde & PTE_P){
+1661     pgtab = (pte_t*)p2v(PTE_ADDR(*pde));
+1662   } else {
+1663     if(!alloc || (pgtab = (pte_t*)kalloc()) == 0)
+1664       return 0;
+1666     memset(pgtab, 0, PGSIZE);
+1670     *pde = v2p(pgtab) | PTE_P | PTE_W | PTE_U;
+1671   }
+1672   return &pgtab[PTX(va)];
+1673 }
+            </code></pre>
+          </section>
+          <section>
+            <h3>Setting up Virtual Memory</h3>
+            <pre><code data-noescape="true" data-trim="true">
+1678 static int
+1679 mappages(pde_t *pgdir, void *va, uint size,
+        uint pa, int perm)
+...
+1689     if(*pte & PTE_P)
+1690       panic("remap");
+1691     *pte = pa | perm | PTE_P;
+1692     if(a == last)
+1693       break;
+1694     a += PGSIZE;
+1695     pa += PGSIZE;
+1696   }
+1697   return 0;
+1698 }
+            </code></pre>
+          </section>
+          <section>
+            <h3>Setting up Virtual Memory</h3>
+            <pre><code data-noescape="true" data-trim="true">
+1763 // Switch h/w page table register to the kernel−only page table,
+1764 // for when no process is running.
+1765 void
+1766 switchkvm(void)
+1767 {
+1768   lcr3(v2p(kpgdir)); // switch to the kernel page table
+1769 }
+            </code></pre>
+          </section>
+          <section>
+            <h3>Setting up Virtual Memory</h3>
+            <pre><code data-noescape="true" data-trim="true">
+1613 // Set up CPU’s kernel segment descriptors.
+1614 // Run once on entry on each CPU.
+1615 void
+1616 seginit(void)
+1617 {
+1618   struct cpu *c;
+...
+1624   c = &cpus[cpunum()];
+1625   c−>gdt[SEG_KCODE] = SEG(STA_X|STA_R, 0, 0xffffffff, 0);
+1626   c−>gdt[SEG_KDATA] = SEG(STA_W, 0, 0xffffffff, 0);
+1627   c−>gdt[SEG_UCODE] = SEG(STA_X|STA_R, 0, 0xffffffff, DPL_USER);
+1628   c−>gdt[SEG_UDATA] = SEG(STA_W, 0, 0xffffffff, DPL_USER);
+...
+1633   lgdt(c−>gdt, sizeof(c−>gdt));
+...
+1639 }
+            </code></pre>
+          </section>
+          <section>
+            <h3>Setting up Virtual Memory</h3>
+            <pre><code data-noescape="true" data-trim="true">
+2787 void
+2788 kinit2(void *vstart, void *vend)
+2789 {
+2790   freerange(vstart, vend);
+2791   kmem.use_lock = 1;
+2792 }
+            </code></pre>
+          </section>
+        </section>
+        <section>
+          <h3>Wrap up</h3>
+          <ul>
+            <li>Used a temporary page of 4 MB</li>
+            <li>Last portion was used to construct new page table</li>
+            <li>Entered new page table</li>
+            <li>Entered new gdt with user and system descriptors</li>
+            <li>Mapped the kernel page tables</li>
+          </ul>
+        </section>
+
+        <section>
+          <h2>Outline</h2>
+          <ol>
+            <li style="opacity: 0.4;">Recap</li>
+            <li style="opacity: 0.4;">Page Table Performance / Overheads</li>
+            <li style="opacity: 0.4;">Xv6 Code Walkthrough</li>
+            <li style="opacity: 1.0;">Page Faults</li>
+            <li style="opacity: 0.4;">Page Files</li>
+            <li style="opacity: 0.4;">Wrap-Up</li>
+          </ol>
+        </section>
+
+        <section>
+          <h3>Exceptions (Briefly)</h3>
+          <ul>
+            <li>What are they?
+              <span class="fragment">Something unexpected happen, force a call itno a special table</span>
+            </li>
+            <li class="fragment">What type of memory accesses would be exceptional?
+              <ul class="fragment">
+                <li>Page / segment defined but not present <br /> (Page Fault / Segment Not Present)</li>
+                <li>Attempt to access paged memory of a higher privilege <br /> (Page Fault)</li>
+                <li>Stack segment limit or presence violation <br /> (Stack Exception)</li>
+                <li>Access invalid memory <br /> (General Protection Exception)</li>
+              </ul>
+            </li>
+          </ul>
+        </section>
+
+        <section>
+          <h3>Page Faults in Xv6</h3>
+          <ul>
+            <li>Allocate memory at load (xv6/exec.c line 5934)</li>
+            <li>There are <emph>no</emph> expected page faults</li>
+          </ul>
+        </section>
+
+        <section>
+          <h3>Page Faults</h3>
+          <ul>
+          <div style="width: 100%">
+            <div style="width: 50%; float: left;">
+              <ul>
+                <li class="fragment">Valid but P not set in PTE</li>
+                <div class="fragment">
+                <li>OS receives an exception</li>
+                <li>Passes to memory manager</li>
+                <li>Memory manager:
+                  <ul>
+                    <li>Allocates pages</li>
+                    <li>Retrieves data from disk</li>
+                    <li>Stores data to the pages</li>
+                    <li>Maps pages to processes' virtual memory</li>
+                  </ul>
+                </li>
+                <li>OS returns execution back to fault causing instruction</li>
+                </div>
+              </ul> <br />
+            </div>
+            <div style="width: 50%; float: left;">
+              <img width="600" src="images/x86-pagefault.png" />
+            </div>
+          </div>
+        </section>
+
+        <section>
+          <h3>Reasons for Page Faults</h3>
+          <ul class="fragment">
+            <li>Guard pages (page stack out of space)</li>
+            <li>Copy on write</li>
+            <li>Pages swapped to disk (over allocation)</li>
+            <li>Data never loaded (on demand)</li>
+          </ul>
+        </section>
+
+
+        <section>
+          <h2>Outline</h2>
+          <ol>
+            <li style="opacity: 0.4;">Recap</li>
+            <li style="opacity: 0.4;">Page Table Performance / Overheads</li>
+            <li style="opacity: 0.4;">Xv6 Code Walkthrough</li>
+            <li style="opacity: 0.4;">Page Faults</li>
+            <li style="opacity: 1.0;">Page Files</li>
+            <li style="opacity: 0.4;">Wrap-Up</li>
+          </ol>
+        </section>
+
+        <section>
+          <h3>Memory Hierarchy</h3>
+          <img width="400" src="images/mem.jpg" /> <br />
+          Over allocate and store some on disk!
+        </section>
+
+        <section>
+          <h3>First in, First out</li>
+          <ul>
+            <li>Use oldest page</li>
+            <li>OS data structures? <span class="fragment">"Stack" of pages</span></li>
+            <li>Issue(s): <span class="fragment">Ignores use of page</span></li>
+          </ul>
+        </section>
+
+        <section>
+          <h3>Second Chance</li>
+          <ul>
+            <li>Enhanced FIFO</li>
+            <li>Check accessed bit:
+              <ul>
+                <li>If unset, use page</li>
+                <li>Else unset, test next oldest page</li>
+              </ul>
+            </li>
+            <li>Can also use write bits</li>
+          </ul>
+        </section>
+
+        <section>
+          <h3>Least Recently Used</h3>
+          <ul>
+            <li>Find page of oldest unaccessed memory</li>
+            <li>Building into OS:
+              <ul class="fragment">
+                <li>Must check access bit -- frequency?</li>
+                <li>Stack based:
+                  <ul>
+                    <li>If accessed, push to top</li>
+                    <li>If need page, pop from bottom</li>
+                  </ul>
+                </li>
+                <li>Timestamp:
+                  <ul>
+                    <li>Add a timestamp field</li>
+                    <li>Find smallest and use</li>
+                  </ul>
+                </li>
+              </ul>
+            </li>
+          </ul>
+        </section>
+
+        <section>
+          <h3>Modern Issues</h3>
+          <p>Garbage collection and streaming media invalidate LRU.</p>
+          <ul>
+            <li>Not recently used -- LRU approximation</li>
+            <li>Used-once -- LRU / FIFO
+              <ul>
+                <li>New pages start on inactive list</li>
+                <li>Promoted to active list after multiple use</li>
+                <li>Pages reclaimed at the end of inactive list</li>
+                <li>Occassionally garbage collect active list</li>
+              </ul>
+            </li>
+          </ul>
+        </section>
+
+
+        <section>
+          <h2>Outline</h2>
+          <ol>
+            <li style="opacity: 0.4;">Recap</li>
+            <li style="opacity: 0.4;">Page Table Performance / Overheads</li>
+            <li style="opacity: 0.4;">Xv6 Code Walkthrough</li>
+            <li style="opacity: 0.4;">Page Faults</li>
+            <li style="opacity: 0.4;">Page Files</li>
+            <li style="opacity: 1.0;">Wrap-Up</li>
+          </ol>
+        </section>
+
+        <section>
+          <h3>Next Time</h3>
+          Wednesday 1:00PM <br />
+          Traps, Interrupts, and the System Call Interface</br />
+        </section>
+
+			</div>
+
+		</div>
+
+		<script src="reveal.js/lib/js/head.min.js"></script>
+		<script src="reveal.js/js/reveal.min.js"></script>
+
+		<script>
+
+			// Full list of configuration options available here:
+			// https://github.com/hakimel/reveal.js#configuration
+			Reveal.initialize({
+				controls: true,
+				progress: true,
+				history: true,
+				center: true,
+        slideNumber: true,
+        margin: 0.0,
+        minScale: 0.5,
+        maxScale: 5.0,
+
+				theme: Reveal.getQueryHash().theme, // available themes are in /css/theme
+				transition: Reveal.getQueryHash().transition || 'default', // default/cube/page/concave/zoom/linear/fade/none
+
+				// Parallax scrolling
+				// parallaxBackgroundImage: 'https://s3.amazonaws.com/hakim-static/reveal-js/reveal-parallax-1.jpg',
+				// parallaxBackgroundSize: '2100px 900px',
+
+				// Optional libraries used to extend on reveal.js
+				dependencies: [
+					{ src: 'reveal.js/lib/js/classList.js', condition: function() { return !document.body.classList; } },
+					{ src: 'reveal.js/plugin/markdown/marked.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+					{ src: 'reveal.js/plugin/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+					{ src: 'reveal.js/plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
+					{ src: 'reveal.js/plugin/zoom-js/zoom.js', async: true, condition: function() { return !!document.body.classList; } },
+					{ src: 'reveal.js/plugin/notes/notes.js', async: true, condition: function() { return !!document.body.classList; } }
+				]
+			});
+
+		</script>
+
+	</body>
+</html>
