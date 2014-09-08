@@ -93,7 +93,7 @@
           <h2>Memory Management</h2>
           <h3>CS422/522 Lecture 4</h3>
           <h3>8 September 2014</h3>
-          <h4>Last updated: 7 September 2014</h4>
+          <h4>Last updated: 8 September 2014</h4>
 				</section>
 
         <section>
@@ -139,7 +139,7 @@
         </section>
 
         <section>
-          <h3>Translation Lookaside BUffer</h3>
+          <h3>Translation Lookaside Buffer</h3>
           <img width="450" src="images/tlb.png" /> <br />
           <ul>
             <li>Maps virtual to physical</li>
@@ -185,6 +185,7 @@
               <li>OS can enforce a ratio of PT to physical memory</li>
               <li>Scales with memory</li>
               <li>Quicker look ups</li>
+              <li>Sharing made easy</li>
             </ul>
           </ul>
         </section>
@@ -224,7 +225,6 @@
         <section>
           <section>
             <h3>Bootstrapping</h3>
-            The first thing a kernel does is turn on paging...
             <pre><code data-noescape="true" data-trim="true">
 1032 # By convention, the _start symbol specifies the ELF entry point.
 1033 # Since we haven’t set up virtual memory yet, our entry point is
@@ -239,6 +239,7 @@
           </section>
           <section>
             <h3>Bootstrapping</h3>
+            The first thing a kernel does is turn on paging...
             <pre><code data-noescape="true" data-trim="true">
 1041 # Turn on page size extension for 4Mbyte pages
 1042 movl %cr4, %eax
@@ -357,6 +358,18 @@
 2829   kmem.freelist = r;
 ...
 2832 }
+            </code></pre>
+          </section>
+
+          <section>
+            <h3>Setting up Virtual Memory</h3>
+            <pre><code data-noescape="true" data-trim="true">
+2827   r = (struct run*)v;
+2828   r−>next = kmem.freelist;
+...
+2764 struct run {
+2765   struct run *next;
+2766 };
             </code></pre>
           </section>
           <section>
@@ -650,11 +663,12 @@
         <section>
           <h3>Memory Hierarchy</h3>
           <img width="400" src="images/mem.jpg" /> <br />
-          Over allocate and store some on disk!
+          RAM / registers limited in size <br />
+          Over-allocate and store some on disk!
         </section>
 
         <section>
-          <h3>First in, First out</li>
+          <h3>First in, First out</h3>
           <ul>
             <li>Use oldest page</li>
             <li>OS data structures? <span class="fragment">"Stack" of pages</span></li>
@@ -663,7 +677,7 @@
         </section>
 
         <section>
-          <h3>Second Chance</li>
+          <h3>Second Chance</h3>
           <ul>
             <li>Enhanced FIFO</li>
             <li>Check accessed bit:
@@ -727,6 +741,15 @@
             <li style="opacity: 0.4;">Page Files</li>
             <li style="opacity: 1.0;">Wrap-Up</li>
           </ol>
+        </section>
+
+        <section>
+          <h3>Systems Seminar</h3>
+          Tomorrow's Topic: Tor <br />
+          Tuesdays at 11:45AM <br />
+          AKW307 <br />
+          Pizza <br />
+          Please contact me if you intend to come <br />
         </section>
 
         <section>
