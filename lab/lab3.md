@@ -1,6 +1,6 @@
 ---
 title: 'Lab 3: User Environments'
-due_date: 'A: 2014-1-17; B: 2014-1-21'
+due_date: 'A: 2014-9-18; B: 2014-9-25'
 ---
 
 Introduction
