@@ -399,9 +399,9 @@ with the x86 interrupt and exception mechanism.
 
 > Read [Chapter 9, Exceptions and Interrupts]
 > ({{ urls.production_url }}/readings/i386/c09.htm) in the
-> [80386 Programmer's > Manual]
+> [80386 Programmer's Manual]
 > ({{ urls.production_url }}/readings/i386/toc.htm)
-> (or Chapter 5 of the [IA-32 > Developer's Manual]
+> (or Chapter 5 of the [IA-32 Developer's Manual]
 > ({{ urls.production_url }}/readings/ia32/IA32-3A.pdf)),
 > if you haven't already.
 
@@ -754,7 +754,7 @@ In `trap.c` we have provided the beginnings of a special function,
 > to `page_fault_handler()`.
 > You should now be able to get make grade
 > to succeed on the `faultread`, `faultreadkernel`, `faultwrite`,
-> and > `faultwritekernel` tests.
+> and `faultwritekernel` tests.
 > If any of them don't work, figure out why and fix them.
 > Remember that you can boot JOS into a particular user program
 > using make run-*x* or make run-*x*-nox.

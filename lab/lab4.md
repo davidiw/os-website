@@ -894,7 +894,7 @@ to IDT entries `IRQ_OFFSET` through `IRQ_OFFSET+15`.
 In `inc/trap.h`, `IRQ_OFFSET` is defined to be decimal 32.
 Thus the IDT entries 32-47 correspond to the IRQs 0-15.
 For example, the clock interrupt is IRQ 0.
-Thus, IDT[IRQ\_OFFSET+0] (i.e., IDT[32]) contains
+Thus, IDT\[IRQ\_OFFSET+0\] (i.e., IDT[32]) contains
 the address of the clock's interrupt handler routine in the kernel.
 This `IRQ_OFFSET` is chosen so that the device interrupts
 do not overlap with the processor exceptions,
