@@ -46,6 +46,8 @@ unless they are of a private or personal nature.
 <h2>Announcements</h2>
 
 <dl>
+<dt>10 Sept</dt>
+<dd>Lab 3a assigned. Beginning next week, office hours on Wednesday will be replaced by hours on Tuesday.</dd>
 <dt>4 Sept</dt>
 <dd>Lab 0 and 1 have an effective due date of 9/10 due to the shopping period</dd>
 <dt>3 Sept</dt>
