@@ -42,7 +42,7 @@ Reading materials
     Manual](http://www.logix.cz/michal/doc/i386/)*, 1987 (HTML). [(local
     copy - PDF)]({{ urls.production_url }}/readings/i386.pdf) [(local copy -
     HTML)]({{ urls.production_url }}/readings/i386/toc.htm) Much shorter than the full current Intel Architecture manuals
-    below, but describes all processor features used in 6.828.
+    below, but describes all processor features used in CS422/522.
 -   [IA-32 Intel Architecture Software Developer's
     Manuals](http://www.intel.com/content/www/us/en/processors/architectures-software-developer-manuals.html),
     Intel, 2007. Local copies:
@@ -158,7 +158,7 @@ Reading materials
     -   [The Guide to ATA/ATAPI
         documentation](http://suif.stanford.edu/~csapuntz/ide.html),
         Constantine Sapuntzakis, January 2002.
--   Sound cards (not supported in 6.828 kernel, but you're welcome to do
+-   Sound cards (not supported in JOS, but you're welcome to do
     it as a challenge problem!)
     -   [Sound Blaster Series Hardware Programming
         Guide]({{ urls.production_url }}/readings/hardware/SoundBlaster.pdf), Creative Technology,
@@ -179,3 +179,35 @@ Reading materials
 -   E1000 Network Interface Card
     -   [PCI/PCI-X Family of Gigabit Ethernet Controllers Software
         Developer’s Manual]({{ urls.production_url }}/readings/hardware/8254x_GBe_SDM.pdf)
+
+### Research Papers
+-   [SPIN—an extensible microkernel for application-specific operating system services]
+    ({{ urls.production_url }}/readings/papers/bershad95spin.pdf),
+    Brian N. Bershad, Craig Chambers, Susan Eggers, Chris Maeda, Dylan McNamee,
+    Przemyslaw Pardyak, Stefan Savage, and Emin Gun Sirer,
+    ACMS SIGOPS Operating Systems Review, January  1995.
+-   [Microkernel operating system architecture and Mach](
+    ({{ urls.production_url }}/readings/papers/black92microkernel.pdf),
+    David L. Black, USENIX Workshop on Micro-Kernels
+    and Other Kernel Architectures, April 1992.
+-   [Exokernel: an operating system architecture for application-level resource management]
+    ({{ urls.production_url }}/readings/papers/engler95exokernel.pdf),
+    Dawson R. Engler, M. Frans Kaashoek, and James O'Toole Jr.,
+    ACM SIGOPS Operating Systems Review, December 1995.
+-   [Thoth, a Portable Real-Time Operating System]
+    ({{ urls.production_url }}/readings/papers/cheriton79thoth.pdf),
+    David R. Cheriton, Michael A. Malcom, Lawrence S. Melen, and Gary R. Safer,
+    Communications of the ACM, February 1979.
+-   [Contiki - a Lightweight and Flexible Operating System for Tiny Networked Sensors]
+    ({{ urls.production_url }}/readings/papers/dunkels04contiki.pdf),
+    Adam Dunkels, Bjorn Gronvall, and Thiemo Voight,
+    IEEE Local Computer Networks, 2004.
+-   [Xen and the Art of Virtualization]
+    ({{ urls.production_url }}/readings/papers/barham03xen.pdf),
+    Paul Barham, Boris Dragovic, Keir Fraser, Steven Hand, Tim Harris,
+    Alex Ho, Rolf Neugebauer, Ian Pratt, and Andrew Warfield,
+    ACM SIGOPS Operating Systems Review, December 2003.
+-   [Formal Requirements for Virtualizable Third Generation Architectures]
+    ({{ urls.production_url }}/readings/papers/popek74virtual.pdf),
+    Gerald J. Popek and Robert P. Goldberg,
+    Communications of the ACM, July 1974.
