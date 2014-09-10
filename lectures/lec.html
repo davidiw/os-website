@@ -31,6 +31,37 @@
 			}
 		</script>
 
+    <script>
+var m_current = 0;
+
+var m_outline = [
+  "Recap",
+  "Traps, Exceptions, and System Calls",
+  "In X86...",
+  "An xv6 Example",
+  "Hardware Interrupts",
+  "Wrap-Up"
+  ];
+
+function writeOutline() {
+  var count = m_outline.length;
+  var trigger = m_current / count;
+
+  document.write("<section>");
+  document.write("<h3>Outline</h3>");
+  document.write("<ol>");
+  for(i = 0; i < count; i++, m_current++) {
+    var opacity = 0.4;
+    if (m_current % count == trigger) {
+      opacity = 1.0;
+    }
+    document.write("<li style=\"opacity: " + opacity + ";\">" + m_outline[i] + "</li>");
+  }
+  document.write("</ol>");
+  document.write("</section>");
+}
+    </script>
+
     <style>
       .reveal pre code { max-height: 700px; }
       .reveal pre { font-size: 70%; }
@@ -59,11 +90,12 @@
           </div>
         </section>
 
+        <script type="text/javascript">writeOutline()</script>
+
         <section>
-          <h2>Outline</h2>
-          <ol>
-            <li style="opacity: 0.4;"></li>
-          </ol>
+          <h3></h3>
+          <pre><code data-noescape="true" data-trim="true">
+          </code></pre>
         </section>
   -->
 				<section>
