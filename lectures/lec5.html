@@ -1,0 +1,649 @@
+<!doctype html>
+<html lang="en">
+
+	<head>
+		<meta charset="utf-8">
+
+    <title>CS422/522 - Lecture 5 - System Interface</title>
+
+    <meta name="description" content="Lecture 5 - System Interface">
+    <meta name="author" content="David Wolinsky">
+
+		<meta name="apple-mobile-web-app-capable" content="yes" />
+		<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+		<link rel="stylesheet" href="reveal.js/css/reveal.min.css">
+		<link rel="stylesheet" href="reveal.js/css/theme/serif.css" id="theme">
+
+		<!-- For syntax highlighting -->
+		<link rel="stylesheet" href="reveal.js/lib/css/zenburn.css">
+
+		<!-- If the query includes 'print-pdf', include the PDF print sheet -->
+		<script>
+			if( window.location.search.match( /print-pdf/gi ) ) {
+				var link = document.createElement( 'link' );
+				link.rel = 'stylesheet';
+				link.type = 'text/css';
+				link.href = 'reveal.js/css/print/pdf.css';
+				document.getElementsByTagName( 'head' )[0].appendChild( link );
+			}
+		</script>
+
+    <script>
+var m_current = 0;
+
+var m_outline = [
+  "Recap",
+  "Traps, Exceptions, and System Calls",
+  "In X86...",
+  "An xv6 Example",
+  "Hardware Interrupts",
+  "Wrap-Up"
+  ];
+
+function writeOutline() {
+  var count = m_outline.length;
+  var trigger = m_current / count;
+
+  document.write("<section>");
+  document.write("<h3>Outline</h3>");
+  document.write("<ol>");
+  for(i = 0; i < count; i++, m_current++) {
+    var opacity = 0.4;
+    if (m_current % count == trigger) {
+      opacity = 1.0;
+    }
+    document.write("<li style=\"opacity: " + opacity + ";\">" + m_outline[i] + "</li>");
+  }
+  document.write("</ol>");
+  document.write("</section>");
+}
+    </script>
+    <style>
+      .reveal pre code { max-height: 700px; }
+      .reveal pre { font-size: 70%; }
+      .reveal p { text-align: left; }
+    </style>
+
+		<!--[if lt IE 9]>
+		<script src="reveal.js/lib/js/html5shiv.js"></script>
+		<![endif]-->
+	</head>
+
+	<body>
+
+		<div class="reveal">
+
+			<!-- Any section element inside of this container is displayed as a slide -->
+			<div class="slides">
+  <!--
+        <section>
+          <h3>Divided</h3>
+          <div style="width: 100%">
+            <div style="width: 50%; float: left;">
+            </div>
+            <div style="width: 50%; float: left;">
+            </div>
+          </div>
+        </section>
+
+        <script type="text/javascript">writeOutline()</script>
+  -->
+				<section>
+          <h2>System Interface</h2>
+          <h3>CS422/522 Lecture 5</h3>
+          <h3>10 September 2014</h3>
+          <h4>Last updated: 10 September 2014</h4>
+				</section>
+
+        <script type="text/javascript">writeOutline()</script>
+
+        <section>
+          <h3>Recap</h3>
+          <ul>
+            <li>Page table performance</li>
+            <li>Xv6 memory initialization</li>
+            <li>Page faults</li>
+            <li>Page strategies</li>
+          </ul>
+        </section>
+
+        <script type="text/javascript">writeOutline()</script>
+
+        <section>
+          <h3>Processes</h3>
+          <ul>
+            <li>Program in execution</li>
+            <li>Runs in userspace</li>
+            <li>Has own view of memory</li>
+            <li>Uses OS as a library / service to underlying hardware</li>
+          </ul>
+          <p>Today -- OS System Call Abstraction and OS Hardware Interface</p>
+        </section>
+
+        <section>
+          <h3>Transitions</h3>
+          <div style="width: 100%">
+            <div style="width: 50%; float: left;">
+              Types: <br />
+              <ul class="fragment">
+                <li>user to kernel - interrupts, exceptions, traps</li>
+                <li>kernel to user - return from interrupts, exceptions, traps</li>
+                <li>kernel to kernel - context switch, interrupts</li>
+              </ul> <br />
+              Motivation: <br />
+              <ul class="fragment">
+                <li>Isolation</li>
+                <li>Abstraction / transparency</li>
+                <li>Events / notifications</li>
+              </ul>
+            </div>
+            <div style="width: 50%; float: left;">
+              <img src="images/os-structure.png" /> <br />
+            </div>
+          </div>
+        </section>
+
+        <section>
+          <h3>Exceptions and Interrupts</h3>
+          <ul>
+            <li>Control transfer from normal flow to handle special events</li>
+            <li>Exceptions <span class="fragment">errors or exceptional conditions</span>
+              <ul class="fragment">
+                <li>Processor detected: faults, traps, aborts</li>
+                <li>Software interrupts</li>
+              </ul>
+            </li>
+            <li>Interrupts <span class="fragment">asynchronous external event</span>
+              <ul class="fragment">
+                <li>Maskable</li>
+                <li>Nonmaskable</li>
+              </ul>
+            </li>
+          </ul>
+        </section>
+
+        <section>
+          <h3>System calls</h3>
+          Userspace accesses service offered by OS.<br />
+          Categories: <br />
+          <ul class="fragment">
+            <li>Process control</li>
+            <li>File management</li>
+            <li>Device management</li>
+            <li>Information</li>
+            <li>Communication</li>
+            <li>[Protection]</li>
+          </ul>
+        </section>
+
+        <section>
+          <h3>CPU and Transitions</h3>
+          The state before, during, and after.
+          <ul>
+            <li>What should stay the same / be different?
+              <ul class="fragment">
+                <li>Faults -- everything remains the same</li>
+                <li>Traps -- almost everything, increment eip and return value</li>
+              </ul>
+            </li>
+            <li>What happens during?
+              <ul class="fragment">
+                <li>Process request</li>
+                <li>If valid, return result</li>
+                <li>If invalid, kill process or crash kernel</li>
+              </ul>
+            </li>
+          </ul>
+        </section>
+
+        <script type="text/javascript">writeOutline()</script>
+
+        <section>
+          <h3>X86 Exceptions and Interrupts</h3>
+          <ul>
+            <li>Stored in interrupt descriptor table, IDT</li>
+            <li>Descriptor format: <br />
+              <img src="images/interrupt-gate.png" />
+            </li>
+            <li>Three types:
+              <ul>
+                <li>Task - Segmentation based management of processes</li>
+                <li>Interrupt - mask (hardware) interrupts</li>
+                <li>Trap - don't mask interrupts</li>
+              </ul>
+            </li>
+          </ul>
+        </section>
+
+        <section>
+          <h3>Exceptions</h3>
+          Examples: <br />
+          <ul class="fragment">
+            <li>Breakpoint</li>
+            <li>General Protection Fault</li>
+            <li>Page Fault</li>
+            <li>Double Fault -- kernel bug</li>
+            <li>Triple Fault -- kernel bug</li>
+          </ul>
+        </section>
+
+        <section>
+          <h3>Interrupts</h3>
+          <ul>
+            <li>Keyboard</li>
+            <li>Hard drive</li>
+            <li>Mouse</li>
+            <li>Network card</li>
+            <li>Spurious -- there was an interrupt, it has since left</li>
+            <li>System timer</li>
+          </ul>
+        </section>
+
+        <section>
+          <h3>Interrupt Table</h3>
+          <ul>
+            <li>256 descriptor entries</li>
+            <li>Some are already occupied by exceptions</li>
+            <li>OS will maps hardware interrupts (IRQS) to others</li>
+            <li>We can occupy one or more for system calls</li>
+          </ul>
+        </section>
+
+        <section>
+          <h3>System Calls</h3>
+          <ul>
+            <li>Goal: Increase CPU privilege level and execute OS service</li>
+            <li>x86 method - assembly instruction int x</li>
+            <li>When setting the descriptor, the x's descriptor's dpl == <span class="fragment">3</span></li>
+            <li>cpl &gt dpl, general protection fault</li>
+            <li>Passing parameters: <span class="fragment">stack or registers</span></li>
+          </ul>
+        </section>
+
+        <section>
+          <h3>Task State Segment</h3>
+          <ul>
+            <li>Hardware support for process management</li>
+            <li>Slower than software so largely deprecated / unused</li>
+            <li>Except: <span class="fragment">holds kernel (CPL = 0) stack</span></li>
+          </ul>
+        </section>
+
+        <section>
+          <h3>System call overview</h3>
+          <ul>
+            <li>Pass parameters, execute int SYSCALL</li>
+            <li>CPU swaps stacks based upon TSS</li>
+            <li>Pushes ss, esp, eflags, cs, eip, error code (optional)</li>
+            <li>May store rest of the cpu state (depends on system call model / compiler)</li>
+            <li>Execute system call</li>
+            <li>Set return result, where? <span class="fragment">register -- eax</span></li>
+            <li>Restore registers</li>
+            <li>execute iret</li>
+          </ul>
+        </section>
+
+        <script type="text/javascript">writeOutline()</script>
+
+        <section>
+          <section>
+            <h3>Setting up the IDT</h3>
+            <ul>
+              <li>Handlers</li>
+              <li>Building IDT entries</li>
+              <li>Setting the IDT</li>
+            </ul>
+          </section>
+          <section>
+            <h3>Handlers</h3>
+            Make produces a vector.S file from vectors.pl:
+            <pre><code data-noescape="true" data-trim="true">
+2981 # .globl vector0
+2982 # vector0:
+2983 # pushl $0 # error
+2984 # pushl $0 # trap number
+2985 # jmp alltraps
+            </code></pre>
+          </section>
+          <section>
+            <h3>Pointers to handlers</h3>
+            <pre><code data-noescape="true" data-trim="true">
+2988 # # vector table
+2989 # .data
+2990 # .globl vectors
+2991 # vectors:
+2992 # .long vector0
+2993 # .long vector1
+2994 # .long vector2
+2995 # ...
+            </code></pre>
+          </section>
+          <section>
+            <h3>Creating the IDT</h3>
+            Called from int main...
+            <pre><code data-noescape="true" data-trim="true">
+3071   for(i = 0; i &lt 256; i++)
+3072     SETGATE(idt[i], 0, SEG_KCODE&lt&lt3, vectors[i], 0);
+3073   SETGATE(idt[T_SYSCALL], 1, SEG_KCODE&lt&lt3, 
+           vectors[T_SYSCALL], DPL_USER);
+            </code></pre>
+          </section>
+          <section>
+            <h3>Setting the IDT</h3>
+            <pre><code data-noescape="true" data-trim="true">
+3081 lidt(idt, sizeof(idt));
+            </code></pre>
+          </section>
+        </section>
+
+        <section>
+          <section>
+            <h3>An Example Using SBRK</h3>
+            <ul>
+              <li>sbrk allocates and frees memory for a process</li>
+              <li>User doesn't typically call, instead uses: <span class="fragment">malloc and free</span></li>
+              <li>sbrk(int increment)
+                <ul>
+                  <li>increment &gt 0 -- <span class="fragment">allocate more memory</span></li>
+                  <li>increment == 0 -- <span class="fragment">determine upper memory boundary</span></li>
+                  <li>increment &lt 0 -- <span class="fragment">free memory</span></li>
+                  <li>In xv6 only  &gt 0 is supported</li>
+                </ul>
+              </li>
+            </ul>
+          </section>
+          <section>
+            <h3>Calling SBRK</h3>
+            <pre><code data-noescape="true" data-trim="true">
+new_va = sbrk(1000);
+            </code></pre>
+          </section>
+          <section>
+            <h3>Entering the Kernel</h3>
+            Enters usys.S and a function like:
+            <pre><code data-noescape="true" data-trim="true">
+.globl sbrk
+sbrk:
+  movl $SYS_SBRK, %eax
+  int $T_SYSCALL
+  ret
+            </code></pre>
+          </section>
+          <section>
+            <h3>Entering the Trap Handler</h3>
+            <pre><code data-noescape="true" data-trim="true">
+.globl vector64
+vector64:
+  pushl $0 # error
+  pushl $64 # trap number
+  jmp alltraps
+            </code></pre>
+          </section>
+          <section>
+            <h3>Initial Trap Handling</h3>
+            <pre><code data-noescape="true" data-trim="true">
+3003 .globl alltraps
+3004 alltraps:
+3005 # Build trap frame.
+3006 pushl %ds
+3007 pushl %es
+3008 pushl %fs
+3009 pushl %gs
+3010 pushal
+3011
+3012 # Set up data and per−cpu segments.
+3013 movw $(SEG_KDATA&lt&lt3), %ax
+3014 movw %ax, %ds
+3015 movw %ax, %es
+3016 movw $(SEG_KCPU&lt&lt3), %ax
+3017 movw %ax, %fs
+3018 movw %ax, %gs
+            </code></pre>
+          </section>
+          <section>
+            <h3>Entering the C Trap Handler</h3>
+            <pre><code data-noescape="true" data-trim="true">
+3020 # Call trap(tf), where tf=%esp
+3021 pushl %esp
+3022 call trap
+            </code></pre>
+          </section>
+          <section>
+            <h3>The C Trap Handler</h3>
+            <pre><code data-noescape="true" data-trim="true">
+3101 trap(struct trapframe *tf)
+3102 {
+3103   if(tf−>trapno == T_SYSCALL){
+3104     if(proc−>killed)
+3105       exit();
+3106     proc−>tf = tf;
+3107     syscall();
+3108     if(proc−>killed)
+3109       exit();
+3110     return;
+3111   }
+...
+            </code></pre>
+          </section>
+          <section>
+            <h3>System Call Handler</h3>
+            <pre><code data-noescape="true" data-trim="true">
+3375 syscall(void)
+3376 {
+3377   int num;
+3378
+3379   num = proc−>tf−>eax;
+3380   if(num > 0 && num < NELEM(syscalls) && syscalls[num]) {
+3381     proc−>tf−>eax = syscalls[num]();
+3382   } else {
+3383     cprintf("%d %s: unknown sys call %d\n",
+3384     proc−>pid, proc−>name, num);
+3385     proc−>tf−>eax = −1;
+3386   }
+3387 }
+            </code></pre>
+          </section>
+          <section>
+            <h3>Defining sys_sbrk</h3>
+            <pre><code data-noescape="true" data-trim="true">
+3344 extern int sys_sbrk(void);
+...
+3350 static int (*syscalls[])(void) = {
+...
+3362 [SYS_sbrk] sys_sbrk,
+...
+            </code></pre>
+          </section>
+          <section>
+            <h3>Executing the system call</h3>
+            <pre><code data-noescape="true" data-trim="true">
+3451 sys_sbrk(void)
+3452 {
+3453   int addr;
+3454   int n;
+3455
+3456   if(argint(0, &n) &lt 0)
+3457     return −1;
+3458   addr = proc−>sz;
+3459   if(growproc(n) &lt 0)
+3460     return −1;
+3461   return addr;
+3462 }
+            </code></pre>
+          </section>
+          <section>
+            <h3>growproc</h3>
+            <ul>
+              <li>Wrapper around growproc</li>
+              <li>growproc actually supports increasing or decreasing memory</li>
+              <li>growproc wraps allocuvm / deallocuvm</li>
+              <li>allocuvm / deallocuvm wrap kalloc / kfree with proper va to pa mappings</li>
+            </ul>
+          </section>
+          <section>
+            <h3>Return to User</h3>
+            <pre><code data-noescape="true" data-trim="true">
+3381     proc−>tf−>eax = syscalls[num]();
+...
+3023 addl $4, %esp
+3024
+3025 # Return falls through to trapret...
+3026 .globl trapret
+3027 trapret:
+3028 popal
+3029 popl %gs
+3030 popl %fs
+3031 popl %es
+3032 popl %ds
+3033 addl $0x8, %esp # trapno and errcode
+3034 iret
+            </code></pre>
+          </section>
+          <section>
+            <h3>Calling SBRK</h3>
+            <pre><code data-noescape="true" data-trim="true">
+new_va = sbrk(1000);
+// new_va should be + 1000 bytes from beyond the previous limit
+            </code></pre>
+          </section>
+        </section>
+
+        <script type="text/javascript">writeOutline()</script>
+
+        <section>
+          <h3>Hardware Interrupts</h3>
+          <ul>
+            <li>Notification of an event from hardware</li>
+            <li>EFLAGS-IF -- set = enabled, unset = disabled</li>
+            <li>Example system timer:
+              <ul>
+                <li>Set to tick off at some fixed time interval -- 10 ms</li>
+                <li>Every 10 ms, interrupt generated</li>
+                <li>In kernel -- IF = 0</li>
+                <li>In user -- IF = 1</li>
+                <li>When triggered, causes trap</li>
+                <li>Trap handler causes switching to a new process</li>
+                <li>Continue execution of resumed process</li>
+              </ul>
+            </li>
+          </ul>
+        </section>
+
+        <section>
+          <h3>Hardware Interrupts Interface</h3>
+          <ul>
+            <li>CPU delegates to APIC (advanced programmable interface</li>
+            <li>Upto 15 different entries</li>
+            <li>Connect directly to CPU trap numbers</li>
+            <li>Mapping setup by calls to APIC</li>
+            <li>After <i>each</i> hardware interrupt, must reset state: <br />
+              send an EOI (end of interrupt) or no more interrupts
+            </li>
+          </ul>
+        </section>
+
+        <section>
+          <h3>Alternatives to Hardware Interrupts</h3>
+          <ul>
+            <li>Consider events versus polling</li>
+            <li>Interrupts would be <span class="fragment">events</span></li>
+            <li class="fragment">Could we implement all hardware interrupts as polling? <br />
+              <span class="fragment">
+                Hard to enforce time sharing:
+                A good process might yield, but a malicious process might never yield
+              </span>
+            </li>
+            <li class="fragment">Performance:
+              <span class="fragment">
+                each poll attempt requires a user to kernel, kernel to user transition
+              </span>
+            </li>
+          </ul>
+        </section>
+
+        <script type="text/javascript">writeOutline()</script>
+
+        <section>
+          <h3>Office Hours Change</h3>
+          After today, Wednesday's office hour cancelled.
+          New office hour Tuesday 1-2 PM
+        <section>
+          <h3>Presentation Days</h3>
+          <ul>
+            <li>During the semester between 3 to 5 days of paper presentations</li>
+            <li>Bad grade begone</li>
+            <li>List of papers forthcoming</li>
+            <li>Student presenting does not need to send review</li>
+            <li>May be (should be) presented in the Tuesday seminars for bonus bad grade begone</li>
+          </ul>
+        </section>
+
+        <section>
+          <h3>Lab 0, Lab 1, Lab 2</h3>
+          <ul>
+            <li>Lab 0 and Lab 1 due tonight before 11:59 PM for credit</li>
+            <li>Lab 2 must due tomorrow before 11:59 PM for full credit</li>
+            <li>Lab 2 has 3 late days, each reduces final score by 10%</li>
+          </ul>
+        </section>
+
+        <section>
+          <h3>Lab 3A: User Environments</h3>
+          <ul>
+            <li>Due: 9/18 @ 11:59 PM</li>
+            <li>Building environments (processes)</li>
+            <li>Implementing a trap handler</li>
+          </ul>
+        </section>
+
+        <section>
+          <h3>Next Time</h3>
+          Monday 1:00PM <br />
+          Processes<br />
+        </section>
+			</div>
+
+		</div>
+
+		<script src="reveal.js/lib/js/head.min.js"></script>
+		<script src="reveal.js/js/reveal.min.js"></script>
+
+		<script>
+
+			// Full list of configuration options available here:
+			// https://github.com/hakimel/reveal.js#configuration
+			Reveal.initialize({
+				controls: true,
+				progress: true,
+				history: true,
+				center: true,
+        slideNumber: true,
+        margin: 0.0,
+        minScale: 0.5,
+        maxScale: 5.0,
+
+				theme: Reveal.getQueryHash().theme, // available themes are in /css/theme
+				transition: Reveal.getQueryHash().transition || 'default', // default/cube/page/concave/zoom/linear/fade/none
+
+				// Parallax scrolling
+				// parallaxBackgroundImage: 'https://s3.amazonaws.com/hakim-static/reveal-js/reveal-parallax-1.jpg',
+				// parallaxBackgroundSize: '2100px 900px',
+
+				// Optional libraries used to extend on reveal.js
+				dependencies: [
+					{ src: 'reveal.js/lib/js/classList.js', condition: function() { return !document.body.classList; } },
+					{ src: 'reveal.js/plugin/markdown/marked.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+					{ src: 'reveal.js/plugin/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+					{ src: 'reveal.js/plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
+					{ src: 'reveal.js/plugin/zoom-js/zoom.js', async: true, condition: function() { return !!document.body.classList; } },
+					{ src: 'reveal.js/plugin/notes/notes.js', async: true, condition: function() { return !!document.body.classList; } }
+				]
+			});
+
+		</script>
+
+	</body>
+</html>
