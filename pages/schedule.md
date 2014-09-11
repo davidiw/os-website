@@ -267,7 +267,9 @@ Template:
    <td>
     <span class="text-muted"><script type="text/javascript">getDate()</script></span><br />
     <span class="text-primary">
-      <b>Code review: </b> Lab 3
+<b>Paper:</b> <a href="{{ urls.production_url }}/readings/papers/engler95exokernel.pdf">
+Exokernel: an operating system architecture for application-level resource management</a>
+by Iulia Tamas <br />
     </span>
    </td>
    <td>
@@ -276,7 +278,9 @@ Template:
    <td>
     <span class="text-muted"><script type="text/javascript">getDate()</script></span><br />
     <span class="text-primary">
-      <b>Hacking day</b>
+<b>Paper:</b> <a href="{{ urls.production_url }}/readings/papers/hunt07singularity.pdf">
+Singularity: Rethinking the Software Stack</a>
+by Dylan Visher <br />
     </span><br />
     <span class="text-info">
       <b>Assignment: </b> <a href="{{ urls.production_url }}/lab/lab4">Lab 4c</a>

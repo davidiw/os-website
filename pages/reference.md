@@ -186,7 +186,7 @@ Reading materials
     Brian N. Bershad, Craig Chambers, Susan Eggers, Chris Maeda, Dylan McNamee,
     Przemyslaw Pardyak, Stefan Savage, and Emin Gun Sirer,
     ACMS SIGOPS Operating Systems Review, January  1995.
--   [Microkernel operating system architecture and Mach](
+-   [Microkernel operating system architecture and Mach]
     ({{ urls.production_url }}/readings/papers/black92microkernel.pdf),
     David L. Black, USENIX Workshop on Micro-Kernels
     and Other Kernel Architectures, April 1992.
