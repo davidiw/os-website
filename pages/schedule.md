@@ -489,7 +489,8 @@ Template:
    <td>
     <span class="text-muted"><script type="text/javascript">getDate()</script></span><br />
     <span class="text-primary">
-      <b>Paper review:</b>
+<b>Paper:</b> <a href="{{ urls.production_url }}/readings/papers/barham03xen.pdf">Xen and the Art of Virtualization</a>
+by Faisal Zaghloul <br />
     </span>
    </td>
    <td>

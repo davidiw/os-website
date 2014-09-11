@@ -211,3 +211,22 @@ Reading materials
     ({{ urls.production_url }}/readings/papers/popek74virtual.pdf),
     Gerald J. Popek and Robert P. Goldberg,
     Communications of the ACM, July 1974.
+-   [The Design and Implementation of a Log-Structured File System]
+    ({{ urls.production_url }}/readings/papers/rosenblum92lfs.pdf),
+    Mendel Rosenblum and John K. Ousterhout,
+    ACM Transactions on Computer Systems, February 1992.
+-   [End-to-End Arguments in System Design]
+    ({{ urls.production_url }}/readings/papers/saltzer84e2e.pdf)
+    Jerome H. Saltzer, David P. Reed, and David D. Clark,
+    ACM Transactions on Computer Systems,
+    November 1984.
+-   [Reflections on an Operating System Design]
+    ({{ urls.production_url }}/readings/papers/lampson76design.pdf)
+    Butler W. Lampson and Howard E. Sturgis,
+    Communications of the ACM,
+    May 1976.
+-   [Singularity: Rethinking the Software Stack]
+    ({{ urls.production_url }}/readings/papers/hunt07singularity.pdf),
+    Galen C. Hunt and James R. Larus,
+    ACM SIGOPS Operating Systems Review,
+    April 2007
