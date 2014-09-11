@@ -38,8 +38,9 @@ $ cd ~/cs422/lab
 $ git commit -am 'changes to lab2 after handin'
 Created commit 734fab7: changes to lab2 after handin
  4 files changed, 42 insertions(+), 9 deletions(-)
-$ git pull
-Already up-to-date.
+$ git fetch jos
+From /c/cs422/repo/joslab
+ * [new branch]      lab3       -> jos/lab3
 $ git checkout --no-track -b lab3 jos/lab3
 Switched to a new branch "lab3"
 $ git push --set-upstream origin lab3
