@@ -203,7 +203,9 @@ Template:
    <td>
     <span class="text-muted"><script type="text/javascript">getDate()</script></span><br />
     <span class="text-primary">
-      <b>Code review: </b>Shell, Lab 1, Lab 2</b>
+<b>Paper:</b> <a href="{{ urls.production_url }}/readings/papers/dunkels04contiki.pdf">
+Contiki - a Lightweight and Flexible Operating System for Tiny Networked Sensors</a>
+by Rahul Dhodapkar <br />
     </span>
    </td>
    <td>
@@ -270,6 +272,9 @@ Template:
 <b>Paper:</b> <a href="{{ urls.production_url }}/readings/papers/engler95exokernel.pdf">
 Exokernel: an operating system architecture for application-level resource management</a>
 by Iulia Tamas <br />
+<b>Paper:</b> <a href="{{ urls.production_url }}/readings/papers/black92microkernel">
+Microkernel operating system architecture and Mach</a>
+by Jonathan Cai <br />
     </span>
    </td>
    <td>
@@ -281,6 +286,9 @@ by Iulia Tamas <br />
 <b>Paper:</b> <a href="{{ urls.production_url }}/readings/papers/hunt07singularity.pdf">
 Singularity: Rethinking the Software Stack</a>
 by Dylan Visher <br />
+<b>Paper:</b> <a href="{{ urls.production_url }}/readings/papers/saltzer84e2e.pdf">
+End-to-End Arguments in System Design</a>
+by Daniel Dickstein <br />
     </span><br />
     <span class="text-info">
       <b>Assignment: </b> <a href="{{ urls.production_url }}/lab/lab4">Lab 4c</a>
@@ -493,8 +501,12 @@ by Dylan Visher <br />
    <td>
     <span class="text-muted"><script type="text/javascript">getDate()</script></span><br />
     <span class="text-primary">
-<b>Paper:</b> <a href="{{ urls.production_url }}/readings/papers/barham03xen.pdf">Xen and the Art of Virtualization</a>
+<b>Paper:</b> <a href="{{ urls.production_url }}/readings/papers/barham03xen.pdf">
+Xen and the Art of Virtualization</a>
 by Faisal Zaghloul <br />
+<b>Paper:</b> <a href="{{ urls.production_url }}/readings/papers/rosenblum92lfs.pdf">
+The Design and Implementation of a Log-Structured File System</a>
+by Seth Lifland <br />
     </span>
    </td>
    <td>
