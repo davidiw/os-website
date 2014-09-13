@@ -1020,4 +1020,4 @@ to examine your changes
 and don't forget to `git add answers-lab3.txt`.
 When you're ready,
 commit your changes with `git commit -am 'my solutions to lab 3'`,
-then `make handin` and follow the directions.
+then `git push` and follow the directions.

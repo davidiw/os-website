@@ -530,4 +530,4 @@ Make sure you pass all of the make grade tests
 and don't forget to write up your answers
 to the questions in `answers-lab2.txt`.
 Commit your changes (including adding `answers-lab2.txt`)
-and type `make handin` in the `lab` directory to hand in your lab.
+and type `git push` in the `lab` directory to hand in your lab.
