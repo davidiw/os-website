@@ -52,7 +52,7 @@
           <h2>Virtual Memory</h2>
           <h3>CS422/522 Lecture 3</h3>
           <h3>3 September 2014</h3>
-          <h4>Last updated: 3 September 2014</h4>
+          <h4>Last updated: 14 September 2014</h4>
 				</section>
 
         <section>
@@ -148,6 +148,16 @@
         <section>
           <h3>x86 Memory Layout</h3>
           <img height="550" src="images/memory-layout.png" />
+        </section>
+
+        <section>
+          <h3>Virtual Memory</h3>
+          <ul>
+            <li>Hardware support for independent views of memory</li>
+            <li>Stored in physical RAM</li>
+            <li>Software only uses virtual memory addresses</li>
+            <li>OS maintains -- must be able to translate between the two</li>
+          </ul>
         </section>
 
         <section>
@@ -530,7 +540,7 @@ jmp $0xf000, $0x10 # CS = $0xf000, EIP = $0xf0010
             <li style="opacity: 0.4;">Overview of Memory</li>
             <li style="opacity: 0.4;">Memory Models</li>
             <li style="opacity: 0.4;">Sharing Memory</li>
-            <li style="opacity: 0.4;">Wrap-Up</li>
+            <li>Wrap-Up</li>
           </ol>
         </section>
 
@@ -538,17 +548,6 @@ jmp $0xf000, $0x10 # CS = $0xf000, EIP = $0xf0010
           <h3>Compilation Process</h3>
           <img width="600" src="images/compilation.png" /><br />
           Compiler, assembler, linking, loading
-        </section>
-
-        <section>
-          <h3>Outline</h3>
-          <ol>
-            <li style="opacity: 0.4;">Recap / Pointers</li>
-            <li style="opacity: 0.4;">Overview of Memory</li>
-            <li style="opacity: 0.4;">Memory Models</li>
-            <li style="opacity: 0.4;">Sharing Memory</li>
-            <li>Wrap-Up</li>
-          </ol>
         </section>
 
         <section>

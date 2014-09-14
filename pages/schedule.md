@@ -168,7 +168,8 @@ Template:
    <td>
     <span class="text-muted"><script type="text/javascript">getDate()</script></span><br />
     <span class="text-primary">
-      <b>Lecture <script type="text/javascript">lectnum()</script>: </b> Processes and Threads
+      <b>Lecture <script type="text/javascript">lectnum()</script>: </b>
+      <a href="{{ urls.production_url }}/lectures/lec6.html">Processes and Threads</a>
     </span><br />
     <span class="text-success">
       <b>Preparation: </b>osc ch 3.1-3.3, ch 4
@@ -206,6 +207,9 @@ Template:
 <b>Paper:</b> <a href="{{ urls.production_url }}/readings/papers/dunkels04contiki.pdf">
 Contiki - a Lightweight and Flexible Operating System for Tiny Networked Sensors</a>
 by Rahul Dhodapkar <br />
+<b>Paper:</b> <a href="{{ urls.production_url }}/readings/papers/lampson76design">
+Reflections on an Operating System Design</a>
+by Hugh O'Cinneide <br />
     </span>
    </td>
    <td>

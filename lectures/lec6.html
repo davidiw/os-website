@@ -1,0 +1,754 @@
+<!doctype html>
+<html lang="en">
+
+	<head>
+		<meta charset="utf-8">
+
+    <title>CS422/522 - Lecture 6 - Processes</title>
+
+    <meta name="description" content="Lecture 6 - Processes">
+    <meta name="author" content="David Wolinsky">
+
+		<meta name="apple-mobile-web-app-capable" content="yes" />
+		<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+		<link rel="stylesheet" href="reveal.js/css/reveal.min.css">
+		<link rel="stylesheet" href="reveal.js/css/theme/serif.css" id="theme">
+
+		<!-- For syntax highlighting -->
+		<link rel="stylesheet" href="reveal.js/lib/css/zenburn.css">
+
+		<!-- If the query includes 'print-pdf', include the PDF print sheet -->
+		<script>
+			if( window.location.search.match( /print-pdf/gi ) ) {
+				var link = document.createElement( 'link' );
+				link.rel = 'stylesheet';
+				link.type = 'text/css';
+				link.href = 'reveal.js/css/print/pdf.css';
+				document.getElementsByTagName( 'head' )[0].appendChild( link );
+			}
+		</script>
+
+    <script>
+var m_current = 0;
+
+var m_outline = [
+  "Recap",
+  "Building a Process",
+  "Running a Process",
+  "Userspace",
+  "Process Monitoring",
+  "Threads",
+  "Wrap-Up"
+  ];
+
+function writeOutline() {
+  var count = m_outline.length;
+  var trigger = m_current / count;
+
+  document.write("<section>");
+  document.write("<h3>Outline</h3>");
+  document.write("<ol>");
+  for(i = 0; i < count; i++, m_current++) {
+    var opacity = 0.4;
+    if (m_current % count == trigger) {
+      opacity = 1.0;
+    }
+    document.write("<li style=\"opacity: " + opacity + ";\">" + m_outline[i] + "</li>");
+  }
+  document.write("</ol>");
+  document.write("</section>");
+}
+    </script>
+
+    <style>
+      .reveal pre code { max-height: 700px; }
+      .reveal pre { font-size: 70%; }
+      .reveal p { text-align: left; }
+    </style>
+
+		<!--[if lt IE 9]>
+		<script src="reveal.js/lib/js/html5shiv.js"></script>
+		<![endif]-->
+	</head>
+
+	<body>
+
+		<div class="reveal">
+
+			<!-- Any section element inside of this container is displayed as a slide -->
+			<div class="slides">
+  <!--
+        <section>
+          <h3>Divided</h3>
+          <div style="width: 100%">
+            <div style="width: 50%; float: left;">
+            </div>
+            <div style="width: 50%; float: left;">
+            </div>
+          </div>
+        </section>
+
+        <script type="text/javascript">writeOutline()</script>
+
+        <section>
+          <h3></h3>
+          <pre><code data-noescape="true" data-trim="true">
+          </code></pre>
+        </section>
+  -->
+				<section>
+          <h2>Processes</h2>
+          <h3>CS422/522 Lecture 6</h3>
+          <h3>15 September 2014</h3>
+          <h4>Last updated: 14 September 2014</h4>
+				</section>
+
+        <script type="text/javascript">writeOutline()</script>
+
+        <section>
+          <h3>Recap</h3>
+          <ul>
+            <li>Interrupts vs Exceptions</li>
+            <li>Traps vs Faults</li>
+            <li>System calls and DPL</li>
+            <li>IRQs -- Hardware Interrupts</li>
+          </ul>
+        </section>
+
+        <script type="text/javascript">writeOutline()</script>
+
+        <section>
+          <h3>Process States</h3>
+          <ul>
+            <li>unused</li>
+            <li>embyro -- new</li>
+            <li>sleep -- waiting</li>
+            <li>runnable -- ready</li>
+            <li>run</li>
+            <li>zombie -- terminated</li>
+          </ul>
+        </section>
+
+        <section>
+          <h3>Building a Process</h3>
+          <ul>
+            <li>Acquire necessary kernel state:
+              <ul>
+                <li>Valid PID</li>
+                <li>Process structure</li>
+              </ul>
+            </li>
+            <li>Memory layout:
+              <ul class="fragment">
+                <li>Kernel code and data -- faster exception / interrupt handling</li>
+                <li>Application code and data -- where? <span class="fragment">elf or fixed</span></li>
+                <li>Stack -- where? <span class="fragment">specific area or end of data page</span></li>
+              </ul>
+            </li>
+            <li>Setting the initial CPU state:
+              <ul class="fragment">
+                <li>Set segmentation registers to user code</li>
+                <li>Enable interrupts</li>
+                <li>Set the stack pointer</li>
+                <li>Set the instruction pointer</li>
+              </ul>
+            </li>
+          </ul>
+        </section>
+
+        <section>
+          <section>
+            <h3>Xv6 Initial Program Setup</h3>
+          </section>
+
+          <section>
+            <h3>Kernel State</h3>
+            <pre><code data-noescape="true" data-trim="true">
+2211   for(p = ptable.proc; p < &ptable.proc[NPROC]; p++)
+2212     if(p−>state == UNUSED)
+2213       goto found;
+2215   return 0;
+2217 found:
+2218   p−>state = EMBRYO;
+2219   p−>pid = nextpid++;
+2220   release(&ptable.lock);
+2221
+2222   // Allocate kernel stack.
+2223   if((p−>kstack = kalloc()) == 0){
+2224     p−>state = UNUSED;
+2225     return 0;
+2226   }
+2227   sp = p−>kstack + KSTACKSIZE;
+            </code></pre>
+          </section>
+
+
+          <section>
+            <h3>Memory Setup</h3>
+            <pre><code data-noescape="true" data-trim="true">
+2259   if((p−>pgdir = setupkvm()) == 0)
+2260     panic("userinit: out of memory?");
+2261   inituvm(p−>pgdir, _binary_initcode_start, (int)_binary_initcode_size);
+            </code></pre>
+          </section>
+
+          <section>
+            <h3>Loading the Application Data</h3>
+            <pre><code data-noescape="true" data-trim="true">
+1800 // Load the initcode into address 0 of pgdir.
+1801 // sz must be less than a page.
+1802 void
+1803 inituvm(pde_t *pgdir, char *init, uint sz)
+1804 {
+1805   char *mem;
+1806
+1807   if(sz >= PGSIZE)
+1808      panic("inituvm: more than a page");
+1809   mem = kalloc();
+1810   memset(mem, 0, PGSIZE);
+1811   mappages(pgdir, 0, PGSIZE, v2p(mem), PTE_W|PTE_U);
+1812   memmove(mem, init, sz);
+1813 }
+            </code></pre>
+          </section>
+
+          <section>
+            <h3>Preparing the User CPU State</h3>
+            <pre><code data-noescape="true" data-trim="true">
+2229   // Leave room for trap frame.
+2230   sp −= sizeof *p−>tf;
+2231   p−>tf = (struct trapframe*)sp;
+...
+2263   memset(p−>tf, 0, sizeof(*p−>tf));
+2264   p−>tf−>cs = (SEG_UCODE &lt&lt 3) | DPL_USER;
+2265   p−>tf−>ds = (SEG_UDATA &lt&lt 3) | DPL_USER;
+2266   p−>tf−>es = p−>tf−>ds;
+2267   p−>tf−>ss = p−>tf−>ds;
+2268   p−>tf−>eflags = FL_IF;
+2269   p−>tf−>esp = PGSIZE;
+2270   p−>tf−>eip = 0; // beginning of initcode.S
+            </code></pre>
+          </section>
+        </section>
+
+        <script type="text/javascript">writeOutline()</script>
+
+        <section>
+          <h3>Lifetime of a Process</h3>
+          <ul>
+            <li>Starting a process</li>
+            <li>Suspending a process</li>
+            <li>Resuming a process</li>
+            <li>Terminating a process</li>
+          </ul>
+        </section>
+
+        <section>
+          <h3>Starting a Process</h3>
+          <ul>
+            <li>How do we (typically) enter kernel mode? <span class="fragment">exceptions</span></li>
+            <li>The process:
+              <ul class="fragment">
+                <li>Setup kernel stack as if interrupt occurred</li>
+                <li>Call iret to pop back into user mode</li>
+              </ul>
+            </li>
+          </ul>
+        </section>
+          
+        <section>
+          <h3>Suspending a Process</h3>
+          Mechanisms for Suspending a Process:
+          <ul class="fragment">
+            <li>Explicitly yielding</li>
+            <li>Waiting for another process</li>
+            <li>Waiting on an event</li>
+            <li>System timer</li>
+          </ul> <br />
+          What triggers these? <span class="fragment">exceptions / interrupts</span>
+        </section>
+
+        <section>
+          <h3>Resuming a Process</h3>
+          <ul>
+            <li>Not all that different from starting</li>
+            <li>Pick a process (scheduling)</li>
+            <li>Use an iret as a software context switch</li>
+          </ul>
+        </section>
+
+        <section>
+          <h3>Terminating a Process</h3>
+          Reasons for terminating a process: <br />
+          <ul class="fragment">
+            <li>end of execution</li>
+            <li>user terminated</li>
+            <li>illegal action</li>
+          </ul> <br />
+          What needs to be done? <br />
+          <ul class="fragment">
+            <li>Clean up open files</li>
+            <li>Release process</li>
+            <li>Free memory</li>
+          </ul>
+        </section>
+
+        <section>
+          <section>
+            <h3>Xv6 Process Lifetime</h3>
+          </section>
+
+          <section>
+            <h3>Preparing the Process</h3>
+            <pre><code data-noescape="true" data-trim="true">
+2233   // Set up new context to start executing at forkret,
+2234   // which returns to trapret.
+2235   sp −= 4;
+2236   *(uint*)sp = (uint)trapret; // lecture 5
+2237
+2238   sp −= sizeof *p−>context;
+2239   p−>context = (struct context*)sp;
+2240   memset(p−>context, 0, sizeof *p−>context);
+2241   p−>context−>eip = (uint)forkret;
+            </code></pre>
+          </section>
+
+          <section>
+            <h3>Starting the Process</h3>
+            <pre><code data-noescape="true" data-trim="true">
+2472 // Switch to chosen process. It is the process’s job
+2473 // to release ptable.lock and then reacquire it
+2474 // before jumping back to us.
+2475 proc = p;
+2476 switchuvm(p);
+2477 p−>state = RUNNING;
+2478 swtch(&cpu−>scheduler, proc−>context);
+            </code></pre>
+          </section>
+
+          <section>
+            <h3>swtch</h3>
+            <pre><code data-noescape="true" data-trim="true">
+2708 swtch:
+2709   movl 4(%esp), %eax
+2710   movl 8(%esp), %edx
+2712   # Save old callee−save registers
+2713   pushl %ebp
+2714   pushl %ebx
+2715   pushl %esi
+2716   pushl %edi
+2718   # Switch stacks
+2719   movl %esp, (%eax)
+2720   movl %edx, %esp
+2722   # Load new callee−save registers
+2723   popl %edi
+2724   popl %esi
+2725   popl %ebx
+2726   popl %ebp
+2727   ret
+            </code></pre>
+          </section>
+
+          <section>
+            <h3>swtch -- digested</h3>
+            Complex bit of code... high level...
+            <ul>
+              <li>Swap CPU kernel context to process kernel context</li>
+              <li>Save important registers</li>
+              <li>Swap stacks</li>
+              <li>Restore registers</li>
+              <li>Go to the stored eip (forkret)</li>
+              <li>forkret will think that it was called by trapret</li>
+            </ul>
+          </section>
+
+          <section>
+            <h3>Let's consider a yield</h3>
+            We don't actually have this system call, but it is easy to add (try it at home!)
+            <pre><code data-noescape="true" data-trim="true">
+// in some user application
+yield();
+            </code></pre>
+            <pre><code data-noescape="true" data-trim="true">
+.globl yield
+yield:
+  movl $SYS_ yield, %eax
+  int $T_SYSCALL
+  ret
+            </code></pre>
+          </section>
+          <section>
+            <h3>In the Kernel</h3>
+            <pre><code data-noescape="true" data-trim="true">
+2521 void
+2522 yield(void)
+2523 {
+2524   acquire(&ptable.lock);
+2525   proc−>state = RUNNABLE;
+2526   sched();
+2527   release(&ptable.lock);
+2528 }
+            </code></pre>
+          </section>
+          <section>
+            <h3>Swapping contexts back to the scheduler</h3>
+            <pre><code data-noescape="true" data-trim="true">
+2503 sched(void)
+2504 {
+2505   int intena;
+...
+2515   intena = cpu−>intena;
+2516   swtch(&proc−>context, cpu−>scheduler);
+2517   cpu−>intena = intena;
+2518 }
+The CPU will find another process to run and call swtch on it.
+            </code></pre>
+          </section>
+
+          <section>
+            <h3>Termination (misbehavior)</h3>
+            <pre><code data-noescape="true" data-trim="true">
+3150   default:
+...
+3157   // In user space, assume process misbehaved.
+3158   cprintf("pid %d %s: trap %d err %d on cpu %d "
+3159           "eip 0x%x addr 0x%x−−kill proc\n",
+3160           proc−>pid, proc−>name, tf−>trapno, tf−>err, cpu−>id, tf−>eip,
+3161           rcr2());
+3162   proc−>killed = 1;
+...
+3165   // Force process exit if it has been killed and is in user space.
+3166   // (If it is still executing in the kernel, let it keep running
+3167   // until it gets to the regular system call return.)
+3168   if(proc && proc−>killed && (tf−>cs&3) == DPL_USER)
+3169     exit();
+            </code></pre>
+          </section>
+          <section>
+            <h3>exit -- files</h3>
+            <pre><code data-noescape="true" data-trim="true">
+2354 exit(void)
+2355 {
+2356   struct proc *p;
+2357   int fd;
+...
+2362   // Close all open files.
+2363   for(fd = 0; fd < NOFILE; fd++){
+2364     if(proc−>ofile[fd]){
+2365       fileclose(proc−>ofile[fd]);
+2366       proc−>ofile[fd] = 0;
+2367     }
+2368   }
+2369
+2370   iput(proc−>cwd); // file system stuff
+2371   proc−>cwd = 0;
+            </code></pre>
+          </section>
+          <section>
+            <h3>exit -- processes</h3>
+            <pre><code data-noescape="true" data-trim="true">
+2375   // Parent might be sleeping in wait().
+2376   wakeup1(proc−>parent);
+2377
+2378   // Pass abandoned children to init.
+2379   for(p = ptable.proc; p &lt &ptable.proc[NPROC]; p++){
+2380     if(p−>parent == proc){
+2381       p−>parent = initproc;
+2382       if(p−>state == ZOMBIE)
+2383         wakeup1(initproc);
+2384     }
+2385   }
+2386
+2387   // Jump into the scheduler, never to return.
+2388   proc−>state = ZOMBIE;
+2389   sched();
+2390   panic("zombie exit");
+2391 }
+            </code></pre>
+          </section>
+          <section>
+            <h3>Freeing memory</h3>
+            Parents job, happens once the parent waits
+            <pre><code data-noescape="true" data-trim="true">
+2419         kfree(p−>kstack);
+2420         p−>kstack = 0;
+2421         freevm(p−>pgdir);
+            </code></pre>
+          </section>
+          <section>
+            <h3>Freeing memory</h3>
+            <pre><code data-noescape="true" data-trim="true">
+1910 freevm(pde_t *pgdir)
+1911 {
+1912   uint i;
+1913
+1914   if(pgdir == 0)
+1915     panic("freevm: no pgdir");
+1916   deallocuvm(pgdir, KERNBASE, 0);
+1917   for(i = 0; i &lt NPDENTRIES; i++){
+1918     if(pgdir[i] & PTE_P){
+1919       char * v = p2v(PTE_ADDR(pgdir[i]));
+1920       kfree(v);
+1921     }
+1922   }
+1923   kfree((char*)pgdir);
+1924 }
+            </code></pre>
+          </section>
+        </section>
+
+        <script type="text/javascript">writeOutline()</script>
+
+        <section>
+          <h3>Userspace</h3>
+          <ul>
+            <li>init -- initial system process</li>
+            <li>System call: <span class="fragment">fork</span></li>
+            <li>New application system call: <span class="fragment">exec</span></li>
+          </ul>
+        </section>
+
+        <section>
+          <h3>init</h3>
+          <ul>
+            <li>Loads additional kernel module</li>
+            <li>Starts any necessary services</li>
+            <li>Starts the user interface (login + shell / gui)</li>
+          </ul>
+        </section>
+
+        <section>
+          <h3>Xv6 init</h3>
+          <pre><code data-noescape="true" data-trim="true">
+7821   for(;;){
+7822     printf(1, "init: starting sh\n");
+7823     pid = fork();
+7824     if(pid < 0){
+7825       printf(1, "init: fork failed\n");
+7826       exit();
+7827     }
+7828     if(pid == 0){
+7829       exec("sh", argv);
+7830       printf(1, "init: exec sh failed\n");
+7831       exit();
+7832     }
+7833     while((wpid=wait()) >= 0 && wpid != pid)
+7834     printf(1, "zombie!\n");
+7835   }
+          </code></pre>
+        </section>
+
+        <section>
+          <h3>fork</h3>
+          <ul class="fragment">
+            <li>Duplicates calling process</li>
+            <li>Allocates a unique PID</li>
+            <li>pid_t fork(void):
+              <ul>
+                <li>in child, pid == 0</li>
+                <li>in parent, pid &gt 0</li>
+              </ul>
+            </li>
+          </ul>
+        </section>
+
+        <section>
+          <h3>fork</h3>
+          <pre><code data-noescape="true" data-trim="true">
+2304 fork(void)
+...
+2310   if((np = allocproc()) == 0)
+...
+2314   if((np−>pgdir = copyuvm(proc−>pgdir, proc−>sz)) == 0){
+...
+2320   np−>sz = proc−>sz;
+2321   np−>parent = proc;
+2322   *np−>tf = *proc−>tf;
+2325   np−>tf−>eax = 0; // child returns 0
+2327   for(i = 0; i &lt NOFILE; i++)
+2328     if(proc−>ofile[i])
+2329       np−>ofile[i] = filedup(proc−>ofile[i]);
+2330   np−>cwd = idup(proc−>cwd);
+...
+2333   np−>state = RUNNABLE;
+2335   return np->pid;
+          </code></pre>
+        </section>
+
+        <section>
+          <h3>exec</h3>
+          <ul>
+            <li>Replaces existing process image with new application</li>
+            <li>Requires a new virtual memory mapping, erasing previous</li>
+            <li>Read from disk application and store in new vm</li>
+            <li>Set eip as entry point into application</li>
+          </ul>
+        </section>
+
+        <section>
+          <h3></h3>
+          <pre><code data-noescape="true" data-trim="true">
+// IT IS TOO BIG! Lots of error checking
+// and similar code bits as before
+          </code></pre>
+        </section>
+
+        <script type="text/javascript">writeOutline()</script>
+
+        <section>
+          <h3>Process Monitoring</h3>
+          <pre><code data-noescape="true" data-trim="true">
+pid_t pid;
+if((pid = fork()) > 0)
+  wpid = wait();
+else
+  exit()
+assert(wpid == pid);
+          </code></pre>
+        </section>
+
+        <section>
+          <h3>wait</h3>
+          <ul>
+            <li>Child exits</li>
+            <li>Child enters zombie</li>
+            <li>Parent wait finds zombie</li>
+            <li>All good</li>
+          </ul>
+        </section>
+
+        <section>
+          <h3>wait</h3>
+          <ul>
+            <li>Parent waits</li>
+            <li>Child exits</li>
+            <li>Child needs to wakeup parent!</li>
+            <li>Potential race condition...</li>
+          </ul>
+        </section>
+
+        <section>
+          <h3>Race Condition</h3>
+          Child:
+          <pre><code data-noescape="true" data-trim="true">
+2354 exit(void)
+...
+2376   wakeup1(proc−>parent);
+          </code></pre>
+          Parent:
+          <pre><code data-noescape="true" data-trim="true">
+2403 wait(void)
+2412     for(p = ptable.proc; p &lt &ptable.proc[NPROC]; p++){
+2413       if(p−>parent != proc)
+2414         continue;
+2416       if(p−>state == ZOMBIE){
+2428         return pid;
+...
+2439     sleep(proc); 
+          </code></pre>
+        </section>
+
+        <script type="text/javascript">writeOutline()</script>
+
+        <section>
+          <h3>Threads</h3>
+          <ul>
+            <li>Process duplicates everything</li>
+            <li>Thread <span class="fragment">is same context, different register state</span> <br />
+              <img class="fragment" width="600" src="images/threads.png" />
+            </li>
+          </ul>
+        </section>
+
+        <section>
+          <h3>Thread (Process) State</h3>
+          <ul class="fragment">
+            <li>Code</li>
+            <li>Data</li>
+            <li>Stack</li>
+            <li>Files</li>
+          </ul>
+        </section>
+
+        <section>
+          <h3>Types of threads</h3>
+          <ul>
+            <li class="fragment">user:
+              <ul>
+                <li>Share a single process -- many-to-one</li>
+                <li>Cooperative multiprocessing</li>
+                <li>Must overcome blocking operations</li>
+              </ul>
+            </li>
+            <li class="fragment">kernel:
+              <ul>
+                <li>Each has a process -- one-to-one</li>
+                <li>Slightly slower context switch</li>
+              </ul>
+            </li>
+            <li class="fragment">user+kernel:
+              <ul>
+                <li>More flexibility -- many-to-many</li>
+                <li>Threadpools -- why not done in kernel?</li>
+              </ul>
+            </li>
+          </ul>
+        </section>
+
+        <script type="text/javascript">writeOutline()</script>
+
+        <section>
+          <h3>Grades for Lab 0, Lab 1, Lab 2</h3>
+        </section>
+
+        <section>
+          <h3>Next Time</h3>
+          Wednesday 1:00PM <br />
+          Synchronization<br />
+        </section>
+			</div>
+
+		</div>
+
+		<script src="reveal.js/lib/js/head.min.js"></script>
+		<script src="reveal.js/js/reveal.min.js"></script>
+
+		<script>
+
+			// Full list of configuration options available here:
+			// https://github.com/hakimel/reveal.js#configuration
+			Reveal.initialize({
+				controls: true,
+				progress: true,
+				history: true,
+				center: true,
+        slideNumber: true,
+        margin: 0.0,
+        minScale: 0.5,
+        maxScale: 5.0,
+
+				theme: Reveal.getQueryHash().theme, // available themes are in /css/theme
+				transition: Reveal.getQueryHash().transition || 'default', // default/cube/page/concave/zoom/linear/fade/none
+
+				// Parallax scrolling
+				// parallaxBackgroundImage: 'https://s3.amazonaws.com/hakim-static/reveal-js/reveal-parallax-1.jpg',
+				// parallaxBackgroundSize: '2100px 900px',
+
+				// Optional libraries used to extend on reveal.js
+				dependencies: [
+					{ src: 'reveal.js/lib/js/classList.js', condition: function() { return !document.body.classList; } },
+					{ src: 'reveal.js/plugin/markdown/marked.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+					{ src: 'reveal.js/plugin/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+					{ src: 'reveal.js/plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
+					{ src: 'reveal.js/plugin/zoom-js/zoom.js', async: true, condition: function() { return !!document.body.classList; } },
+					{ src: 'reveal.js/plugin/notes/notes.js', async: true, condition: function() { return !!document.body.classList; } }
+				]
+			});
+
+		</script>
+
+	</body>
+</html>
