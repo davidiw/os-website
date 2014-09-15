@@ -218,7 +218,7 @@ by Hugh O'Cinneide <br />
    <td>
     <span class="text-muted"><script type="text/javascript">getDate()</script></span><br />
     <span class="text-primary">
-      <b>Paper review: </b>
+      <b>Code review:</b> Lab 0, Lab 1, Lab 2</b>
     </span><br />
     <span class="text-info">
       <b>Assignment: </b> <a href="{{ urls.production_url }}/lab/lab4">Lab 4a</a>

@@ -52,7 +52,6 @@ unless they are of a private or personal nature.
 <dd>Lab 0 and 1 have an effective due date of 9/10 due to the shopping period</dd>
 <dt>3 Sept</dt>
 <dd>Lab 2 assigned, Lab 0 due tonight, Lab 1 due tomorrow night</dd>
-</dl>
 <dt>27 Aug</dt>
 <dd>First lecture, Lab 0 and Lab 1 assigned</dd>
 </dl>
