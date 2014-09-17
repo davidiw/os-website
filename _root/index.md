@@ -23,7 +23,7 @@ permalink: /index.html
 &emsp;<a href="http://www.davidwolinsky.com">David Wolinsky</a>,
   AKW403,
   <a href="mailto:david.wolinsky@yale.edu">david.wolinsky@yale.edu</a><br/>
-&emsp;Office hours: MW 2:30-4:00PM or by appointment.
+&emsp;Office hours: M 2:30-4:00PM, T 1:00-2:30PM, or by appointment.
 </p>
 
 

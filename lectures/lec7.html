@@ -1,0 +1,660 @@
+<!doctype html>
+<html lang="en">
+
+	<head>
+		<meta charset="utf-8">
+
+    <title>CS422/522 - Lecture 7 - Synchronization</title>
+
+    <meta name="description" content="Lecture 7 - Synchronization">
+    <meta name="author" content="David Wolinsky">
+
+		<meta name="apple-mobile-web-app-capable" content="yes" />
+		<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+		<link rel="stylesheet" href="reveal.js/css/reveal.min.css">
+		<link rel="stylesheet" href="reveal.js/css/theme/serif.css" id="theme">
+
+		<!-- For syntax highlighting -->
+		<link rel="stylesheet" href="reveal.js/lib/css/zenburn.css">
+
+		<!-- If the query includes 'print-pdf', include the PDF print sheet -->
+		<script>
+			if( window.location.search.match( /print-pdf/gi ) ) {
+				var link = document.createElement( 'link' );
+				link.rel = 'stylesheet';
+				link.type = 'text/css';
+				link.href = 'reveal.js/css/print/pdf.css';
+				document.getElementsByTagName( 'head' )[0].appendChild( link );
+			}
+		</script>
+
+    <script>
+var m_current = 0;
+
+var m_outline = [
+  "Recap",
+  "Race Conditions",
+  "Locks",
+  "Dining Philosophers",
+  "Priority Inversion",
+  "Locks in Xv6",
+  "Wrap-Up"
+  ];
+
+function writeOutline() {
+  var count = m_outline.length;
+  var trigger = m_current / count;
+
+  document.write("<section>");
+  document.write("<h3>Outline</h3>");
+  document.write("<ol>");
+  for(i = 0; i < count; i++, m_current++) {
+    var opacity = 0.4;
+    if (m_current % count == trigger) {
+      opacity = 1.0;
+    }
+    document.write("<li style=\"opacity: " + opacity + ";\">" + m_outline[i] + "</li>");
+  }
+  document.write("</ol>");
+  document.write("</section>");
+}
+    </script>
+
+    <style>
+      .reveal pre code { max-height: 700px; }
+      .reveal pre { font-size: 70%; }
+      .reveal p { text-align: left; }
+    </style>
+
+		<!--[if lt IE 9]>
+		<script src="reveal.js/lib/js/html5shiv.js"></script>
+		<![endif]-->
+	</head>
+
+	<body>
+
+		<div class="reveal">
+
+			<!-- Any section element inside of this container is displayed as a slide -->
+			<div class="slides">
+  <!--
+        <section>
+          <h3>Divided</h3>
+          <div style="width: 100%">
+            <div style="width: 50%; float: left;">
+            </div>
+            <div style="width: 50%; float: left;">
+            </div>
+          </div>
+        </section>
+
+        <script type="text/javascript">writeOutline()</script>
+
+        <section>
+          <h3></h3>
+          <pre><code data-noescape="true" data-trim="true">
+          </code></pre>
+        </section>
+  -->
+				<section>
+          <h2>Synchronization</h2>
+          <h3>CS422/522 Lecture 7</h3>
+          <h3>17 September 2014</h3>
+          <h4>Last updated: 14 September 2014</h4>
+				</section>
+
+        <script type="text/javascript">writeOutline()</script>
+
+        <section>
+          <h3>Recap</h3>
+          <ul>
+            <li>Starting, running, terminating processes</li>
+            <li>Processes vs Threads</li>
+            <li>Multiprocessor systems</li>
+          </ul>
+        </section>
+
+        <script type="text/javascript">writeOutline()</script>
+
+        <section>
+          <h3>Process Monitoring</h3>
+          Recall ... a parent needs to wait on all children processes to clean up their state:
+          <pre><code data-noescape="true" data-trim="true">
+pid_t pid;
+if ((pid = fork()) > 0)
+  wpid = wait();
+else
+  exit()
+assert(wpid == pid);
+          </code></pre>
+        </section>
+
+        <section>
+          <h3>wait</h3>
+          <ul>
+            <li>Child exits</li>
+            <li>Child enters zombie</li>
+            <li>Parent wait finds zombie</li>
+            <li>All good</li>
+          </ul>
+          <pre><code data-noescape="true" data-trim="true">
+pid_t pid;
+if ((pid = fork()) > 0)
+  wpid = wait();
+else
+  exit()
+assert(wpid == pid);
+          </code></pre>
+        </section>
+
+        <section>
+          <h3>wait</h3>
+          <ul>
+            <li>Parent waits</li>
+            <li>Child exits</li>
+            <li>Child needs to wakeup parent!</li>
+            <li>Potential race condition...</li>
+          </ul>
+          <pre><code data-noescape="true" data-trim="true">
+pid_t pid;
+if ((pid = fork()) > 0)
+  wpid = wait();
+else
+  exit()
+assert(wpid == pid);
+          </code></pre>
+        </section>
+
+        <section>
+          <h3>Race Condition</h3>
+          Child:
+          <pre><code data-noescape="true" data-trim="true">
+2354 exit(void)
+...
+2376   wakeup1(proc−>parent);
+          </code></pre>
+          Parent:
+          <pre><code data-noescape="true" data-trim="true">
+2403 wait(void)
+2412     for(p = ptable.proc; p &lt &ptable.proc[NPROC]; p++){
+2413       if(p−>parent != proc)
+2414         continue;
+2416       if(p−>state == ZOMBIE){
+2428         return pid;
+...
+2439     sleep(proc); 
+          </code></pre>
+        </section>
+
+        <section>
+          <h3>Is This Ever Safe?</h3>
+          <p>Is there a scenario in which this code would be safe?</p>
+          <ul class="fragment">
+            <li>Prevent context switching while already in kernel (disable interrupts) and...</li>
+            <li>Asymmetric Multiprocessing or</li>
+            <li>Uniprocessor</li>
+          </ul>
+        </section>
+
+        <section>
+          <h3>Definitions</h3>
+          <p>
+          <b>Critical Section</b> is some shared state (or memory)
+          that may be simultaneously accessed and changed by different processes
+          </p>
+          <p class="fragment">
+          Failure to properly synchronize leads to inconsistent state or a <b>race conditions</b>
+          </p>
+        </section>
+
+        <script type="text/javascript">writeOutline()</script>
+
+        <section>
+          <h3>Shared Variable</h3>
+          <pre><code data-noescape="true" data-trim="true">
+int shared = 0;
+if ((pid = fork()) > 0)
+  shared++;
+else
+  shared++;
+          </code></pre>
+          What is the value of shared? <span class="fragment">1 or 2</span>
+        </section>
+
+        <section>
+          <h3>Locks</h3>
+          Mutual exclusion -- one at a time <br />
+          <pre><code data-noescape="true" data-trim="true">
+lock_t l;
+int shared = 0;
+if ((pid = fork()) > 0) {
+  lock(l);
+  shared++;
+  unlock(l);
+} else {
+  lock(l);
+  shared++;
+  unlock(l);
+}
+          </code></pre>
+          What is the value of shared? <span class="fragment">2</span>
+        </section>
+
+        <section>
+          <h3>A Broken Lock</h3>
+          <pre><code data-noescape="true" data-trim="true">
+void acquire(int *lock) {
+  while(*lock);
+  *lock = 1;
+}
+          </code></pre>
+          <pre><code data-noescape="true" data-trim="true">
+void release(int *lock) {
+  *lock = 0;
+}
+          </code></pre>
+          <span class="fragment">What type of lock is this? <span class="fragment">Spin lock</span></span>
+        </section>
+
+        <section>
+          <h3>Goals of Locks</h3>
+          <ul>
+            <li>Mutual exclusion</li>
+            <li>Progress</li>
+            <li>Bounded waiting</li>
+          </ul>
+        </section>
+
+        <section>
+          <h3>Types of Locks</h3>
+          <ul>
+            <li>Software spin locks</li>
+            <li>Hardware spin locks</li>
+            <li>Mutex</li>
+            <li>Semaphores</li>
+            <li>Monitors</li>
+          </ul>
+        </section>
+
+        <section>
+          <h3>Software Locks -- Lamport</h3>
+          <pre><code data-noescape="true" data-trim="true">
+Entering: array [1..NUM_THREADS] of bool = {false};
+Number: array [1..NUM_THREADS] of integer = {0};
+
+lock(integer i) {
+  Entering[i] = true;
+  Number[i] = 1 + max(Number[1], ..., Number[NUM_THREADS]);
+  Entering[i] = false;
+  for (j = 1; j &lt= NUM_THREADS; j++) {
+    while (Entering[j]);
+    while ((Number[j] != 0) &&
+          ((Number[j], j) &lt (Number[i], i)));
+  }
+}
+
+unlock(integer i) {
+  Number[i] = 0;
+}
+          </code></pre>
+          <span class="fragment">Does it support our 3 goals? <span class="fragment"> yes!</span></span>
+        </section>
+
+        <section>
+          <h3>Hardware Locks -- Test and Set</h3>
+          <pre><code data-noescape="true" data-trim="true">
+int test_and_set(int *lock) {
+  int rv =  *lock;
+  if (*lock == 0)
+    *lock = 1;
+  return rv;
+}
+          </code></pre>
+          <span class="fragment">Does it support our 3 goals? <span class="fragment"> no!</span></span>
+        </section>
+
+        <section>
+          <h3>Hardware Locks -- Compare and Swap</h3>
+          <pre><code data-noescape="true" data-trim="true">
+int compare_and_swap(int *lock, int oval, int nval) {
+  int rv =  *lock;
+  if (*reg = oval)
+    *reg = nval;
+  return rv;
+}
+          </code></pre>
+          <span class="fragment">Does it support our 3 goals? <span class="fragment"> no!</span></span>
+        </section>
+
+        <section>
+          <h3>Spin Locks?</h3>
+          <ul>
+            <li>Advantages:
+              <ul class="fragment">
+                <li>Fast response time</li>
+                <li>Simple / light weight</li>
+              </ul>
+            </li>
+            <li>Disadvantages:
+              <ul class="fragment">
+                <li>Can cause starvation / deadlock</li>
+                <li>Consume significant CPU resources</li>
+              </ul>
+            </li>
+            <li class="fragment">What type of applications / processors is it good to use on?</li>
+          </ul>
+        </section>
+
+        <section>
+          <h3>Semaphores</h3>
+          <pre><code data-noescape="true" data-trim="true">
+void v(semaphore *s) {
+  lock(s->control);
+  s->count++;
+  signal(s);
+  unlock(s->control);
+}
+
+void p(semaphore *s) {
+  lock(s->control);
+  if (s->count == 0) {
+    queue(s);
+  }
+  s->count--;
+  unlock(s->control);
+}
+          </code></pre>
+          <span class="fragment">Does it support our 3 goals? <span class="fragment"> yes!</span></span>
+        </section>
+
+        <section>
+          <h3>Reentrant</h3>
+          <p>What happens if we call v on a semaphore more than once?</p>
+          <div class="fragment">
+            <p>We will block indefinitely -- deadlock</p>
+            <p>Semaphores are not reentrant</p>
+          </div>
+          <p class="fragment">Do we have any examples in xv6?</p>
+          <p class="fragment">pushcli/popcli</p>
+        </section>
+
+        <section>
+          <h3>(Reentrant) Mutex</h3>
+          <pre><code data-noescape="true" data-trim="true">
+void acquire(mutex *m, int me) {
+  lock(m->control);
+  if (m->owner != 0 && m->owner != me) {
+    queue(m);
+  }
+  owner = me;
+  m->count++;
+  unlock(m->control);
+}
+
+void release(mutex *m) {
+  lock(m->control)
+  if (--m->count == 0) {
+    m->owner = 0
+    signal(m);
+  }
+  unlock(m->control);
+}
+          </code></pre>
+          <span class="fragment">Does it support our 3 goals? <span class="fragment"> yes!</span></span>
+        </section>
+
+        <script type="text/javascript">writeOutline()</script>
+
+        <section>
+          <h3>Dining Philosophers</h3>
+          <ul>
+            <li>N philosophers</li>
+            <li>N forks</li>
+            <li>Each philosopher needs left and right fork to eat</li>
+          </ul> <br />
+          <div style="width: 100%">
+            <div style="width: 50%; float: left;">
+              <p>Philosophers can:</p>
+              <ul>
+                <li>Think</li>
+                <li>Hungry</li>
+                <li>Eat</li>
+              </ul>
+            </div>
+            <div style="width: 50%; float: left;">
+              <img width="400" src="images/dining_phil.png" />
+            </div>
+          </div>
+        </section>
+
+        <section>
+          <h3>Dining Philosophers' Challenges</h3>
+          <img width="300" src="images/dining_phil.png" /> <br />
+
+          <ul class="fragment">
+            <li>How to claim fork (synchronization / <b>mutual exclusion</b>)</li>
+            <li>Those not eating or not adjacent to each other should not affect each other (<b>progress</b>)</li>
+            <li>How to handle everyone picking up a chopstick and never letting go
+              (deadlock / starvation / <b>bounded waiting</b>)
+            </li>
+          </ul>
+        </section>
+
+        <section>
+          <h3>Solutions to Dining Philosophers?</h3>
+          <p>If we use the locking strategies discussed thus far?</p>
+          <p class="fragment">If all execute lock(left) then lock(right),
+          they may end up waiting forever for the right fork</p>
+          <span class="fragment">What might solve this?</span>
+        </section>
+
+        <section>
+          <h3>Monitors</h3>
+
+          Monitors wrap both code and data:
+          <div style="width: 100%">
+            <div style="width: 50%; float: left;">
+              <pre><code data-noescape="true" data-trim="true">
+lock(mon)
+while mon->value &lt expected
+  wait(mon)
+<span class="fragment" data-fragment-index="2">mon->value -= expected
+unlock(mon)
+</span>
+              </code></pre>
+            </div>
+            <div style="width: 50%; float: left;">
+              <pre><code data-noescape="true" data-trim="true">
+<span class="fragment" data-fragment-index="1">lock(monitor)
+mtr->value += 10
+notify(monitor)
+</span>
+              </code></pre>
+            </div>
+          </div>
+          <div class="fragment" style="float: right;">
+            Note: Monitors may be used to encapsulate an underlying state. Calling a function, implicitly acquires the lock.
+          </div>
+        </section>
+
+        <section>
+          <h3>Solving Dining Philosophers</h3>
+          <pre style="font-size: 60%;"><code data-noescape="true" data-trim="true">
+enum {THINKING, HUNGRY, EATING} state[5];
+
+pickup(int i)
+  state[i] = HUNGRY;
+  test(i);
+  if (state[i] != EATING)
+    self[i].wait();
+
+putdown(int i)
+  state[i] = THINKING;
+  test((i + 4) % 5);
+  test((i + 1) % 5);
+
+test(int i)
+  if (((state[(i + 4) % 5)] != EATING) &&
+      (state[i] == HUNGRY) &&
+      (state[(i + 1) % 5] != EATING)) {
+    state[i] = EATING;
+    self[i].signal();
+  }
+          </code></pre>
+        </section>
+
+        <script type="text/javascript">writeOutline()</script>
+
+        <section>
+          <h3>Priority Inversion</h3>
+          <ul>
+            <li>Locks in kernel -- why / where?
+              <ul class="fragment">
+                <li>Devices</li>
+                <li>Process management</li>
+                <li>Memory allocation</li>
+                <li>Files</li>
+              </ul>
+              <li class="fragment">Priority inversion:
+                <ul>
+                  <li>Low priority task obtains lock</li>
+                  <li>High priority task needs lock, waits</li>
+                  <li>Medium priority task doesn't need lock, preempts L</li>
+                </ul>
+                <li class="fragment">How to address? <span class="fragment">inherit priority</span></li>
+              </li>
+            </li>
+          </ul>
+        </section>
+
+        <script type="text/javascript">writeOutline()</script>
+
+        <section>
+          <h3>Locks in Xv6</h3>
+          <pre><code data-noescape="true" data-trim="true">
+1474 acquire(struct spinlock *lk)
+1475 {
+1476   pushcli(); // disable interrupts to avoid deadlock.
+1477   if(holding(lk))
+1478      panic("acquire");
+1479
+1483   while(xchg(&lk−>locked, 1) != 0);
+1489 }
+...
+1502 release(struct spinlock *lk)
+1503 {
+1504   if(!holding(lk))
+1505     panic("release");
+1506
+1519   xchg(&lk−>locked, 0);
+1520
+1521   popcli();
+1522 }
+          </code></pre>
+        </section>
+
+        <section>
+          <h3>No Race Condition</h3>
+          Child:
+          <pre><code data-noescape="true" data-trim="true">
+2354 exit(void)
+...
+2373   acquire(&ptable.lock);
+2376   wakeup1(proc−>parent);
+          </code></pre>
+          Parent:
+          <pre><code data-noescape="true" data-trim="true">
+2403 wait(void)
+2408   acquire(&ptable.lock);
+2412     for(p = ptable.proc; p &lt &ptable.proc[NPROC]; p++){
+2413       if(p−>parent != proc)
+2414         continue;
+2416       if(p−>state == ZOMBIE){
+2428         return pid;
+...
+2439     sleep(proc, &ptable.lock); 
+          </code></pre>
+        </section>
+
+        <script type="text/javascript">writeOutline()</script>
+
+        <section>
+          <h3>Lab 2 Grades</h3>
+          <ul>
+            <li>Code: 62/70</li>
+            <li>Questions: 13/20</li>
+          </ul>
+        </section>
+
+        <section>
+          <h3>Lab 3</h3>
+          Lab 3a should be completed by Thursday. <br />
+          Lab 3b, hence Lab 3, must be completed by next Thursday. <br />
+        </section>
+
+        <section>
+          <h3>Paper Reading</h3>
+          3 paper reading sessions in next 3 weeks<br />
+          Read papers, summarize, state key ideas<br />
+          Printed reviews due at start of class<br />
+          E-mailed reviews will <b>not</b> accepted<br />
+          Reviews count toward quiz grade<br />
+          You may be tested on the papers<br />
+        </section>
+
+        <section>
+          <h3>Next Time</h3>
+          Monday 1:00PM <br />
+          Wednesday 1:00PM <br />
+          Papers, check schedule<br />
+          &nbsp<br />
+          Following week:<br />
+          Monday 1:00PM <br />
+          Interprocess Communication<br />
+        </section>
+			</div>
+
+		</div>
+
+		<script src="reveal.js/lib/js/head.min.js"></script>
+		<script src="reveal.js/js/reveal.min.js"></script>
+
+		<script>
+
+			// Full list of configuration options available here:
+			// https://github.com/hakimel/reveal.js#configuration
+			Reveal.initialize({
+				controls: true,
+				progress: true,
+				history: true,
+				center: true,
+        slideNumber: true,
+        margin: 0.0,
+        minScale: 0.5,
+        maxScale: 5.0,
+
+				theme: Reveal.getQueryHash().theme, // available themes are in /css/theme
+				transition: Reveal.getQueryHash().transition || 'default', // default/cube/page/concave/zoom/linear/fade/none
+
+				// Parallax scrolling
+				// parallaxBackgroundImage: 'https://s3.amazonaws.com/hakim-static/reveal-js/reveal-parallax-1.jpg',
+				// parallaxBackgroundSize: '2100px 900px',
+
+				// Optional libraries used to extend on reveal.js
+				dependencies: [
+					{ src: 'reveal.js/lib/js/classList.js', condition: function() { return !document.body.classList; } },
+					{ src: 'reveal.js/plugin/markdown/marked.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+					{ src: 'reveal.js/plugin/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+					{ src: 'reveal.js/plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
+					{ src: 'reveal.js/plugin/zoom-js/zoom.js', async: true, condition: function() { return !!document.body.classList; } },
+					{ src: 'reveal.js/plugin/notes/notes.js', async: true, condition: function() { return !!document.body.classList; } }
+				]
+			});
+
+		</script>
+
+	</body>
+</html>
