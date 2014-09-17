@@ -103,7 +103,7 @@ function writeOutline() {
           <h2>Synchronization</h2>
           <h3>CS422/522 Lecture 7</h3>
           <h3>17 September 2014</h3>
-          <h4>Last updated: 14 September 2014</h4>
+          <h4>Last updated: 17 September 2014</h4>
 				</section>
 
         <script type="text/javascript">writeOutline()</script>
@@ -321,8 +321,8 @@ int test_and_set(int *lock) {
           <pre><code data-noescape="true" data-trim="true">
 int compare_and_swap(int *lock, int oval, int nval) {
   int rv =  *lock;
-  if (*reg = oval)
-    *reg = nval;
+  if (*lock = oval)
+    *lock = nval;
   return rv;
 }
           </code></pre>
@@ -372,7 +372,7 @@ void p(semaphore *s) {
 
         <section>
           <h3>Reentrant</h3>
-          <p>What happens if we call v on a semaphore more than once?</p>
+          <p>What happens if we call p (acquire) on a semaphore more than once?</p>
           <div class="fragment">
             <p>We will block indefinitely -- deadlock</p>
             <p>Semaphores are not reentrant</p>
@@ -469,7 +469,7 @@ unlock(mon)
             <div style="width: 50%; float: left;">
               <pre><code data-noescape="true" data-trim="true">
 <span class="fragment" data-fragment-index="1">lock(monitor)
-mtr->value += 10
+mon->value += 10
 notify(monitor)
 </span>
               </code></pre>
