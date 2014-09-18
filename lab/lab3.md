@@ -92,13 +92,6 @@ You may also want to take another look at the
 as it includes information on debugging
 user code that becomes relevant in this lab.
 
-### Lab Requirements
-
-XXX
-This lab is divided into two parts, A and B.
-Part A is due Friday, January 17th.
-Part B is due Tuesday, January 21st.
-
 ### Inline Assembly
 
 In this lab you may find GCC's inline assembly language feature useful,
@@ -705,6 +698,19 @@ or dispatches to a specific handler function.
 > You should be able to get make grade to succeed on the `divzero`,
 > `softint`, and `badsegment` tests at this point.
 
+<p />
+
+> <span class="label-warning">**Challenge 1**</span>
+> You probably have a lot of very similar code right now,
+> between the lists of TRAPHANDLER in trapentry.S
+> and their installations in trap.c. Clean this up.
+> Change the macros in trapentry.S
+> to automatically generate a table for trap.c to use.
+> Note that you can switch between laying down code
+> and data in the assembler by using the directives .text and .data.
+
+<p />
+
 > **Questions**
 
 > Answer the following questions in your `answers-lab3.txt`:
@@ -784,6 +790,28 @@ for example, performs an `int3` after displaying its panic message.
 > You should now be able to get make grade
 > to succeed on the `breakpoint` test.
 
+<p />
+
+> <span class="label-warning">**Challenge 2**</span>
+>
+> Modify the JOS kernel monitor so that you can 'continue' execution
+> from the current location (e.g., after the int3,
+> if the kernel monitor was invoked via the breakpoint exception),
+> and so that you can single-step one instruction at a time.
+> You will need to understand certain bits of the EFLAGS register
+> in order to implement single-stepping.
+>
+> Optional: If you're feeling really adventurous,
+> find some x86 disassembler source code - e.g.,
+> by ripping it out of QEMU, or out of GNU binutils,
+> or just write it yourself -
+> and extend the JOS kernel monitor to be able to disassemble
+> and display instructions as you are stepping through them.
+> Combined with the symbol table loading from lab 2,
+> this is the stuff of which real kernel debuggers are made.
+
+<p />
+
 > **Questions**
 
 > 3.  The break point test case will either generate a break point exception
@@ -856,6 +884,67 @@ You should read through it and make sure you understand what is going on.
 > your system call handler isn't quite right.
 > You should also now be able to get make grade
 > to succeed on the `testbss` test.
+
+<p />
+
+> <span class="label-warning">**Challenge 3**</span>
+> Implement system calls using the sysenter and sysexit instructions
+> instead of using int 0x30 and iret.
+>
+> The sysenter/sysexit instructions were
+> designed by Intel to be faster than int/iret.
+> They do this by using registers instead of the stack
+> and by making assumptions about how the segmentation registers are used.
+> The exact details of these instructions can be found
+> in Volume 2B of the Intel reference manuals.
+
+> The easiest way to add support for these instructions in JOS
+> is to add a sysenter_handler in kern/trapentry.S
+> that saves enough information about the user environment to return to it,
+> sets up the kernel environment, pushes the arguments to syscall()
+> and calls syscall() directly.
+> Once syscall() returns, set everything up for
+> and execute the sysexit instruction.
+> You will also need to add code to kern/init.c
+> to set up the necessary model specific registers (MSRs).
+> Section 6.1.2 in Volume 2 of the AMD Architecture Programmer's Manual
+> and the reference on SYSENTER in Volume 2B of the Intel reference manuals
+> give good descriptions of the relevant MSRs.
+> You can find an implementation of wrmsr to add to inc/x86.h
+> for writing to these MSRs here.
+
+> Finally, lib/syscall.c must be changed
+> to support making a system call with sysenter.
+> Here is a possible register layout for the sysenter instruction:
+>
+>  eax                - syscall number
+>  edx, ecx, ebx, edi - arg1, arg2, arg3, arg4
+>  esi                - return pc
+>  ebp                - return esp
+>  esp                - trashed by sysenter
+
+> GCC's inline assembler will automatically save registers
+> that you tell it to load values directly into.
+> Don't forget to either save (push) and restore (pop)
+> other registers that you clobber,
+> or tell the inline assembler that you're clobbering them.
+> The inline assembler doesn't support saving %ebp,
+> so you will need to add code to save and restore it yourself.
+> The return address can be put into %esi by using an instruction
+> like leal after_sysenter_label, %%esi.
+
+> Note that this only supports 4 arguments,
+> so you will need to leave the old method of doing system calls
+> around to support 5 argument system calls.
+> Furthermore, because this fast path doesn't
+> update the current environment's trap frame,
+> it won't be suitable for some of the system calls
+> we add in later labs.
+
+> You may have to revisit your code
+> once we enable asynchronous interrupts in the next lab.
+> Specifically, you'll need to enable interrupts
+> when returning to the user process, which sysexit doesn't do for you.
 
 ### User-mode startup
 
@@ -1020,4 +1109,4 @@ to examine your changes
 and don't forget to `git add answers-lab3.txt`.
 When you're ready,
 commit your changes with `git commit -am 'my solutions to lab 3'`,
-then `git push` and follow the directions.
+then `git push`.

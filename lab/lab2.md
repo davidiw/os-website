@@ -496,6 +496,40 @@ and `check_page_installed_pgdir()` checks.
 >     and when we begin running at an EIP above KERNBASE?
 >     Why is this transition necessary?
 
+<p />
+
+> <span class="label-warning">**Challenge 1**</span>
+> We consumed many physical pages to hold the page tables
+> for the KERNBASE mapping.
+> Do a more space-efficient job using the PTE_PS ("Page Size") bit
+> in the page directory entries.
+> This bit was not supported in the original 80386,
+> but is supported on more recent x86 processors.
+> You will therefore have to refer to Volume 3 of the current Intel manuals.
+> Make sure you design the kernel to use this optimization
+> only on processors that support it!
+
+<p />
+
+> <span class="label-warning">**Challenge 2**</span>
+> Extend the JOS kernel monitor with commands to:
+>
+> - Display in a useful and easy-to-read format
+>   all of the physical page mappings (or lack thereof)
+>   that apply to a particular range of virtual/linear addresses
+>   in the currently active address space.
+>   For example, you might enter 'showmappings 0x3000 0x5000'
+>   to display the physical page mappings and corresponding permission bits
+>   that apply to the pages at virtual addresses 0x3000, 0x4000, and 0x5000.
+> - Explicitly set, clear, or change the permissions
+>   of any mapping in the current address space.
+> - Dump the contents of a range of memory given either a virtual
+>   or physical address range.
+>   Be sure the dump code behaves correctly
+>   when the range extends across page boundaries!
+> - Do anything else that you think might be useful later
+>   for debugging the kernel. (There's a good chance it will be!)
+
 ### Address Space Layout Alternatives
 
 The address space layout we use in JOS is not the only one possible.
@@ -516,14 +550,44 @@ unrestricted use of the *entire* 4GB of virtual address space -
 while still fully protecting the kernel from these processes
 and protecting different processes from each other!
 
-Generalize the kernel's memory allocation system
-to support pages of a variety of power-of-two allocation unit sizes
-from 4KB up to some reasonable maximum of your choice.
-Be sure you have some way to divide larger allocation units
-into smaller ones on demand,
-and to coalesce multiple small allocation units back
-into larger units when possible.
-Think about the issues that might arise in such a system.
+> <span class="label-warning">**Challenge 3**</span>
+> Write up an outline of how a kernel could be designed
+> to allow user environments
+> unrestricted use of the full 4GB virtual and linear address space.
+> Hint: the technique is sometimes known as "follow the bouncing kernel."
+> In your design, be sure to address exactly what has to happen
+> when the processor transitions between kernel and user modes,
+> and how the kernel would accomplish such transitions.
+> Also describe how the kernel would access physical memory
+> and I/O devices in this scheme,
+> and how the kernel would access a user environment's virtual address space
+> during system calls and the like.
+> Finally, think about and describe the advantages and disadvantages
+> of such a scheme in terms of flexibility, performance, kernel complexity,
+> and other factors you can think of.
+
+<p />
+
+> <span class="label-warning">**Challenge 4**</span>
+> Since our JOS kernel's memory management system only allocates
+> and frees memory on page granularity,
+> we do not have anything comparable
+> to a general-purpose malloc/free facility
+> that we can use within the kernel.
+> This could be a problem if we want to support certain types of I/O devices
+> that require physically contiguous buffers larger than 4KB in size,
+> or if we want user-level environments, and not just the kernel,
+> to be able to allocate and map 4MB superpages
+> for maximum processor efficiency.
+> (See the earlier challenge problem about PTE_PS.)
+>
+> Generalize the kernel's memory allocation system to support pages
+> of a variety of power-of-two allocation unit sizes from 4KB
+> up to some reasonable maximum of your choice.
+> Be sure you have some way to divide larger allocation units
+> into smaller ones on demand, and to coalesce multiple small allocation units
+> back into larger units when possible.
+> Think about the issues that might arise in such a system.
 
 **This completes the lab.**
 Make sure you pass all of the make grade tests

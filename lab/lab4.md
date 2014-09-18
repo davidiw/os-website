@@ -326,6 +326,26 @@ the scheduler in the next exercise.
 >     Describe a scenario in which using a shared kernel stack will go wrong,
 >     even with the protection of the big kernel lock.
 
+<p />
+
+> <span class="label-warning">**Challenge 1**</span>
+> The big kernel lock is simple and easy to use.
+> Nevertheless, it eliminates all concurrency in kernel mode.
+> Most modern operating systems use different locks
+> to protect different parts of their shared state,
+> an approach called fine-grained locking.
+> Fine-grained locking can increase performance significantly,
+> but is more difficult to implement and error-prone.
+> If you are brave enough,
+> drop the big kernel lock and embrace concurrency in JOS!
+
+It is up to you to decide the locking granularity (the amount of data that a lock protects). As a hint, you may consider using spin locks to ensure exclusive access to these shared components in the JOS kernel:
+
+- The page allocator.
+- The console driver.
+- The scheduler.
+- The inter-process communication (IPC) state that you will implement in the part C.
+
 ### Round-Robin Scheduling
 
 Your next task in this lab is to change the JOS kernel
@@ -398,6 +418,35 @@ If any of this does not happen, then fix your code before proceeding.
 >     it must ensure the old environment's registers are saved
 >     so they can be restored properly later.
 >     Why? Where does this happen?
+
+<p />
+
+> <span class="label-warning">**Challenge 2**</span>
+> Add a less trivial scheduling policy to the kernel,
+> such as a fixed-priority scheduler
+> that allows each environment to be assigned a priority
+> and ensures that higher-priority environments are always
+> chosen in preference to lower-priority environments.
+> If you're feeling really adventurous,
+> try implementing a Unix-style adjustable-priority scheduler
+> or even a lottery or stride scheduler.
+> (Look up "lottery scheduling" and "stride scheduling" in Google.)
+
+Write a test program or two that verifies that your scheduling algorithm is working correctly (i.e., the right environments get run in the right order). It may be easier to write these test programs once you have implemented fork() and IPC in parts B and C of this lab.
+
+> <span class="label-warning">**Challenge 3**</span>
+> The JOS kernel currently does not allow applications
+> to use the x86 processor's x87 floating-point unit (FPU),
+> MMX instructions, or Streaming SIMD Extensions (SSE).
+> Extend the Env structure to provide a save area
+> for the processor's floating point state,
+> and extend the context switching code
+> to save and restore this state properly
+> when switching from one environment to another.
+> The FXSAVE and FXRSTOR instructions may be useful,
+> but note that these are not in the old i386 user's manual
+> because they were introduced in more recent processors.
+> Write a user-level test program that does something cool with floating-point.
 
 ### System Calls for Environment Creation
 
@@ -485,16 +534,24 @@ The parent exits after 10 iterations, whereas the child exits after 20.
 > Test your JOS kernel with `user/dumbfork`
 > and make sure it works before proceeding.
 
-This completes Part A of the lab;
-check it using make grade and hand it in
-using make handin as usual.
-If you are trying to figure out
-why a particular test case is failing,
-run ./grade-lab4 -v, which will show you the output of the kernel builds
-and QEMU runs for each test,
-until a test fails.
-When a test fails, the script will stop,
-and then you can inspect `jos.out` to see what the kernel actually printed.
+> <span class="label-warning">**Challenge 4**</span>
+> Add the additional system calls necessary
+> to read all of the vital state of an existing environment
+> as well as set it up.
+> Then implement a user mode program that forks off a child environment,
+> runs it for a while (e.g., a few iterations of sys_yield()),
+> then takes a complete snapshot or checkpoint of the child environment,
+> runs the child for a while longer,
+> and finally restores the child environment to the state
+> it was in at the checkpoint and continues it from there.
+> Thus, you are effectively "replaying" the execution of the child environment
+> from an intermediate state.
+> Make the child environment perform some interaction with the user
+> using sys_cgetc() or readline() so that the user can view
+> and mutate its internal state,
+> and verify that with your checkpoint/restart
+> you can give the child environment a case of selective amnesia,
+> making it "forget" everything that happened beyond a certain point.
 
 Part B: Copy-on-Write Fork
 --------------------------
@@ -769,6 +826,15 @@ Run `user/faultallocbad`. You should see:
 Make sure you understand why `user/faultalloc`
 and `user/faultallocbad` behave differently.
 
+> <span class="label-warning">**Challenge 5**</span>
+> Extend your kernel so that not only page faults,
+> but all types of processor exceptions
+> that code running in user space can generate,
+> can be redirected to a user-mode exception handler.
+> Write user-mode test programs to test user-mode handling
+> of various exceptions such as divide-by-zero,
+> general protection fault, and illegal opcode.
+
 ### Implementing Copy-on-Write Fork
 
 You now have the kernel facilities
@@ -855,6 +921,31 @@ Here's the control flow for the user page fault handler:
 > 1006: I am '101'
 > ```
 
+> <span class="label-warning">**Challenge 6**</span>
+> Implement a shared-memory fork() called sfork().
+> This version should have the parent
+> and child share all their memory pages
+> (so writes in one environment appear in the other)
+> except for pages in the stack area,
+> which should be treated in the usual copy-on-write manner.
+> Modify user/forktree.c to use sfork() instead of regular fork().
+> Also, once you have finished implementing IPC in part C,
+> use your sfork() to run user/pingpongs.
+> You will have to find a new way to provide
+> the functionality of the global thisenv pointer.
+
+> <span class="label-warning">**Challenge 7**</span>
+> Your implementation of fork makes a huge number of system calls.
+> On the x86, switching into the kernel using interrupts has non-trivial cost.
+> Augment the system call interface so that it is possible
+> to send a batch of system calls at once.
+> Then change fork to use this interface.
+
+How much faster is your new fork?
+
+You can answer this (roughly) by using analytical arguments to estimate how much of an improvement batching system calls will make to the performance of your fork: How expensive is an int 0x30 instruction? How many times do you execute int 0x30 in your fork? Is accessing the TSS stack switch also expensive? And so on...
+
+Alternatively, you can boot your kernel on real hardware and really benchmark your code. See the RDTSC (read time-stamp counter) instruction, defined in the IA32 manual, which counts the number of clock cycles that have elapsed since the last processor reset. QEMU doesn't emulate this instruction faithfully (it can either count the number of virtual instructions executed or use the host TSC, neither of which reflects the number of cycles a real CPU would require).
 
 Part C: Preemptive Multitasking and Inter-Process communication (IPC)
 ---------------------------------------------------------------------
@@ -1104,6 +1195,35 @@ or zero if no page was received.
 > You might find it interesting to read `user/primes.c`
 > to see all the forking and IPC going on behind the scenes.
 
+> <span class="label-warning">**Challenge 8**</span>
+> Why does ipc_send have to loop?
+> Change the system call interface so it doesn't have to.
+> Make sure you can handle multiple environments
+> trying to send to one environment at the same time.
+
+> <span class="label-warning">**Challenge 9**</span>
+> The prime sieve is only one neat use of message passing
+> between a large number of concurrent programs.
+> Read C. A. R. Hoare, ``Communicating Sequential Processes,''
+> Communications of the ACM 21(8) (August 1978), 666-667,
+> and implement the matrix multiplication example.
+
+> <span class="label-warning">**Challenge 10**</span>
+> One of the most impressive examples of the power of message passing
+> is Doug McIlroy's power series calculator, described in M. Douglas McIlroy,
+> ``Squinting at Power Series,'' Software--Practice and Experience,
+> 20(7) (July 1990), 661-683.
+> Implement his power series calculator
+> and compute the power series for sin(x+x^3).
+
+> <span class="label-warning">**Challenge 11**</span>
+> Make JOS's IPC mechanism more efficient
+> by applying some of the techniques from Liedtke's paper,
+> Improving IPC by Kernel Design, or any other tricks you may think of.
+> Feel free to modify the kernel's system call API for this purpose,
+> as long as your code is backwards compatible
+> with what our grading scripts expect.
+
 **This ends part C.**
 Make sure you pass all of the `make grade` tests
 and don't forget to write up your answers
@@ -1114,4 +1234,4 @@ use `git status` and `git diff` to examine your changes
 and don't forget to `git add answers-lab4.txt`.
 When you're ready,
 commit your changes with `git commit -am 'my solutions to lab 4'`,
-then `make handin` and follow the directions.
+then `git push`.
