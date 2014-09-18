@@ -279,8 +279,6 @@ since any idle CPUs will eventually receive a timer interrupt
 and fail to find the handler,
 which causes a GPF.
 
-XXX Let's either have a quick exercise to ignore these or fix it in the code for the students
-
 #### Locking
 
 Our current code spins after initializing the AP in `mp_main()`.
@@ -951,8 +949,6 @@ and so far we have never gotten around to re-enabling them.
 > to the currently running user environment and destroy it.
 > Eventually it should run out of environments to destroy
 > and drop into the monitor.
-
-XXX Move earlier and put in place a hack that ignores interrupts
 
 #### Handling Clock Interrupts
 
