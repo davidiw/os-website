@@ -175,8 +175,7 @@ The diagram shows the entire system including the device driver,
 which will be covered later.
 In this lab, you will implement the parts highlighted in green.
 
-XXX
-<center><img src="./Lab 6  Network Driver_files/ns.png" alt="Network server architecture"></center>
+<center><img src="{{ urls.production_url }}/lectures/images/ns.png"></center>
 
 ### The Core Network Server Environment
 
@@ -286,7 +285,6 @@ that time has advanced by 10ms.
 This is implemented in `kern/time.c`,
 but is not yet fully integrated into your kernel.
 
-XXX
 > **Exercise 1**
 
 > Add a call to `time_tick` for every clock interrupt in `kern/trap.c`.
