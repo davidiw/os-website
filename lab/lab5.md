@@ -300,13 +300,6 @@ since the client shared it with the file system server in the first place.
 Also, in its response, `FSREQ_OPEN` shares with the client a new "Fd page".
 We'll return to the file descriptor page shortly.
 
-> **Exercise 3**
-
-> Finish the implementation of serve_read in serv.c.
-> Hint: the functions openfile_lookup and file_read will come in handy.
-
-> You should pass make run-testfile now.
-
 <p />
 
 > <span class="label-warning">**Challenge 1**</span>
@@ -351,7 +344,7 @@ Think about what you would have to do
 in order to implement `exec` in user space,
 and be sure you understand why it is harder.
 
-> **Exercise 4**
+> **Exercise 3**
 
 > `spawn` relies on the new syscall `sys_env_set_trapframe`
 > to initialize the state of the newly created environment.
@@ -424,7 +417,7 @@ Note that this is different from marking it copy-on-write:
 as described in the first paragraph,
 we want to make sure to *share* updates to the page.
 
-> **Exercise 5**
+> **Exercise 4**
 
 > Change `duppage` in `lib/fork.c` to follow the new convention.
 > If the page table entry has the `PTE_SHARE` bit set,
@@ -461,7 +454,7 @@ while input typed to the console appear as characters on the serial port.
 that have been used by the kernel monitor since lab 1,
 but now you need to attach these to the rest of the system.
 
-> **Exercise 6**
+> **Exercise 5**
 
 > In your `kern/trap.c`, call `kbd_intr`
 > to handle trap `IRQ_OFFSET+IRQ_KBD`
@@ -503,20 +496,10 @@ use `fprintf(1, "...", ...)`.
 `printf("...", ...)` is a short-cut for printing to FD 1.
 See `user/lsfd.c` for examples.
 
-> **Exercise 7**
-
-> The shell doesn't support I/O redirection.
-> It would be nice to run sh <script
-> instead of having to type in all the commands in the script by hand,
-> as you did above.
-> Add I/O redirection for < to user/sh.c.
-
-> Test your implementation by typing sh <script into your shell
-
-> Run `make run-testshell` to test your shell.
-> `testshell` simply feeds the above commands
-> (also found in `fs/testshell.sh`) into the shell
-> and then checks that the output matches `fs/testshell.key`.
+Run `make run-testshell` to test your shell.
+`testshell` simply feeds the above commands
+(also found in `fs/testshell.sh`) into the shell
+and then checks that the output matches `fs/testshell.key`.
 
 Your code should pass all tests at this point. As usual, you can grade
 your submission with make grade and hand it in with make handin.
