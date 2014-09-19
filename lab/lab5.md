@@ -7,7 +7,7 @@ Introduction: Spawn and shell
 =============================
 
 In this lab, you will implement `spawn`, a library call
-Jthat loads and runs on-disk executables.
+that loads and runs on-disk executables.
 You will then flesh out your kernel and
 library operating system enough to run a shell on the console.
 
