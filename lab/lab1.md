@@ -918,7 +918,9 @@ is located in the separate `lib` directory.
 > To test code, per questions 3, 4, and 5,
 > one option is to modify monitor.c and insert one or more
 > additional commands.
->
+
+<p />
+
 > **Question**
 
 > 1.  Explain the interface between `printf.c` and `console.c`.
@@ -1058,6 +1060,8 @@ offending function.
 > the address of the `test_backtrace` function in
 > `obj/kern/kernel.asm`, set a breakpoint there, and examine what
 > happens each time it gets called after the kernel starts.
+
+<p />
 
 > **Question**
 

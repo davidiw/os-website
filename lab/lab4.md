@@ -170,6 +170,8 @@ before going on to wake up the next one.
 > (but might fail the updated `check_kern_pgdir()` test,
 > which we will fix soon).
 
+<p />
+
 > **Question**
 
 > 1.  Compare `kern/mpentry.S` side by side with `boot/boot.S`.

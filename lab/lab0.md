@@ -1,5 +1,5 @@
 ---
-title: 'Exercise: Shell'
+title: 'Lab 0: Shell'
 due_date: '2014-8-29'
 ---
 
