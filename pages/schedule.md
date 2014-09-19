@@ -291,9 +291,9 @@ by Jonathan Cai <br />
 <b>Paper:</b> <a href="{{ urls.production_url }}/readings/papers/hunt07singularity.pdf">
 Singularity: Rethinking the Software Stack</a>
 by Dylan Visher <br />
-<b>Paper:</b> <a href="{{ urls.production_url }}/readings/papers/saltzer84e2e.pdf">
-End-to-End Arguments in System Design</a>
-by Daniel Dickstein <br />
+<b>Paper:</b> <a href="{{ urls.production_url }}/readings/papers/cheriton79thoth.pdf">
+Thoth, a Portable Real-Time Operating System</a>
+by Jason Brooks <br />
     </span><br />
     <span class="text-info">
       <b>Assignment: </b> <a href="{{ urls.production_url }}/lab/lab4">Lab 4c</a>
