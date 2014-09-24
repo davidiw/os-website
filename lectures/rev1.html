@@ -62,59 +62,37 @@
             <h3>Shell Exercise</h3>
             Test cases:
             <pre><code data-noescape="true" data-trim="true">
-28/28: ls
-28/28: ls > y
-28/28: cat < y | sort | uniq | wc > y1
-28/28: ls | sort | uniq | wc
-25/28: sleep 1 | echo test
-16/28: echo test | sleep 1
+ls
+ls > y
+cat < y | sort | uniq | wc > y1
+ls | sort | uniq | wc
+sleep 1 | echo test
+echo test | sleep 1
             </code></pre>
+<table>
+<tr><th>Case</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th></tr>
+<tr><td>Passed</td><td>28</td><td>28</td><td>28</td><td>28</td><td>25</td><td>16</td><tr> 
+<tr><td>Total</td><td>28</td><td>28</td><td>28</td><td>28</td><td>28</td><td>28</td><tr> 
+</table>
           </section>
           <section>
             <h3>How many forks?</h3>
             <pre><code data-noescape="true" data-trim="true">
-case '|':                                                                             
-  pcmd = (struct pipecmd*)cmd;                                                        
-  pipe(p);                                                                            
-  if(fork1() == 0) {                                                                  
-    close(0);                                                                         
-    dup(p[0]);                                                                        
-    close(p[0]);                                                                      
-    close(p[1]);                                                                      
-    runcmd(pcmd->right);                                                               
-  }                                                                                   
-  else {                                                                              
-    close(1);                                                                         
-    dup(p[1]);                                                                        
-    close(p[0]);                                                                      
-    close(p[1]);                                                                      
-    runcmd(pcmd->left);                                                              
-  }                                                                                   
-  break; 
-            </code></pre>
-          </section>
-          <section>
-            <h3>How many forks?</h3>
-            <pre><code data-noescape="true" data-trim="true">
-case '|':                                                                             
-  pcmd = (struct pipecmd*)cmd;                                                        
-  pipe(p);                                                                            
-  if(fork1() == 0) {                                                                  
-    close(0);                                                                         
-    dup(p[0]);                                                                        
-    close(p[0]);                                                                      
-    close(p[1]);                                                                      
-    runcmd(pcmd->right);                                                               
-  }                                                                                   
-  else {                                                                              
-    close(1);                                                                         
-    dup(p[1]);                                                                        
-    close(p[0]);                                                                      
-    close(p[1]);                                                                      
-    runcmd(pcmd->left);                                                              
-    wait();     // this wait never gets executed!                                     
-  }                                                                                   
-  break; 
+case '|':
+  pcmd = (struct pipecmd*)cmd;
+  pipe(p);
+  if(fork1() == 0) {
+    dup(p[0],0);
+    close(p[0]);
+    close(p[1]);
+    runcmd(pcmd->right);
+  } else {
+    dup(p[1],1);
+    close(p[0]);
+    close(p[1]);
+    runcmd(pcmd->left);
+  }
+  break;
             </code></pre>
           </section>
           <section>
@@ -124,17 +102,28 @@ case '|':
   pcmd = (struct pipecmd*)cmd;
   pipe(p);
   if(fork1() == 0) {
-    close(1);
-    dup(p[1]);
-    close(p[0]);
-    close(p[1]);
+    ...
+    runcmd(pcmd->right);
+  } else {
+    ...
+    runcmd(pcmd->left);
+    wait();
+  }
+  break;
+            </code></pre>
+          </section>
+          <section>
+            <h3>How many forks?</h3>
+            <pre><code data-noescape="true" data-trim="true">
+case '|':
+  pcmd = (struct pipecmd*)cmd;
+  pipe(p);
+  if(fork1() == 0) {
+    ...
     runcmd(pcmd->left);
   }
   if(fork1() == 0) {
-    close(0);
-    dup(p[0]);
-    close(p[0]);
-    close(p[1]);
+    ...
     runcmd(pcmd->right);
   }
   close(p[0]);
@@ -150,21 +139,25 @@ case '|':
           <h3>Lab 1: Question Group 1</h3>
           <ol>
 <li>At what point does the processor start executing 32-bit code? What exactly causes the switch from 16- to 32-bit mode?</li></br>
+<div class="fragment">
 32-bit code start: ljmp at boot/boot.S:55</br>
 <pre><code data-noescape="true" data-trim="true">
   ljmp    $PROT_MODE_CSEG, $protcseg
 </code></pre>
 [+3pts]
+</div>
           </ol>
         </section>
         <section>
           <h3>Lab 1: Question Group 1</h3>
           <ol start=2>
 <li>What is the last instruction of the boot loader executed, and what is the first instruction of the kernel it just loaded?</li></br>
+<div class="fragment">
 call of e_entry at boot/main.c:60</br>
 [+3pts]</br>
  movw $0x1234,0x472 in kern/entry.S:45</br>
 [+3pts]
+</div>
           </ol>
         </section>
         <section>
@@ -172,8 +165,10 @@ call of e_entry at boot/main.c:60</br>
             <h3>Lab 1: Question Group 1</h3>
             <ol start=3>
 <li>Where is the first instruction of the kernel?</li></br>
+<div class="fragment">
 0x0010000c (physical address at this point!)</br>
 [+3pts]
+</div>
             </ol>
           </section>
           <section>
@@ -199,8 +194,10 @@ Multiboot header
           <h3>Lab 1: Question Group 1</h3>
           <ol start=4>
 <li>How does the boot loader decide how many sectors it must read in order to fetch the entire kernel from disk? Where does it find this information?</li></br>
+<div class="fragment">
 p_memsz for each program header in ELF header</br>
 [+2pts for ELF header, +1pt for field]
+</div>
           </ol>
         </section>
 
@@ -208,9 +205,11 @@ p_memsz for each program header in ELF header</br>
           <h3>Lab 1: Question Group 2</h3>
           <ol>
 <li>Explain the interface between printf.c and console.c. Specifically, what function does console.c export? How is this function used by printf.c?</li></br>
+<div class="fragment">
 console.c exports cputchar()</br>
 printf.c delegates to cputchar() for actual output</br>
 [+3pts]
+</div>
           </ol>
         </section>
         <section>
@@ -228,8 +227,10 @@ if (crt_pos >= CRT_SIZE) {
 }
 </code></pre>
 </li></br>
+<div class="fragment">
 scrolling text off top of screen</br>
 [+3pts]
+</div>
             </ol>
           </section>
           <section>
@@ -276,6 +277,7 @@ int x = 1, y = 3, z = 4;
 cprintf("x %d, y %x, z %d\n", x, y, z);
 </code></pre>
 </li></br>
+<div class="fragment">
 fmt points to format string</br>
 ap points to x on the stack</br>
 [+2pts]</br>
@@ -283,6 +285,7 @@ va_arg [x => y] -> cons_putc(49)</br>
 va_arg [y => z] -> cons_putc(51)</br>
 va_arg [z => z + sizeof(z)] -> cons_putc(52)</br>
 [+1pt each call]
+</div>
           </ol>
         </section>
         <section>
@@ -294,12 +297,14 @@ unsigned int i = 0x00646c72;
 cprintf("H%x Wo%s", 57616, &i);
 </code></pre>
 </li></br>
+<div class="fragment">
 output is "he110 World"</br>
 [+1pt]</br>
 i = 0x726c6400 for big-endian</br>
 [+1pt]</br>
 y = 57616 for big-endian (doesn't change)</br>
 [+1pt]
+</div>
           </ol>
         </section>
         <section>
@@ -310,18 +315,22 @@ y = 57616 for big-endian (doesn't change)</br>
 cprintf("x=%d y=%d", 3);
 </code></pre>
 </li></br>
+<div class="fragment">
 y = whatever is on stack below args</br>
 [+3pts for mentioning stack]
+</div>
           </ol>
         </section>
         <section>
           <h3>Lab 1: Question Group 2</h3>
           <ol start="6">
 <li>Let's say that GCC changed its calling convention so that it pushed arguments on the stack in declaration order, so that the last argument is pushed last. How would you have to change cprintf or its interface so that it would still be possible to pass it a variable number of arguments?</li></br>
+<div class="fragment">
 need number of variable args and them to be of constant/known size</br>
   OR</br>
 need fmt string to be on top of stack (breaks variadic args)</br>
 [+3pts for mentioning number of args or stack position]</br>
+</div>
           </ol>
         </section>
 
@@ -329,6 +338,7 @@ need fmt string to be on top of stack (breaks variadic args)</br>
           <h3>Lab 1: Question Group 3</h3>
           <ol>
 <li>How many 32-bit words does each recursive nesting level of test_backtrace push on the stack, and what are those words?</li></br>
+<div class="fragment">
 <pre><code data-noescape="true" data-trim="true">
 [1] push %ebp
 [1] push %ebx
@@ -339,6 +349,7 @@ need fmt string to be on top of stack (breaks variadic args)</br>
  = 8 words total for each recursive call</br>
 [+1pt each push, sub, call]</br>
 [+1pt for 8 words]</br>
+</div>
           </ol>
         </section>
 
@@ -353,8 +364,10 @@ char* value = return_a_pointer();
 x = (mystery_t) value;
 </code></pre>
 </li></br>
+<div class="fragment">
 uintptr_t, otherwise dereference doesn't make sense</br>
 [+3pts]
+</div>
           </ol>
         </section>
 
@@ -363,6 +376,7 @@ uintptr_t, otherwise dereference doesn't make sense</br>
             <h3>Lab 2: Question Group 2</h3>
             <ol>
 <li>What entries (rows) in the page directory have been filled in at this point? What addresses do they map and where do they point?</li>
+<div class="fragment">
 <pre><code data-noescape="true" data-trim="true">
   1023    ffc00000   page table for top 4MB of phys mem
    ...    ...        [phys. mem. remappings]
@@ -377,6 +391,7 @@ uintptr_t, otherwise dereference doesn't make sense</br>
 </code></pre>
 [+1pt each for {pages, kern_pgdir, kstack, kernel, phys mappings}]</br>
 [-1pt total for listing things that aren't there yet]</br>
+</div>
             </ol>
           </section>
           <section>
@@ -396,18 +411,21 @@ are of the same structure.</li>
           <h3>Lab 2: Question Group 2</h3>
           <ol start="2">
 <li>We have placed the kernel and user environment in the same address space. Why will user programs not be able to read or write the kernel's memory? What specific mechanisms protect the kernel memory?</li></br>
+<div class="fragment">
 The kernel data structures are mapped two times, once read-only for
   the user (PTE_U, no PTE_W) and once read-write (PTE_W, no PTE_U) for
   the kernel. The CPU paging mechanism enforces this protection and
   faults if user code tries to write a page without PTE_W or access a
   page without PTE_U.</br>
 [+3pts]
+</div>
           </ol>
         </section>
         <section>
           <h3>Lab 2: Question Group 2</h3>
           <ol start="3">
 <li>What is the maximum amount of physical memory that this operating system can support? Why?</li></br>
+<div class="fragment">
 <pre>
   1024 PDEs
 * 1024 PTEs per PT
@@ -417,12 +435,14 @@ The kernel data structures are mapped two times, once read-only for
 OR</br>
 64MB because only read 16 bits from nvram</br>
 [+3pts]
+</div>
           </ol>
         </section>
         <section>
           <h3>Lab 2: Question Group 2</h3>
           <ol start="4">
 <li>How much space overhead is there for managing memory, if we actually had the maximum amount of physical memory? How is this overhead broken down?</li></br>
+<div class="fragment">
 <pre>
   4KB for PD
 + 1024*4096 for PTs
@@ -431,20 +451,31 @@ OR</br>
 </pre>
 [+1pt each for {PD, PTs, pages}]</br>
 [Note: credit given even if numbers are off due to #3]
+</div>
           </ol>
         </section>
         <section>
           <h3>Lab 2: Question Group 2</h3>
           <ol start="5">
 <li>What makes it possible for us to continue executing at a low EIP between when we enable paging and when we begin running at an EIP above KERNBASE?</li></br>
+<div class="fragment">
 entrypgdir maps two regions to same physical addresses:
 <pre>
   [0, 4MB) -> [0, 4MB) and
   [KERNBASE, KERNBASE + 4MB) -> [0, 4MB)
 </pre>
 [+3pts]
+</div>
           </ol>
         </section>
+
+        <section>
+          <h3>Administrative Stuff</h3>
+            <ol>
+<li>Lab 4 (officially) available this afternoon</li>
+<li>Lab 3 due tomorrow</li>
+            </ol>
+        <section>
 			</div>
 
 		</div>
