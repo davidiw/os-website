@@ -1,0 +1,521 @@
+<!doctype html>
+<html lang="en">
+
+	<head>
+		<meta charset="utf-8">
+
+    <title>CS422/522 - Code Review - Shell, Lab 1, Lab 2</title>
+
+    <meta name="description" content="Lecture 3 - Virtual Memory">
+    <meta name="author" content="David Wolinsky">
+
+		<meta name="apple-mobile-web-app-capable" content="yes" />
+		<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+		<link rel="stylesheet" href="reveal.js/css/reveal.min.css">
+		<link rel="stylesheet" href="reveal.js/css/theme/serif.css" id="theme">
+
+		<!-- For syntax highlighting -->
+		<link rel="stylesheet" href="reveal.js/lib/css/zenburn.css">
+
+		<!-- If the query includes 'print-pdf', include the PDF print sheet -->
+		<script>
+			if( window.location.search.match( /print-pdf/gi ) ) {
+				var link = document.createElement( 'link' );
+				link.rel = 'stylesheet';
+				link.type = 'text/css';
+				link.href = 'reveal.js/css/print/pdf.css';
+				document.getElementsByTagName( 'head' )[0].appendChild( link );
+			}
+		</script>
+
+    <style>
+      .reveal pre code { max-height: 700px; }
+      .reveal pre { font-size: 70%; }
+      .reveal p { text-align: left; }
+      .reveal table, .reveal th, .reveal td { border: 1px solid black; }
+      .reveal li { font-weight: bold; }
+    </style>
+
+		<!--[if lt IE 9]>
+		<script src="reveal.js/lib/js/html5shiv.js"></script>
+		<![endif]-->
+	</head>
+
+	<body>
+
+		<div class="reveal">
+
+			<!-- Any section element inside of this container is displayed as a slide -->
+			<div class="slides">
+				<section>
+          <h2>Shell, Lab 1, Lab 2</h2>
+          <h3>CS422/522 Code Review</h3>
+          <h3>24 September 2014</h3>
+          <h4>Last updated: 24 September 2014</h4>
+				</section>
+
+        <section>
+          <section>
+            <h3>Shell Exercise</h3>
+            Test cases:
+            <pre><code data-noescape="true" data-trim="true">
+ls
+ls > y
+cat < y | sort | uniq | wc > y1
+ls | sort | uniq | wc
+sleep 1 | echo test
+echo test | sleep 1
+            </code></pre>
+<table>
+<tr><th>Case</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th></tr>
+<tr><td>Passed</td><td>28</td><td>28</td><td>28</td><td>28</td><td>25</td><td>16</td><tr> 
+<tr><td>Total</td><td>28</td><td>28</td><td>28</td><td>28</td><td>28</td><td>28</td><tr> 
+</table>
+          </section>
+          <section>
+            <h3>How many forks?</h3>
+            <pre><code data-noescape="true" data-trim="true">
+case '|':
+  pcmd = (struct pipecmd*)cmd;
+  pipe(p);
+  if(fork1() == 0) {
+    dup(p[0],0);
+    close(p[0]);
+    close(p[1]);
+    runcmd(pcmd->right);
+  } else {
+    dup(p[1],1);
+    close(p[0]);
+    close(p[1]);
+    runcmd(pcmd->left);
+  }
+  break;
+            </code></pre>
+          </section>
+          <section>
+            <h3>How many forks?</h3>
+            <pre><code data-noescape="true" data-trim="true">
+case '|':
+  pcmd = (struct pipecmd*)cmd;
+  pipe(p);
+  if(fork1() == 0) {
+    ...
+    runcmd(pcmd->right);
+  } else {
+    ...
+    runcmd(pcmd->left);
+    wait();
+  }
+  break;
+            </code></pre>
+          </section>
+          <section>
+            <h3>How many forks?</h3>
+            <pre><code data-noescape="true" data-trim="true">
+case '|':
+  pcmd = (struct pipecmd*)cmd;
+  pipe(p);
+  if(fork1() == 0) {
+    ...
+    runcmd(pcmd->left);
+  }
+  if(fork1() == 0) {
+    ...
+    runcmd(pcmd->right);
+  }
+  close(p[0]);
+  close(p[1]);
+  wait();
+  wait();
+  break;
+            </code></pre>
+          </section>
+        </section>
+
+        <section>
+          <h3>Lab 1: Question Group 1</h3>
+          <ol>
+<li>At what point does the processor start executing 32-bit code? What exactly causes the switch from 16- to 32-bit mode?</li></br>
+<div class="fragment">
+32-bit code start: ljmp at boot/boot.S:55</br>
+<pre><code data-noescape="true" data-trim="true">
+  ljmp    $PROT_MODE_CSEG, $protcseg
+</code></pre>
+[+3pts]
+</div>
+          </ol>
+        </section>
+        <section>
+          <h3>Lab 1: Question Group 1</h3>
+          <ol start=2>
+<li>What is the last instruction of the boot loader executed, and what is the first instruction of the kernel it just loaded?</li></br>
+<div class="fragment">
+call of e_entry at boot/main.c:60</br>
+[+3pts]</br>
+ movw $0x1234,0x472 in kern/entry.S:45</br>
+[+3pts]
+</div>
+          </ol>
+        </section>
+        <section>
+          <section>
+            <h3>Lab 1: Question Group 1</h3>
+            <ol start=3>
+<li>Where is the first instruction of the kernel?</li></br>
+<div class="fragment">
+0x0010000c (physical address at this point!)</br>
+[+3pts]
+</div>
+            </ol>
+          </section>
+          <section>
+            <h3>Lab 1: Question Group 1</h3>
+            <ol start=3>
+Why not 0x00100000?
+<pre><code data-noescape="true" data-trim="true">
+f0100000:   02 b0 ad 1b 00 00       add    0x1bad(%eax),%dh 
+f0100006:   00 00                   add    %al,(%eax)
+f0100008:   fe 4f 52                decb   0x52(%edi)
+f010000b:   e4 66                   in     $0x66,%al
+</code></pre>
+Multiboot header
+<table>
+<tr><th>Offset</th><th>Type</th><th>Field Name</th><th>Note</th></tr>
+<tr><td>0</td><td>u32</td><td> magic</td><td>0x1badb002</td></tr> 
+<tr><td>4</td><td>u32</td><td>flags </td><td>0</td></tr> 
+<tr><td>8</td><td>u32</td><td>checksum </td><td>-(magic + flags)</td></tr>
+</table>
+          </section>
+        </section>
+        <section>
+          <h3>Lab 1: Question Group 1</h3>
+          <ol start=4>
+<li>How does the boot loader decide how many sectors it must read in order to fetch the entire kernel from disk? Where does it find this information?</li></br>
+<div class="fragment">
+p_memsz for each program header in ELF header</br>
+[+2pts for ELF header, +1pt for field]
+</div>
+          </ol>
+        </section>
+
+        <section>
+          <h3>Lab 1: Question Group 2</h3>
+          <ol>
+<li>Explain the interface between printf.c and console.c. Specifically, what function does console.c export? How is this function used by printf.c?</li></br>
+<div class="fragment">
+console.c exports cputchar()</br>
+printf.c delegates to cputchar() for actual output</br>
+[+3pts]
+</div>
+          </ol>
+        </section>
+        <section>
+          <section>
+            <h3>Lab 1: Question Group 2</h3>
+            <ol start=2>
+<li>Explain the following from console.c:
+<pre><code data-noescape="true" data-trim="true">
+if (crt_pos >= CRT_SIZE) {
+   int i;
+   memcpy(crt_buf, crt_buf + CRT_COLS, (CRT_SIZE - CRT_COLS) * sizeof(uint16_t));
+   for (i = CRT_SIZE - CRT_COLS; i < CRT_SIZE; i++)
+       crt_buf[i] = 0x0700 | ' ';
+   crt_pos -= CRT_COLS;
+}
+</code></pre>
+</li></br>
+<div class="fragment">
+scrolling text off top of screen</br>
+[+3pts]
+</div>
+            </ol>
+          </section>
+          <section>
+            <h3>Lab 1: Question Group 2</h3>
+VGA Text Buffer
+<table>
+<tr>
+<th colspan="8">Attribute</th>
+<th colspan="8">Character</th>
+</tr>
+<tr>
+<td width="48" align="center">7</td>
+<td width="48" align="center">6</td>
+<td width="48" align="center">5</td>
+<td width="48" align="center">4</td>
+<td width="48" align="center">3</td>
+<td width="48" align="center">2</td>
+<td width="48" align="center">1</td>
+<td width="48" align="center">0</td>
+<td width="48" align="center">7</td>
+<td width="48" align="center">6</td>
+<td width="48" align="center">5</td>
+<td width="48" align="center">4</td>
+<td width="48" align="center">3</td>
+<td width="48" align="center">2</td>
+<td width="48" align="center">1</td>
+<td width="48" align="center">0</td>
+</tr>
+<tr>
+<td align="center">Blink</td>
+<td colspan="3" align="center">Background color</td>
+<td colspan="4" align="center">Foreground color</td>
+<td colspan="8" align="center">Code point</td>
+</tr>
+</table>
+          </section>
+        </section>
+        <section>
+          <h3>Lab 1: Question Group 2</h3>
+          <ol start=3>
+<li>Trace the execution of the following code step-by-step:
+<pre><code data-noescape="true" data-trim="true">
+int x = 1, y = 3, z = 4;
+cprintf("x %d, y %x, z %d\n", x, y, z);
+</code></pre>
+</li></br>
+<div class="fragment">
+fmt points to format string</br>
+ap points to x on the stack</br>
+[+2pts]</br>
+va_arg [x => y] -> cons_putc(49)</br>
+va_arg [y => z] -> cons_putc(51)</br>
+va_arg [z => z + sizeof(z)] -> cons_putc(52)</br>
+[+1pt each call]
+</div>
+          </ol>
+        </section>
+        <section>
+          <h3>Lab 1: Question Group 2</h3>
+          <ol start="4">
+<li>Explain the output of the following code:
+<pre><code data-noescape="true" data-trim="true">
+unsigned int i = 0x00646c72;
+cprintf("H%x Wo%s", 57616, &i);
+</code></pre>
+</li></br>
+<div class="fragment">
+output is "he110 World"</br>
+[+1pt]</br>
+i = 0x726c6400 for big-endian</br>
+[+1pt]</br>
+y = 57616 for big-endian (doesn't change)</br>
+[+1pt]
+</div>
+          </ol>
+        </section>
+        <section>
+          <h3>Lab 1: Question Group 2</h3>
+          <ol start="5">
+<li>In the following code, what is going to be printed after y=?
+<pre><code data-noescape="true" data-trim="true">
+cprintf("x=%d y=%d", 3);
+</code></pre>
+</li></br>
+<div class="fragment">
+y = whatever is on stack below args</br>
+[+3pts for mentioning stack]
+</div>
+          </ol>
+        </section>
+        <section>
+          <h3>Lab 1: Question Group 2</h3>
+          <ol start="6">
+<li>Let's say that GCC changed its calling convention so that it pushed arguments on the stack in declaration order, so that the last argument is pushed last. How would you have to change cprintf or its interface so that it would still be possible to pass it a variable number of arguments?</li></br>
+<div class="fragment">
+need number of variable args and them to be of constant/known size</br>
+  OR</br>
+need fmt string to be on top of stack (breaks variadic args)</br>
+[+3pts for mentioning number of args or stack position]</br>
+</div>
+          </ol>
+        </section>
+
+        <section>
+          <h3>Lab 1: Question Group 3</h3>
+          <ol>
+<li>How many 32-bit words does each recursive nesting level of test_backtrace push on the stack, and what are those words?</li></br>
+<div class="fragment">
+<pre><code data-noescape="true" data-trim="true">
+[1] push %ebp
+[1] push %ebx
+[5] sub 0x14,%esp       [NOTE: gcc reserves extra]
+[0] mov (x-1),(%esp)    [reserved by sub]
+[1] call test_backtrace [pushes %eip]
+</code></pre>
+ = 8 words total for each recursive call</br>
+[+1pt each push, sub, call]</br>
+[+1pt for 8 words]</br>
+</div>
+          </ol>
+        </section>
+
+        <section>
+          <h3>Lab 2: Question Group 1</h3>
+          <ol>
+<li>Assuming that the following JOS kernel code is correct, what type should variable x have, uintptr_t or physaddr_t?
+<pre><code data-noescape="true" data-trim="true">
+mystery_t x;
+char* value = return_a_pointer();
+*value = 10;
+x = (mystery_t) value;
+</code></pre>
+</li></br>
+<div class="fragment">
+uintptr_t, otherwise dereference doesn't make sense</br>
+[+3pts]
+</div>
+          </ol>
+        </section>
+
+        <section>
+        <section>
+            <h3>Lab 2: Question Group 2</h3>
+            <ol>
+<li>What entries (rows) in the page directory have been filled in at this point? What addresses do they map and where do they point?</li>
+<div class="fragment">
+<pre><code data-noescape="true" data-trim="true">
+  1023    ffc00000   page table for top 4MB of phys mem
+   ...    ...        [phys. mem. remappings]
+   960    f0000000   kernel (first 4MB of physical memory)
+   959    efc00000   kstack
+   958    ef800000   [nothing]
+   957    ef400000   kern_pgdir
+   956    ef000000   pages
+   955    eec00000   [nothing]
+   ...    ...        [nothing]
+     0    00000000   [nothing]
+</code></pre>
+[+1pt each for {pages, kern_pgdir, kstack, kernel, phys mappings}]</br>
+[-1pt total for listing things that aren't there yet]</br>
+</div>
+            </ol>
+          </section>
+          <section>
+          <h3>Virtual page directory</h3>
+<ul>
+<li>Just like page directory provides contiguous view of memory, virtual (recursive)
+page directory provides contigous view of page tables.</li>
+<li>Maps page directory as entry in self, plays games with fact that PDEs and PTEs
+are of the same structure.</li>
+<li>Confuses QEMU monitor, which displays page PDEs as PTEs.</li>
+<li>Will make use of virtual page directory in Lab 4...</li>
+</ul>
+          </section>
+        </section>
+
+        <section>
+          <h3>Lab 2: Question Group 2</h3>
+          <ol start="2">
+<li>We have placed the kernel and user environment in the same address space. Why will user programs not be able to read or write the kernel's memory? What specific mechanisms protect the kernel memory?</li></br>
+<div class="fragment">
+The kernel data structures are mapped two times, once read-only for
+  the user (PTE_U, no PTE_W) and once read-write (PTE_W, no PTE_U) for
+  the kernel. The CPU paging mechanism enforces this protection and
+  faults if user code tries to write a page without PTE_W or access a
+  page without PTE_U.</br>
+[+3pts]
+</div>
+          </ol>
+        </section>
+        <section>
+          <h3>Lab 2: Question Group 2</h3>
+          <ol start="3">
+<li>What is the maximum amount of physical memory that this operating system can support? Why?</li></br>
+<div class="fragment">
+<pre>
+  1024 PDEs
+* 1024 PTEs per PT
+* 4KB per PG
+= 4GB
+</pre>
+OR</br>
+64MB because only read 16 bits from nvram</br>
+[+3pts]
+</div>
+          </ol>
+        </section>
+        <section>
+          <h3>Lab 2: Question Group 2</h3>
+          <ol start="4">
+<li>How much space overhead is there for managing memory, if we actually had the maximum amount of physical memory? How is this overhead broken down?</li></br>
+<div class="fragment">
+<pre>
+  4KB for PD
++ 1024*4096 for PTs
++ 1024*1024*8B for pages array
+= 4MB + 4KB + 8MB
+</pre>
+[+1pt each for {PD, PTs, pages}]</br>
+[Note: credit given even if numbers are off due to #3]
+</div>
+          </ol>
+        </section>
+        <section>
+          <h3>Lab 2: Question Group 2</h3>
+          <ol start="5">
+<li>What makes it possible for us to continue executing at a low EIP between when we enable paging and when we begin running at an EIP above KERNBASE?</li></br>
+<div class="fragment">
+entrypgdir maps two regions to same physical addresses:
+<pre>
+  [0, 4MB) -> [0, 4MB) and
+  [KERNBASE, KERNBASE + 4MB) -> [0, 4MB)
+</pre>
+[+3pts]
+</div>
+          </ol>
+        </section>
+
+        <section>
+          <h3>Administrative Stuff</h3>
+            <ol>
+<li>Lab 4 (officially) available this afternoon</li>
+<li>Lab 3 due tomorrow</li>
+            </ol>
+        <section>
+			</div>
+
+		</div>
+
+		<script src="reveal.js/lib/js/head.min.js"></script>
+		<script src="reveal.js/js/reveal.min.js"></script>
+
+		<script>
+
+			// Full list of configuration options available here:
+			// https://github.com/hakimel/reveal.js#configuration
+			Reveal.initialize({
+				controls: true,
+				progress: true,
+				history: true,
+				center: false, 
+        slideNumber: true,
+        margin: 0.0,
+        minScale: 0.2,
+        maxScale: 5.0,
+
+				theme: Reveal.getQueryHash().theme, // available themes are in /css/theme
+				transition: Reveal.getQueryHash().transition || 'default', // default/cube/page/concave/zoom/linear/fade/none
+
+				// Parallax scrolling
+				// parallaxBackgroundImage: 'https://s3.amazonaws.com/hakim-static/reveal-js/reveal-parallax-1.jpg',
+				// parallaxBackgroundSize: '2100px 900px',
+
+				// Optional libraries used to extend on reveal.js
+				dependencies: [
+					{ src: 'reveal.js/lib/js/classList.js', condition: function() { return !document.body.classList; } },
+					{ src: 'reveal.js/plugin/markdown/marked.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+					{ src: 'reveal.js/plugin/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+					{ src: 'reveal.js/plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
+					{ src: 'reveal.js/plugin/zoom-js/zoom.js', async: true, condition: function() { return !!document.body.classList; } },
+					{ src: 'reveal.js/plugin/notes/notes.js', async: true, condition: function() { return !!document.body.classList; } }
+				]
+			});
+
+		</script>
+
+	</body>
+</html>
