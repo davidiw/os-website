@@ -132,26 +132,27 @@ The E1000 can produce a lot of debug output,
 so you have to enable specific logging channels.
 Some channels you might find useful are:
 
-Flag       | Meaning
------------|----------------------------------------------------
-gtx        | Log packet transmit operations
-gtxerr     | Log transmit ring errors
-grx        | Log changes to RCTL
-grxfilter  | Log filtering of incoming packets
-grxerr     | Log receive ring errors
-gunknown   | Log reads and writes of unknown registers
-geeprom    | Log reads from the EEPROM
-ginterrupt | Log interrupts and changes to interrupt registers.
+Flag      | Meaning
+----------|----------------------------------------------------
+tx        | Log packet transmit operations
+txerr     | Log transmit ring errors
+rx        | Log changes to RCTL
+rxfilter  | Log filtering of incoming packets
+rxerr     | Log receive ring errors
+unknown   | Log reads and writes of unknown registers
+eeprom    | Log reads from the EEPROM
+interrupt | Log interrupts and changes to interrupt registers.
 
 To enable "tx" and "txerr" logging, for example,
 use `make E1000_DEBUG=tx,txerr ...`.
 
-Note that `E1000_DEBUG` only works in the 6.828 version of QEMU.
+Note that `E1000_DEBUG` only works in the CPSC422/522 version of QEMU.
 
 You can take debugging using software emulated hardware one step further.
 If you are ever stuck and do not understand
 why the E1000 is not responding the way you would expect,
-you can look at QEMU's E1000 implementation in `hw/e1000.c`.
+you can look at QEMU's E1000 implementation in [hw/e1000.c]
+(https://github.com/qemu/qemu/blob/master/hw/net/e1000.c).
 
 ### The Network Server
 
@@ -184,14 +185,11 @@ the socket call dispatcher and lwIP itself.
 The socket call dispatcher works exactly like the file server.
 User environments use stubs (found in `lib/nsipc.c`)
 to send IPC messages to the core network environment.
-If you look at `lib/nsipc.c`,
- you will see that we find the core network server
-the same way we found the file server:
-`i386_init` created the NS environment with NS_TYPE_NS,
-so we scan `envs`, looking for this special environment type.
-For each user environment IPC,
-the dispatcher in the network server calls
-the appropriate BSD socket interface function
+`i386_init` constructs the core ntework server
+with NS environment with `NS_TYPE_NS`.
+Similar to the file system setup,
+user IPC will be dispatched to the network server stack
+and passed to the appropriate BSD socket interface function
 provided by lwIP on behalf of the user.
 
 Regular user environments do not use the `nsipc_*` calls directly.
@@ -294,7 +292,7 @@ but is not yet fully integrated into your kernel.
 Use `make INIT_CFLAGS=-DTEST_NO_NS run-testtime`
 to test your time code.
 You should see the environment count down from 5 in 1 second intervals.
-The "-DTEST_NO_NS" disables starting the network server environment,
+The `-DTEST_NO_NS` disables starting the network server environment,
 because it will panic at this point in the lab.
 
 ### The Network Interface Card
@@ -309,7 +307,7 @@ while writing your driver.
 > **Exercise 2**
 
 > Browse Intel's [Software Developer's Manual]
-> (http://pdosnew.csail.mit.edu/6.828/2014/readings/hardware/8254x_GBe_SDM.pdf)
+> ({{ urls.production_url }}/readings/hardware/8254x_GBe_SDM.pdf)
 > for the E1000.
 > This manual covers several closely related Ethernet controllers.
 > QEMU emulates the 82540EM.
@@ -500,8 +498,8 @@ Hint: You'll need a lot of constants,
 like the locations of registers and values of bit masks.
 Trying to copy these out of the developer's manual is error-prone
 and mistakes can lead to painful debugging sessions.
-We recommend instead using QEMU's [`e1000_hw.h`]
-(http://pdosnew.csail.mit.edu/6.828/2014/labs/lab6/e1000_hw.h)
+We recommend instead using QEMU's [`e1000_regs.h`]
+(https://github.com/qemu/qemu/blob/master/hw/net/e1000_regs.h)
 header as a guideline.
 We don't recommend copying it in verbatim,
 because it defines far more than you actually need
@@ -971,7 +969,7 @@ Now you're ready to implement receiving packets.
 To receive a packet, your driver will have to keep track
 of which descriptor it expects to hold the next received packet
 (hint: depending on your design,
-there's probably already be a register in the E1000 keeping track of this).
+there's probably already a register in the E1000 keeping track of this).
 Similar to transmit, the documentation states
 that the RDH register cannot be reliably read from software,
 so in order to determine if a packet
@@ -1175,6 +1173,14 @@ We have provided skeleton code
 for a very simple web server in `user/httpd.c`.
 The skeleton code deals with incoming connections and parses the headers.
 
+This is the first time in the class,
+you will be writing application code.
+JOS stores its application library headers in `inc/lib.h`.
+The JOS API is similar to Linux and other POSIX systems.
+Therefore you can either use `man pages` on your machine,
+source code analysis,
+or experimentation to understand the library.
+
 > **Exercise 13**
 
 > The web server is missing the code that deals
@@ -1182,7 +1188,7 @@ The skeleton code deals with incoming connections and parses the headers.
 > Finish the web server by implementing `send_file` and `send_data`.
 
 Once you've finished the web server,
-point your favorite browser at http://<i>host</i>:<i>port</i>/index.html,
+point your favorite browser at http://host:port/index.html,
 where <i>host</i> is the name of the computer running QEMU
 (`python.zoo.cs.yale.edu` if you're
 running QEMU on the Zoo,
@@ -1203,7 +1209,7 @@ At this point, you should score 105/105 on `make grade`.
 > with multiple sockets at once <i>and</i>
 > to send and receive on the same socket at the same time.
 > There are multiple ways to go about this.
-> lwIP provides a MSG_DONTWAIT flag for recv
+> lwIP provides a `MSG_DONTWAIT` flag for recv
 > (see `lwip_recvfrom` in `net/lwip/api/sockets.c`),
 > so you could constantly loop through all open sockets,
 > polling them for data.

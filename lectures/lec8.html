@@ -1,0 +1,490 @@
+<!doctype html>
+<html lang="en">
+
+	<head>
+		<meta charset="utf-8">
+
+    <title>CS422/522 - Lecture 8 - Scheduling</title>
+
+    <meta name="description" content="Lecture 8 - Scheduling">
+    <meta name="author" content="David Wolinsky">
+
+		<meta name="apple-mobile-web-app-capable" content="yes" />
+		<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+		<link rel="stylesheet" href="reveal.js/css/reveal.min.css">
+		<link rel="stylesheet" href="reveal.js/css/theme/serif.css" id="theme">
+
+		<!-- For syntax highlighting -->
+		<link rel="stylesheet" href="reveal.js/lib/css/zenburn.css">
+
+		<!-- If the query includes 'print-pdf', include the PDF print sheet -->
+		<script>
+			if( window.location.search.match( /print-pdf/gi ) ) {
+				var link = document.createElement( 'link' );
+				link.rel = 'stylesheet';
+				link.type = 'text/css';
+				link.href = 'reveal.js/css/print/pdf.css';
+				document.getElementsByTagName( 'head' )[0].appendChild( link );
+			}
+		</script>
+
+    <script>
+var m_current = 0;
+
+var m_outline = [
+  "Recap",
+  "Scheduling Overview",
+  "Scheduling Algorithms",
+  "Real-time Scheduling",
+  "Scheduling in Xv6",
+  "Wrap-Up"
+  ];
+
+function writeOutline() {
+  var count = m_outline.length;
+  var trigger = m_current / count;
+
+  document.write("<section>");
+  document.write("<h3>Outline</h3>");
+  document.write("<ol>");
+  for(i = 0; i < count; i++, m_current++) {
+    var opacity = 0.4;
+    if (m_current % count == trigger) {
+      opacity = 1.0;
+    }
+    document.write("<li style=\"opacity: " + opacity + ";\">" + m_outline[i] + "</li>");
+  }
+  document.write("</ol>");
+  document.write("</section>");
+}
+    </script>
+
+    <style>
+      .reveal pre code { max-height: 700px; }
+      .reveal pre { font-size: 70%; }
+      .reveal p { text-align: left; }
+    </style>
+
+		<!--[if lt IE 9]>
+		<script src="reveal.js/lib/js/html5shiv.js"></script>
+		<![endif]-->
+	</head>
+
+	<body>
+
+		<div class="reveal">
+
+			<!-- Any section element inside of this container is displayed as a slide -->
+			<div class="slides">
+  <!--
+        <section>
+          <h3>Divided</h3>
+          <div style="width: 100%">
+            <div style="width: 50%; float: left;">
+            </div>
+            <div style="width: 50%; float: left;">
+            </div>
+          </div>
+        </section>
+
+        <script type="text/javascript">writeOutline()</script>
+
+        <section>
+          <h3></h3>
+          <pre><code data-noescape="true" data-trim="true">
+          </code></pre>
+        </section>
+  -->
+				<section>
+          <h2>Scheduling</h2>
+          <h3>CS422/522 Lecture 8</h3>
+          <h3>29 September 2014</h3>
+          <h4>Last updated: 29 September 2014</h4>
+				</section>
+
+        <script type="text/javascript">writeOutline()</script>
+
+        <section>
+          <h3>Recap</h3>
+          <ul>
+            <li>Race conditions</li>
+            <li>Synchronization</li>
+            <li>Atomic operations</li>
+            <li>Priority Inversion</li>
+          </ul>
+        </section>
+
+        <section>
+          <h3>Debugging</h3>
+          <ol>
+            <li>Before you have a bug...:
+              <ul>
+                <li>Read documentation</li>
+                <li>Understand hardware interface</li>
+                <li>Understand software interface</li>
+              </ul>
+            </li>
+            <li>Find the exact line / instruction causing bug</li>
+            <li>Understand error message</li>
+            <li>Think about all data related to that point</li>
+            <li>Make sure you setup the data correctly</li>
+            <li>Usage error message to narrow in on issue</li>
+            <li>Check your code</li>
+          </ol>
+        </section>
+
+        <section>
+          <h3>Example</h3>
+          <ol>
+            <li>int 0x30 -- triple fault</li>
+            <li>Triple fault: <span class="fragment">unable to access memory</span></li>
+            <li>Possible sources:
+              <ul class="fragment">
+                <li>IDT not set or lidt not called</li>
+                <li>Invalid IDT</li>
+                <li>0x30 IDT entry improperly set</li>
+                <li>GPF not correctly set</li>
+              </ul>
+            </li>
+          </ol>
+        </section>
+
+        <script type="text/javascript">writeOutline()</script>
+
+        <section>
+          <h3>Scheduling</h3>
+          <ul>
+            <li>N processes &gt&gt M processors</li>
+            <li>Each process:
+              <ul>
+                <li>Has illusion of ownership of the machine</li>
+                <li>Has own virtual processor</li>
+                <li>Allocated timeslice of CPU</li>
+              </ul>
+            </li>
+            <li>System support:
+              <ul>
+                <li>Cooperative</li>
+                <li>Preemptive</li>
+              </ul>
+            </li>
+          </ul>
+        </section>
+
+        <section>
+          <h3>Cooperative Multiprocessing</h3>
+          <ul>
+            <li>What causes process switches?
+              <ul class="fragment">
+                <li>Explicit yields</li>
+                <li>Wait on I/O</li>
+                <li>Termination</li>
+                <li>Generally -- transitions to kernel</li>
+              </ul>
+            </li>
+            <li class="fragment">Disadvantage: <span class="fragment">bad application may never release CPU.</span></li>
+            <li class="fragment">Advantage: <span class="fragment">(critical / sensitive) operations are not interrupted.</span></li>
+          </ul>
+        </section>
+
+        <section>
+          <h3>Preemptive Multiprocessing</h3>
+          <ul>
+            <li>What causes process switches?
+              <ul class="fragment">
+                <li>Timer interrupt</li>
+                <li>Resource available</li>
+              </ul>
+            </li>
+            <li class="fragment">Advantage: <span class="fragment">system enforced fair share of CPU</span></li>
+            <li class="fragment">Disadvantage: <span class="fragment">preemption may occur during sensitive operations</span></li>
+          </ul>
+        </section>
+
+        <section>
+          <h3>Scheduling Process</h3>
+          <img width="300" src="images/scheduling.png" /> <br />
+          <ul>
+            <li>Current process yields</li>
+            <li>Enters kernel</li>
+            <li>Save current process state</li>
+            <li>Kernel selects new process</li>
+            <li>Kernel loads new process state (context switch)</li>
+          </ul>
+        </section>
+
+        <section>
+          <h3>Scheduling Criteria</h3>
+          <ul class="fragment">
+            <li>CPU utilization</li>
+            <li>Throughput</li>
+            <li>Turnaround time</li>
+            <li>Waiting time</li>
+            <li>Response time</li>
+          </ul>
+        </section>
+
+        <section>
+          <h3>Scheduling Algorithm Families</h3>
+          <ul>
+            <li>Cooperative</li>
+            <li>Preemptive</li>
+            <li>Real-time</li>
+          </ul>
+        </section>
+
+        <section>
+          <h3>Multiprocessor Concerns</h3>
+          <ul>
+            <li>Synchronized access to list of processes</li>
+            <li>Processor affinity</li>
+            <li>Load balancing concerns:
+              <ul class="fragment">
+                <li>Optimize CPU usage</li>
+                <li>Cost of migrating a process</li>
+                <li>Access to memory (NUMA)</li>
+              </ul>
+            </li>
+          </ul>
+        </section>
+
+        <script type="text/javascript">writeOutline()</script>
+
+        <section>
+          <h3>First-Come, First-Serve</h3>
+          <ul>
+            <li>Processes become runnable, enter queue</li>
+            <li>First in queue runs</li>
+            <li>Employs cooperative multiprocessing:
+              <ul>
+                <li>Release CPU on I/O or termination</li>
+                <li>Returns to tail of queue on I/O completion</li>
+              </ul>
+            </li>
+            <li class="fragment">Example: <br />
+              <img class="fragment" src="images/fcfs-sched.png" />
+            </li>
+            <li class="fragment">Issue: <span class="fragment">Long waiting time</span></li>
+          </ul>
+        </section>
+
+        <section>
+          <h3>Shortest-Job-First</h3>
+          <ul>
+            <li>Processes become runnable, enter queue</li>
+            <li>Queue sorted by job run-time</li>
+            <li>Employs cooperative multiprocessing</li>
+            <li class="fragment">Example: <br />
+              <img class="fragment" src="images/sjf-sched.png" />
+            </li>
+            <li class="fragment">Issues:
+              <ul class="fragment">
+                <li>High consumption processes may never run, starvation</li>
+                <li>Requires knowledge of application run time</li>
+              </ul>
+            </li>
+        </section>
+
+        <section>
+          <h3>Priority Scheduling</h3>
+          <ul>
+            <li>Each process has a priority</li>
+            <li>High priority runs</li>
+            <li>New high priority proceess joins the queue:
+              <ul>
+                <li>Cooperative: <span class="fragment">wait for current process to end</span></li>
+                <li>Preemptive: <span class="fragment">interrupt current process and replace</span></li>
+              </ul>
+            </li>
+            <li class="fragment">Priority ~ Shortest-Job-First</li>
+            <li class="fragment">Priority can address starvation:
+              <span class="fragment">increase priority of old processes (aging)</span>
+            </li>
+          </ul>
+        </section>
+
+        <section>
+          <h3>Round-Robin</h3>
+          <ul>
+            <li>First-come, first-serve with preemption</li>
+            <li>Processes run until done using CPU or preempted</li>
+            <li>Preempted aftera quantum / time slice</li>
+            <li>Challenge: <span class="fragment">balance between execution time / context switch time</span></li>
+          </ul>
+        </section>
+
+        <script type="text/javascript">writeOutline()</script>
+
+        <section>
+          <h3>Real-Time Scheduling</h3>
+          <ul>
+            <li>Critical operations <i>must</i> occur at a certain time:
+              <ul>
+                <li>Soft: executed as soon as possible</li>
+                <li>Hard: if not executed don't execute</li>
+              </ul>
+            </li>
+            <li>Processes typically run periodically and for a fixed period of time</li>
+            <li class="fragment">Delays:
+              <ul class="fragment">
+                <li>Interrupt -- time to begin processing the interrupt</li>
+                <li>Dispatch -- context switch</li>
+              </ul>
+            </li>
+          </ul>
+        </section>
+
+        <section>
+          <h3>Priority Scheduling</h3>
+          <ul>
+            <li>Processes run at assigned priority</li>
+            <li>Example:
+              <table>
+                <tr><td>PID</td><td>CPU Time</td><td>Period</td><td>Priority</td></tr>
+                <tr><td>0</td><td>100 ms</td><td>35 ms</td><td>0</td></tr>
+                <tr><td>1</td><td>50 ms</td><td>20 ms</td><td>1</td></tr>
+              </table>
+            </li>
+            <li class="fragment"><img src="images/priority-sched-fail.png" /></li>
+          </ul>
+        </section>
+
+        <section>
+          <h3>Rate-Monotonic</h3>
+          <ul>
+            <li>Priority set to inverse of period</li>
+            <li>Optimal for static scheduling</li>
+            <center>
+              <table>
+                <tr><td>PID</td><td>CPU Time</td><td>Period</td><td>Priority</td></tr>
+                <tr><td>0</td><td>100 ms</td><td>35 ms</td><td>1/100</td></tr>
+                <tr><td>1</td><td>50 ms</td><td>20 ms</td><td>1/50</td></tr>
+              </table>
+            </center>
+            <img class="fragment" src="images/rm-sched-good.png" />
+          </ul>
+        </section>
+
+        <section>
+          <h3>Another RM Example</h3>
+          <center>
+            <table>
+              <tr><td>PID</td><td>CPU Time</td><td>Period</td><td>Priority</td></tr>
+              <tr><td>0</td><td>50 ms</td><td>25 ms</td><td>1/50</td></tr>
+              <tr><td>1</td><td>80 ms</td><td>35 ms</td><td>1/80</td></tr>
+            </table>
+          </center>
+          <img class="fragment" src="images/rm-sched-fail.png" />
+        </section>
+
+        <section>
+          <h3>Earliest-Deadline-First</h3>
+          Prioritize earliest deadline first <br />
+          <center>
+            <table>
+              <tr><td>PID</td><td>CPU Time</td><td>Period</td><td>Priority</td></tr>
+              <tr><td>0</td><td>50 ms</td><td>25 ms</td><td>dynamic</td></tr>
+              <tr><td>1</td><td>80 ms</td><td>35 ms</td><td>dynamic</td></tr>
+            </table>
+          </center>
+          <img class="fragment" src="images/edf-sched-good.png" />
+        </section>
+
+        <script type="text/javascript">writeOutline()</script>
+
+        <section>
+          <h3>Xv6 Scheduler</h3>
+          <pre><code data-noescape="true" data-trim="true">
+2460   struct proc *p;
+2462   for(;;){
+2464     sti();
+2467     acquire(&ptable.lock);
+2468     for(p = ptable.proc; p &lt &ptable.proc[NPROC]; p++){
+2469       if(p−>state != RUNNABLE)
+2470         continue;
+2471
+2475       proc = p;
+2476       switchuvm(p);
+2477       p−>state = RUNNING;
+2478       swtch(&cpu−>scheduler, proc−>context);
+2479       switchkvm();
+2483       proc = 0;
+2484     }
+2485     release(&ptable.lock);
+2487   }
+          </code></pre>
+        </section>
+
+        <section>
+          <h3>Interrupt-Based Context Switch</h3>
+          <pre><code data-noescape="true" data-trim="true">
+3113   switch(tf−>trapno){
+3114     case T_IRQ0 + IRQ_TIMER:
+3115     if(cpu−>id == 0){
+3116       acquire(&tickslock);
+3117       ticks++;
+3118       wakeup(&ticks);
+3119       release(&tickslock);
+3120     }
+3121     lapiceoi();
+...
+3173   if(proc && proc−>state == RUNNING &&
+            tf−>trapno == T_IRQ0+IRQ_TIMER)
+3174     yield();
+          </code></pre>
+        </section>
+
+        <script type="text/javascript">writeOutline()</script>
+
+        <section>
+          <h3>Next Time</h3>
+          Wednesday 1:00PM <br />
+          Interprocess Communication</br />
+        </section>
+
+			</div>
+
+		</div>
+
+		<script src="reveal.js/lib/js/head.min.js"></script>
+		<script src="reveal.js/js/reveal.min.js"></script>
+
+		<script>
+
+			// Full list of configuration options available here:
+			// https://github.com/hakimel/reveal.js#configuration
+			Reveal.initialize({
+				controls: true,
+				progress: true,
+				history: true,
+				center: true,
+        slideNumber: true,
+        margin: 0.0,
+        minScale: 0.5,
+        maxScale: 5.0,
+
+				theme: Reveal.getQueryHash().theme, // available themes are in /css/theme
+				transition: Reveal.getQueryHash().transition || 'default', // default/cube/page/concave/zoom/linear/fade/none
+
+				// Parallax scrolling
+				// parallaxBackgroundImage: 'https://s3.amazonaws.com/hakim-static/reveal-js/reveal-parallax-1.jpg',
+				// parallaxBackgroundSize: '2100px 900px',
+
+				// Optional libraries used to extend on reveal.js
+				dependencies: [
+					{ src: 'reveal.js/lib/js/classList.js', condition: function() { return !document.body.classList; } },
+					{ src: 'reveal.js/plugin/markdown/marked.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+					{ src: 'reveal.js/plugin/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+					{ src: 'reveal.js/plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
+					{ src: 'reveal.js/plugin/zoom-js/zoom.js', async: true, condition: function() { return !!document.body.classList; } },
+					{ src: 'reveal.js/plugin/notes/notes.js', async: true, condition: function() { return !!document.body.classList; } }
+				]
+			});
+
+		</script>
+
+	</body>
+</html>

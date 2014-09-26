@@ -304,6 +304,19 @@ unlock(integer i) {
         </section>
 
         <section>
+          <h3>Hardware Locks</h3>
+          <ul>
+            <li>Software operations may be:
+              <ul>
+                <li>Interrupted</li>
+                <li>Occur out of order</li>
+              </ul>
+            </li>
+            <li>Alternative -- Hardware -- atomic operations</li>
+          </ul>
+        </section>
+
+        <section>
           <h3>Hardware Locks -- Test and Set</h3>
           <pre><code data-noescape="true" data-trim="true">
 int test_and_set(int *lock) {
@@ -613,7 +626,7 @@ test(int i)
           &nbsp<br />
           Following week:<br />
           Monday 1:00PM <br />
-          Interprocess Communication<br />
+          Scheduling<br />
         </section>
 			</div>
 
