@@ -239,7 +239,8 @@ by Hugh O'Cinneide <br />
    <td>
     <span class="text-muted"><script type="text/javascript">getDate()</script></span><br />
     <span class="text-primary">
-      <b>Lecture <script type="text/javascript">lectnum()</script>: </b> Scheduling
+      <b>Lecture <script type="text/javascript">lectnum()</script>: </b>
+      <a href="{{ urls.production_url }}/lectures/lec8.html">Scheduling</a>
     </span><br />
     <span class="text-success">
       <b>Preparation: </b>xv6 book ch 5, osc ch 6

@@ -120,18 +120,19 @@ function writeOutline() {
         <section>
           <h3>Debugging</h3>
           <ol>
-            <li>Before you have a bug...:
+            <li>Before you begin:
               <ul>
                 <li>Read documentation</li>
                 <li>Understand hardware interface</li>
-                <li>Understand software interface</li>
+                <li>Understand software interfaces</li>
               </ul>
             </li>
             <li>Find the exact line / instruction causing bug</li>
             <li>Understand error message</li>
             <li>Think about all data related to that point</li>
+            <li>Examine memory / variables</li>
             <li>Make sure you setup the data correctly</li>
-            <li>Usage error message to narrow in on issue</li>
+            <li>Use error message to narrow in on issue</li>
             <li>Check your code</li>
           </ol>
         </section>
@@ -182,7 +183,7 @@ function writeOutline() {
                 <li>Explicit yields</li>
                 <li>Wait on I/O</li>
                 <li>Termination</li>
-                <li>Generally -- transitions to kernel</li>
+                <li>"Transitions to kernel"</li>
               </ul>
             </li>
             <li class="fragment">Disadvantage: <span class="fragment">bad application may never release CPU.</span></li>
@@ -196,7 +197,7 @@ function writeOutline() {
             <li>What causes process switches?
               <ul class="fragment">
                 <li>Timer interrupt</li>
-                <li>Resource available</li>
+                <li>Resource available (hardware interrupt)</li>
               </ul>
             </li>
             <li class="fragment">Advantage: <span class="fragment">system enforced fair share of CPU</span></li>
@@ -237,15 +238,14 @@ function writeOutline() {
         </section>
 
         <section>
-          <h3>Multiprocessor Concerns</h3>
+          <h3>Multiprocessor/Multicore Concerns</h3>
           <ul>
             <li>Synchronized access to list of processes</li>
             <li>Processor affinity</li>
-            <li>Load balancing concerns:
+            <li>Resource contention:
               <ul class="fragment">
-                <li>Optimize CPU usage</li>
-                <li>Cost of migrating a process</li>
-                <li>Access to memory (NUMA)</li>
+                <li>NUMA Architecture / migration</li>
+                <li>Single (limited) resource, many consumers</li>
               </ul>
             </li>
           </ul>
@@ -339,17 +339,15 @@ function writeOutline() {
 
         <section>
           <h3>Priority Scheduling</h3>
-          <ul>
-            <li>Processes run at assigned priority</li>
-            <li>Example:
+            Processes run at assigned priority
+            <center>
               <table>
                 <tr><td>PID</td><td>CPU Time</td><td>Period</td><td>Priority</td></tr>
                 <tr><td>0</td><td>100 ms</td><td>35 ms</td><td>0</td></tr>
                 <tr><td>1</td><td>50 ms</td><td>20 ms</td><td>1</td></tr>
               </table>
-            </li>
-            <li class="fragment"><img src="images/priority-sched-fail.png" /></li>
-          </ul>
+            </center>
+          <img src="images/priority-sched-fail.png" />
         </section>
 
         <section>
@@ -438,6 +436,11 @@ function writeOutline() {
         </section>
 
         <script type="text/javascript">writeOutline()</script>
+
+        <section>
+          <h3>Lab 4a</h3>
+          Assigned last week, should wrap up by Thursday.
+        </section>
 
         <section>
           <h3>Next Time</h3>
