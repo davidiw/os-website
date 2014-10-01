@@ -1,0 +1,635 @@
+<!doctype html>
+<html lang="en">
+
+	<head>
+		<meta charset="utf-8">
+
+    <title>CS422/522 - Lecture 9 - Interprocess Communication</title>
+
+    <meta name="description" content="Lecture 9 - Interprocess Communication">
+    <meta name="author" content="David Wolinsky">
+
+		<meta name="apple-mobile-web-app-capable" content="yes" />
+		<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+		<link rel="stylesheet" href="reveal.js/css/reveal.min.css">
+		<link rel="stylesheet" href="reveal.js/css/theme/serif.css" id="theme">
+
+		<!-- For syntax highlighting -->
+		<link rel="stylesheet" href="reveal.js/lib/css/zenburn.css">
+
+		<!-- If the query includes 'print-pdf', include the PDF print sheet -->
+		<script>
+			if( window.location.search.match( /print-pdf/gi ) ) {
+				var link = document.createElement( 'link' );
+				link.rel = 'stylesheet';
+				link.type = 'text/css';
+				link.href = 'reveal.js/css/print/pdf.css';
+				document.getElementsByTagName( 'head' )[0].appendChild( link );
+			}
+		</script>
+
+    <script>
+var m_current = 0;
+
+var m_outline = [
+  "Recap",
+  "Interprocess Communication Overview",
+  "Interprocess Communication Examples",
+  "IPC in Xv6",
+  "Wrap-Up"
+  ];
+
+function writeOutline() {
+  var count = m_outline.length;
+  var trigger = m_current / count;
+
+  document.write("<section>");
+  document.write("<h3>Outline</h3>");
+  document.write("<ol>");
+  for(i = 0; i < count; i++, m_current++) {
+    var opacity = 0.4;
+    if (m_current % count == trigger) {
+      opacity = 1.0;
+    }
+    document.write("<li style=\"opacity: " + opacity + ";\">" + m_outline[i] + "</li>");
+  }
+  document.write("</ol>");
+  document.write("</section>");
+}
+    </script>
+
+    <style>
+      .reveal pre code { max-height: 700px; }
+      .reveal pre { font-size: 70%; }
+      .reveal p { text-align: left; }
+    </style>
+
+		<!--[if lt IE 9]>
+		<script src="reveal.js/lib/js/html5shiv.js"></script>
+		<![endif]-->
+	</head>
+
+	<body>
+
+		<div class="reveal">
+
+			<!-- Any section element inside of this container is displayed as a slide -->
+			<div class="slides">
+  <!--
+        <section>
+          <h3>Divided</h3>
+          <div style="width: 100%">
+            <div style="width: 50%; float: left;">
+            </div>
+            <div style="width: 50%; float: left;">
+            </div>
+          </div>
+        </section>
+
+        <script type="text/javascript">writeOutline()</script>
+
+        <section>
+          <h3></h3>
+          <pre><code class="cpp" data-noescape="true" data-trim="true">
+          </code></pre>
+        </section>
+  -->
+				<section>
+          <h2>Interprocess Communication</h2>
+          <h3>CS422/522 Lecture 9</h3>
+          <h3>1 October 2014</h3>
+          <h4>Last updated: 1 October 2014</h4>
+				</section>
+
+        <script type="text/javascript">writeOutline()</script>
+
+        <section>
+          <h3>Recap</h3>
+          <ul>
+            <li>Scheduling Overview</li>
+            <li>Cooperative Multiprocessing</li>
+            <li>Preemptive Multiprocessing</li>
+            <li>Real-time Scheduling</li>
+            <li>Scheduling in Multicore/processor Systems</li>
+          </ul>
+        </section>
+
+        <script type="text/javascript">writeOutline()</script>
+
+        <section>
+          <h3>Inteprocess Communication</h3>
+          <ul>
+            <li>More than one process or thread to communicate</li>
+            <li>Why?
+              <ul class="fragment">
+                <li>Information sharing</li>
+                <li>Computation speedup</li>
+                <li>Modularity</li>
+              </ul>
+            </li>
+            <li class="fragment">Challenges:
+              <ul class="fragment">
+                <li>Naming</li>
+                <li>Language</li>
+                <li>Sychronization</li>
+              </ul>
+            </li>
+          </ul>
+        </section>
+
+        <section>
+          <h3>Chrome</h3>
+          Chrome has 3 (types of) processes: <br />
+          <ul>
+            <li>Browser</li>
+            <li>Renderer</li>
+            <li>Plug-ins</li>
+          </ul>
+          <div class="fragment">Why?</div>
+        </section>
+
+        <section>
+          <h3>Types of IPC</h3>
+          <ul class="fragment">
+            <li>files</li>
+            <li>signals</li>
+            <li>pipes</li>
+            <li>shared memory</li>
+            <li>sockets</li>
+            <li>message queues</li>
+            <li>semaphore</li>
+          </ul>
+        </section>
+
+        <section>
+          <h3>Consumer / Producer</h3>
+          <pre><code class="cpp" data-noescape="true" data-trim="true">
+char buffer[BUFFER_SIZE];
+int in = 0, out = 0;
+...
+while (1) {
+  while (((in + 1) % BUFFER_SIZE) == out);
+  buffer[in] = produce();
+  in = (in + 1) % BUFFER_SIZE;
+}
+...
+while (1) {
+  while (in == out);
+  consume(buffer[out];
+  out = (out + 1) % BUFFER_SIZE;
+}
+          </code></pre>
+        </section>
+
+        <script type="text/javascript">writeOutline()</script>
+
+        <section>
+          <section>
+            <h3>Signals</h3>
+            Asychronous notification of an event
+            <ul>
+              <li>Process A sends signal to Process B</li>
+              <li>OS interrupts Process B</li>
+              <li>If Process B registered a handler, it handles</li>
+              <li>Otherwise default handler handles</li>
+            </ul>
+          </section>
+
+          <section>
+            <h3>Important Signals</h3>
+            <ul>
+              <li>SIGINT -- ctrl-c</li>
+              <li>SIGILL -- illegal instruction</li>
+              <li>SIGKILL -- kill signal</li>
+              <li>SIGSTOP -- pauses a process</li>
+              <li>SIGCONT -- resumes a process</li>
+              <li>SIGUSR1 / SIGUSR2</li>
+            </ul>
+          </section>
+
+          <section>
+            <h3>Signals and Threads</h3>
+            Don't mix well: <br />
+            <ul class="fragment">
+              <li>Handling thread</li>
+              <li>Notifying other threads</li>
+              <li>Handling interruption</li>
+              <li>Accidental deadlocking</li>
+            </ul>
+          </section>
+        </section>
+
+        <section>
+          <section>
+            <h3>Files</h3>
+            <ul>
+              <li>Computer storage</li>
+              <li>Stored inside a mounted file system</li>
+              <li>Supports open, write, read, close</li>
+              <li>Challenges
+                <ul class="fragment">
+                  <li>File consistency</li>
+                  <li>Signaling updates</li>
+                  <li>Sychronizing access</li>
+                </ul>
+              </li>
+            </ul>
+          </section>
+
+          <section>
+            <h3>Unix Files</h3>
+            <pre><code class="cpp" data-noescape="true" data-trim="true">
+int fd = open(argv[1], O_CREAT | O_WRONLY, S_IRUSR);
+write(fd, argv[2], strlen(argv[2]));
+close(fd);
+...
+char buf[256];
+int n;
+int fd = open(argv[1], O_RDONLY, S_IRUSR);
+while ((n = read(fd, buf, 256)) %gt 0)
+  write(STDOUT_FILENO, buf, n);
+write(STDOUT_FILENO, "\n", 1);
+close(fd);
+            </code></pre>
+          </section>
+        </section>
+
+        <section>
+          <section>
+            <h3>Pipes</h3>
+            <ul>
+              <li>Communication channel between two processes</li>
+              <li>Supports write, read, close</li>
+              <li>Bidirectional or unidirectional</li>
+              <li>Half or full duplex</li>
+              <li>Relationship between processes</li>
+              <li>Local or network</li>
+              <li>Linux / POSIX -- FIFO</li>
+            </ul>
+          </section>
+
+          <section>
+            <h3>Unix Pipes</h3>
+            <pre><code class="cpp" data-noescape="true" data-trim="true">
+int pipefd[2];
+pid_t cpid;
+char buf;
+
+pipe(pipefd);
+if ((cpid = fork()) == 0)
+  close(pipefd[1]);          /* Close unused write end */
+  while (read(pipefd[0], &buf, 1) > 0)
+    write(STDOUT_FILENO, &buf, 1);
+
+  write(STDOUT_FILENO, "\n", 1);
+  close(pipefd[0]);
+} else {            /* Parent writes argv[1] to pipe */
+  close(pipefd[0]);          /* Close unused read end */
+  write(pipefd[1], "hello\0", 6);
+  close(pipefd[1]);          /* Reader will see EOF */
+  wait(NULL);                /* Wait for child */
+}
+            </code></pre>
+          </section>
+
+          <section>
+            <h3>Named Pipes</h3>
+            <ul>
+              <li>int mkfifo(const char *pathname, mode_t mode);</li>
+              <li>Access by any process on the machine</li>
+              <li>Direction / duplex?</li>
+            </ul>
+          </section>
+        </section>
+
+        <section>
+          <section>
+            <h3>Shared memory</h3>
+            <ul>
+              <li>Same PADDR mapped into different processes</li>
+              <li>Supports bidirectional / full duplex writing</li>
+              <li>Sychronization</li>
+            </ul>
+          </section>
+
+          <section>
+            <h3>Linux Shared Memory</h3>
+            <pre><code class="cpp" data-noescape="true" data-trim="true">
+int segment_id = shmget (0xDEADBEEF, 1024, 0644 | IPC_CREAT);
+char* shared_memory;
+...
+shared_memory = (char*) shmat (segment_id, NULL, 0);
+sprintf (shared_memory, “Hello, world.”);
+shmdt (shared_memory);
+...
+shared_memory = (char*) shmat (segment_id, 0x12345678, 0);
+printf (“%s\n”, shared_memory);
+shmdt (shared_memory);
+            </code></pre>
+          </section>
+        </section>
+
+        <section>
+          <section>
+            <h3>Message Passing</h3>
+            <ul>
+              <li>send(A, message)</li>
+              <li>B = receive(message)</li>
+              <li>Named by PID</li>
+              <li>Blocking vs non-blocking, issues:
+                <ul class="fragment">
+                  <li>Message never arrives</li>
+                  <li>Polling is inefficient</li>
+                </ul>
+              </li>
+              <li class="fragment">Direct vs indirect, issues:
+                <ul class="fragment">
+                  <li>Direct requires good timing or blocking</li>
+                  <li>Indirect requires kernel to buffer, how big a buffer is enough?</li>
+                </ul>
+              </li>
+          </section>
+
+          <section>
+            <h3>Posix Message Queues</h3>
+            <pre><code class="cpp" data-noescape="true" data-trim="true">
+int msgid = msgget(0xDEADBEAF, 0644 | IPC_CREAT);
+...
+char buf[256];
+printf("Write a message: ");
+scanf("%s", buf);
+msgsnd(msgid, buf, strlen(buf), 0);
+...
+char buf[256];
+msgrcv(msgid, buf, 256, 0);
+printf("Incoming message: %s", buf);
+            </code></pre>
+          </section>
+        </section>
+
+        <section>
+          <section>
+            <h3>Semaphores</h3>
+            <ul>
+              <li>Recall sychronization lecture</li>
+              <li>Resource count</li>
+              <li>P - sem_wait - take</li>
+              <li>V - sem_post - return</li>
+              <li>P and V are atomic operations</li>
+            </ul>
+          </section>
+
+          <section>
+            <h3>Semaphores</h3>
+            <pre><code data-noescape="true" data-trim="true">
+void p(semaphore *s) {
+  lock(s->control);
+  if (s->count == 0) {
+    queue(s);
+  }
+  s->count--;
+  unlock(s->control);
+}
+
+void v(semaphore *s) {
+  lock(s->control);
+  s->count++;
+  signal(s);
+  unlock(s->control);
+}
+            </code></pre>
+          </section>
+
+          <section>
+            <h3>Posix Semaphores</h3>
+            <pre><code class="cpp" data-noescape="true" data-trim="true">
+int semid = semget(0xDEADBEEF, 1, 0644 | IPC_CREAT);
+struct sembuf sem;
+sem.sem_num = 1;
+sem.sem_flg = 0;
+...
+sem.sem_op = -1;
+semop(semid, &sem, 1);
+// critical section
+sem.sem_op = 1;
+semop(semid, &sem, 1);
+            </code></pre>
+          </section>
+        </section>
+
+        <script type="text/javascript">writeOutline()</script>
+
+        <section>
+          <section>
+            <h3>Xv6 Pipes</h3>
+            <pre><code class="cpp" data-noescape="true" data-trim="true">
+7763 SYSCALL(pipe)
+...
+5851 sys_pipe(void)
+5853   int *fd;
+5854   struct file *rf, *wf;
+5855   int fd0, fd1;
+5857   if(argptr(0, (void*)&fd, 2*sizeof(fd[0])) &lt 0)
+5858     return −1;
+5859   if(pipealloc(&rf, &wf) &lt 0)
+5860      return −1;
+5862   if((fd0 = fdalloc(rf)) &lt 0 || (fd1 = fdalloc(wf)) &lt 0){
+...
+5869   fd[0] = fd0;
+5870   fd[1] = fd1;
+            </pre></code>
+          </section>
+
+          <section>
+            <h3>Xv6 Pipes</h3>
+            <pre><code class="cpp" data-noescape="true" data-trim="true">
+6009 #define PIPESIZE 512
+6010
+6011 struct pipe {
+6012   struct spinlock lock;
+6013   char data[PIPESIZE];
+6014   uint nread; // number of bytes read
+6015   uint nwrite; // number of bytes written
+6016   int readopen; // read fd is still open
+6017   int writeopen; // write fd is still open
+6018 };
+            </pre></code>
+          </section>
+          <section>
+            <h3>Xv6 Pipes</h3>
+            <pre><code class="cpp" data-noescape="true" data-trim="true">
+6021 pipealloc(struct file **f0, struct file **f1)
+6023   struct pipe *p;
+6025   p = 0;
+6026   *f0 = *f1 = 0;
+6027   if((*f0 = filealloc()) == 0 || (*f1 = filealloc()) == 0)
+6028     goto bad;
+6029   if((p = (struct pipe*)kalloc()) == 0)
+6030     goto bad;
+6031   p−>readopen = 1;
+6032   p−>writeopen = 1;
+6033   p−>nwrite = 0;
+6034   p−>nread = 0;
+6035   initlock(&p−>lock, "pipe");
+            </pre></code>
+          </section>
+          <section>
+            <h3>Xv6 Pipes</h3>
+            <pre><code class="cpp" data-noescape="true" data-trim="true">
+6036   (*f0)−>type = FD_PIPE;
+6037   (*f0)−>readable = 1;
+6038   (*f0)−>writable = 0;
+6039   (*f0)−>pipe = p;
+6040   (*f1)−>type = FD_PIPE;
+6041   (*f1)−>readable = 0;
+6042   (*f1)−>writable = 1;
+6043   (*f1)−>pipe = p;
+6044   return 0;
+            </pre></code>
+          </section>
+          <section>
+            <h3>Xv6 Pipe Writing</h3>
+            <pre><code class="cpp" data-noescape="true" data-trim="true">
+6080 pipewrite(struct pipe *p, char *addr, int n)
+6082   int i;
+6084   acquire(&p−>lock);
+6085   for(i = 0; i &lt n; i++){
+6086     while(p−>nwrite == p−>nread + PIPESIZE){
+6087       if(p−>readopen == 0 || proc−>killed){
+6088         release(&p−>lock);
+6089         return −1;
+6090       }
+6091       wakeup(&p−>nread);
+6092       sleep(&p−>nwrite, &p−>lock);
+6093     }
+6094     p−>data[p−>nwrite++ % PIPESIZE] = addr[i];
+6095   }
+6096   wakeup(&p−>nread);
+6097   release(&p−>lock);
+6098   return n;
+            </pre></code>
+          </section>
+          <section>
+            <h3>Xv6 Pipes</h3>
+            <pre><code class="cpp" data-noescape="true" data-trim="true">
+6101 piperead(struct pipe *p, char *addr, int n)
+6103   int i;
+6105   acquire(&p−>lock);
+6106   while(p−>nread == p−>nwrite && p−>writeopen){
+6107     if(proc−>killed){
+6108       release(&p−>lock);
+6109       return −1;
+6110     }
+6111     sleep(&p−>nread, &p−>lock);
+6112   }
+6113   for(i = 0; i &lt n; i++){
+6114     if(p−>nread == p−>nwrite)
+6115       break;
+6116     addr[i] = p−>data[p−>nread++ % PIPESIZE];
+6117   }
+6118   wakeup(&p−>nwrite);
+6119   release(&p−>lock);
+6120   return i;
+            </pre></code>
+          </section>
+        </section>
+
+        <section>
+          <h3>Xv6 IPC in Action</h3>
+          <p>You have to design an application that counts the words from several files, how would you build it?</p>
+          <ul class="fragment">
+            <li>Fork one process per file</li>
+            <li>Use pipe to return results</li>
+            <li>Use parent to process results</li>
+          </ul> <br />
+          <span class="fragment">Issues?</span>
+          <ul class="fragment">
+            <li>Pipes are blocking</li>
+            <li>Non-blocking pipes</li>
+            <li>Select: blocking mechanism to find if any descriptor is available for reading/writing</li>
+          </ul>
+        </section>
+
+        <script type="text/javascript">writeOutline()</script>
+
+        <section>
+          <h3>Lab 3 Grades</h3>
+          <ul>
+            <li>Code: 80/80</li>
+            <li>Questions: 9/15</li>
+          </ul>
+        </section>
+
+        <section>
+          <h3>Lab 4</h3>
+          Lab 4a should be completed by Thursday<br />
+          Lab 4b should be started and completed by next Thursday<br />
+          No office hours next week<br />
+        </section>
+
+        <section>
+          <h3>Midterm</h3>
+          October 27th
+          Covers all material up through drivers and I/O <br />
+          Including paper reading<br />
+          Test focuses on understanding not memorization<br />
+          Question / answer session 20 October<br />
+        </section>
+
+        <section>
+          <h3>Next Time</h3>
+          Talks supervised by Ewa Syta<br />
+          Monday 1:00PM <br />
+          Wednesday 1:00PM <br />
+          Papers, check schedule<br />
+          &nbsp<br />
+          Following week:<br />
+          Monday 1:00PM <br />
+          File Systems<br />
+        </section>
+			</div>
+
+		</div>
+
+		<script src="reveal.js/lib/js/head.min.js"></script>
+		<script src="reveal.js/js/reveal.min.js"></script>
+
+		<script>
+
+			// Full list of configuration options available here:
+			// https://github.com/hakimel/reveal.js#configuration
+			Reveal.initialize({
+				controls: true,
+				progress: true,
+				history: true,
+				center: true,
+        slideNumber: true,
+        margin: 0.0,
+        minScale: 0.5,
+        maxScale: 5.0,
+
+				theme: Reveal.getQueryHash().theme, // available themes are in /css/theme
+				transition: Reveal.getQueryHash().transition || 'default', // default/cube/page/concave/zoom/linear/fade/none
+
+				// Parallax scrolling
+				// parallaxBackgroundImage: 'https://s3.amazonaws.com/hakim-static/reveal-js/reveal-parallax-1.jpg',
+				// parallaxBackgroundSize: '2100px 900px',
+
+				// Optional libraries used to extend on reveal.js
+				dependencies: [
+					{ src: 'reveal.js/lib/js/classList.js', condition: function() { return !document.body.classList; } },
+					{ src: 'reveal.js/plugin/markdown/marked.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+					{ src: 'reveal.js/plugin/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+					{ src: 'reveal.js/plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
+					{ src: 'reveal.js/plugin/zoom-js/zoom.js', async: true, condition: function() { return !!document.body.classList; } },
+					{ src: 'reveal.js/plugin/notes/notes.js', async: true, condition: function() { return !!document.body.classList; } }
+				]
+			});
+
+		</script>
+
+	</body>
+</html>

@@ -364,19 +364,19 @@ int compare_and_swap(int *lock, int oval, int nval) {
         <section>
           <h3>Semaphores</h3>
           <pre><code data-noescape="true" data-trim="true">
-void v(semaphore *s) {
-  lock(s->control);
-  s->count++;
-  signal(s);
-  unlock(s->control);
-}
-
 void p(semaphore *s) {
   lock(s->control);
   if (s->count == 0) {
     queue(s);
   }
   s->count--;
+  unlock(s->control);
+}
+
+void v(semaphore *s) {
+  lock(s->control);
+  s->count++;
+  signal(s);
   unlock(s->control);
 }
           </code></pre>

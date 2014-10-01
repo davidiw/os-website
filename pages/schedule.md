@@ -252,7 +252,8 @@ by Hugh O'Cinneide <br />
    <td>
     <span class="text-muted"><script type="text/javascript">getDate()</script></span><br />
     <span class="text-primary">
-      <b>Lecture <script type="text/javascript">lectnum()</script>: </b> Interprocess Communication
+      <b>Lecture <script type="text/javascript">lectnum()</script>: </b>
+      <a href="{{ urls.production_url }}/lectures/lec9.html">Interprocess Communication</a>
     </span><br />
     <span class="text-success">
       <b>Preparation: </b>osc ch 3.4-3.6
