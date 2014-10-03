@@ -279,8 +279,8 @@ by Hugh O'Cinneide <br />
 <b>Paper:</b> <a href="{{ urls.production_url }}/readings/papers/engler95exokernel.pdf">
 Exokernel: an operating system architecture for application-level resource management</a>
 by Iulia Tamas <br />
-<b>Paper:</b> <a href="{{ urls.production_url }}/readings/papers/black92microkernel">
-Microkernel operating system architecture and Mach</a>
+<b>Paper:</b> <a href="{{ urls.production_url }}/readings/papers/accetta86microkernel.pdf">
+Mach: A New Kernel Foundation for UNIX Development</a>
 by Jonathan Cai <br />
     </span>
    </td>
