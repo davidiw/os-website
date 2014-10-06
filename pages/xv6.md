@@ -55,9 +55,9 @@ The latest xv6 source is available via
 <pre>git clone git://pdos.csail.mit.edu/xv6/xv6.git</pre>
 We also distribute the sources as a printed booklet with line numbers
 that keep everyone together during lectures.  The booklet is available as
-[xv6-rev7.pdf]({{ urls.production_url }}/readings/xv6/xv6-rev7.pdf).
+[xv6-rev8.pdf]({{ urls.production_url }}/readings/xv6/xv6-rev8.pdf).
 To get the version corresponding to this booklet, run
-<pre>git checkout -b xv6-rev7 xv6-rev7</pre>
+<pre>git checkout -b xv6-rev8 xv6-rev8</pre>
 
 The xv6 source code is licensed under the traditional
 [MIT license](http://www.opensource.org/licenses/mit-license.php);
@@ -65,7 +65,7 @@ see the LICENSE file in the source distribution.
 To help students read through xv6
 and learn about the main ideas in operating systems
 we also distribute a
-[textbook/commentary]({{ urls.production_url }}/readings/xv6/book-rev7.pdf)
+[textbook/commentary]({{ urls.production_url }}/readings/xv6/book-rev8.pdf)
 for the latest xv6.
 The line numbers in this book refer to the above source booklet.
 
