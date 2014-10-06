@@ -109,26 +109,15 @@ Grading policy
 
 **Lectures (10% of grade):**
 Throughout the semester,
-there will be pop quizzes at the beginning of lectures.
-The questions will be based upon the assigned readings
-listed under "Preparation" for that class.
-If you are tardy or miss the class,
-you forfeit that quiz, there are no makeups.
-Approved absences will result your overall grade computed
-without the inclusion of the quiz.
-
-<!--
-**Homework (10% of grade):**
-Some of the lab assignments have questions that must be submitted along
-with your solutions to the lab.
-Additionally, there may be homework assigned on weeks,
-when no lab is due.
-Submissions will be due via the zoo
-and hence your submission must be dated no later than the due date.
-If you miss the deadline,
-you forfeit that homework grade.
-Approved absences will allow for a delayed submission date.
--->
+there will be attendance checks as well as presentation days.
+On presentation days,
+each student is responsible for submitting a printed copy
+of a review for each paper presented.
+The presenting student must prepare a presentation
+and submit it electronically.
+In addition to getting credit for a review,
+the presenting student will gain a waiver on late days
+for a single lab.
 
 **Labs (60% of grade):**
 There are a total of 6 core labs and a final challenge lab.
