@@ -318,7 +318,7 @@ by Jason Brooks <br />
       <b>Lecture <script type="text/javascript">lectnum()</script>: </b> File systems
     </span><br />
     <span class="text-success">
-      <b>Preparation: </b>xv6 book ch 6, osc ch 11 and 12
+      <b>Preparation: </b>xv6 book ch 6, osc ch 10.5, 11, and 12
     </span><br />
    </td>
    <td>

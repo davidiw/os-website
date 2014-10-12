@@ -44,6 +44,9 @@
     "enable" : "false"
 
 "widgets" :
+  "analytics" :
+    "use" : "google"
+    "tracking_id" : "UA-55655322-1"
   "syntax" :
     "use" : "prettify"
     "linenums" : "false"
