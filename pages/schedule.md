@@ -316,6 +316,7 @@ by Jason Brooks <br />
     <span class="text-muted"><script type="text/javascript">getDate()</script></span><br />
     <span class="text-primary">
       <b>Lecture <script type="text/javascript">lectnum()</script>: </b> File systems
+      <a href="{{ urls.production_url }}/lectures/lec10.html">File systems</a>
     </span><br />
     <span class="text-success">
       <b>Preparation: </b>xv6 book ch 6, osc ch 10.5, 11, and 12
