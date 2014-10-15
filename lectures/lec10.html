@@ -290,17 +290,6 @@ function writeOutline() {
         </section>
 
         <section>
-          <h3>Inode Cache</h3>
-          <ul>
-            <li>We store each inode in a cache</li>
-            <li>File descriptor has pointer to inode</li>
-            <li>Inode has reference counter</li>
-            <li>Freed back to inode cache upon end of use</li>
-            <li>Inodes are first loaded into memory via the buffer cache</li>
-          </ul>
-        </section>
-
-        <section>
           <h3>Xv6 Read Example</h3>
           cat /home/davidiw/hw5.sol <br />
           <ul>
@@ -312,6 +301,52 @@ function writeOutline() {
             <li>Allocate a fd with the inode info and return to user</li>
             <li>read(fd, ...)
             <li>Read hw5.sol data from disk into buffer and then print on screen</li>
+          </ul>
+        </section>
+
+        <section>
+          <h3>Reading from a FS</h3>
+          <ul>
+            <li>Find the inode in the inode cache or find a free inode</li>
+            <li>If a free inode:
+              <ul>
+                <li>Find the buffer in the buffer cache or find a free buffer</li>
+                <li>Read the buffer if necessary</li>
+                <li>Update the inodes contents</li>
+                <li>Release the buffer</li>
+              </ul>
+            </li>
+            <li>Map the read address into the disk using inode maps</li>
+            <li>Find existing buffer or read from disk into a free buffer cache</li>
+          </ul>
+        </section>
+
+        <section>
+          <h3>Inode Cache</h3>
+          <ul>
+            <li>We store each inode in a cache</li>
+            <li>File descriptor has pointer to inode</li>
+            <li>Inode has reference counter</li>
+            <li>Freed back to inode cache upon end of use</li>
+            <li>Inodes are first loaded into memory via the buffer cache</li>
+            <li>Contents written to disk</li>
+            <li>Updated on disk if:
+              <ul>
+                <li>Size increased during write</li>
+                <li>No more active uses</li>
+                <li>Contents deleted (truncated)</li>
+              </ul>
+            </li>
+          </ul>
+        </section>
+
+        <section>
+          <h3>Buffer Cache</h3>
+          <ul>
+            <li>Stores all reads (and writes) from disk</li>
+            <li>Cannot be used concurrently</li>
+            <li>Sleep on block, but must check block again upon wakeup</li>
+            <li>Contents written to disk during a transaction commit</li>
           </ul>
         </section>
 

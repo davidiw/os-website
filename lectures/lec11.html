@@ -106,10 +106,24 @@ function writeOutline() {
         <script type="text/javascript">writeOutline()</script>
 
         <section>
-          <h3>Recap</h3>
+          <h3>File System Overview</h3>
+          <img src="images/file-access.png" />
+        </section>
+
+        <section>
+          <h3>Reading from a FS</h3>
           <ul>
-            <li>Basic file system layout</li>
-            <li>File system reading -- inode and block caches</li>
+            <li>Find the inode in the inode cache or find a free inode</li>
+            <li>If a free inode:
+              <ul>
+                <li>Find the buffer in the buffer cache or find a free buffer</li>
+                <li>Read the buffer if necessary</li>
+                <li>Update the inodes contents</li>
+                <li>Release the buffer</li>
+              </ul>
+            </li>
+            <li>Map the read address into the disk using inode maps</li>
+            <li>Find existing buffer or read from disk into a free buffer cache</li>
           </ul>
         </section>
 
@@ -121,22 +135,25 @@ function writeOutline() {
             <li>Inode has reference counter</li>
             <li>Freed back to inode cache upon end of use</li>
             <li>Inodes are first loaded into memory via the buffer cache</li>
+            <li>Contents written to disk</li>
+            <li>Updated on disk if:
+              <ul>
+                <li>Size increased during write</li>
+                <li>No more active uses</li>
+                <li>Contents deleted (truncated)</li>
+              </ul>
+            </li>
           </ul>
         </section>
 
         <section>
-          <h3>A More Practical FS Approach</h3>
+          <h3>Buffer Cache</h3>
           <ul>
-            <li>File descriptor -- user / kernel interfacee</li>
-            <li>Pathname</li>
-            <li>Directory</li>
-            <li>Inode</li>
-            <li>Logging -- reliability</li>
-            <li>Buffer cache -- performance / sychronization</li>
-            <li>Disk</li>
-          </ul> <br />
-          <img src="images/fs-struct-log.png" />  <br />
-          We extend superblock to contain number of log entries
+            <li>Stores all reads (and writes) from disk</li>
+            <li>Cannot be used concurrently</li>
+            <li>Sleep on block, but must check block again upon wakeup</li>
+            <li>Contents written to disk during a transaction commit</li>
+          </ul>
         </section>
 
         <script type="text/javascript">writeOutline()</script>
@@ -195,11 +212,8 @@ function writeOutline() {
             <li>Return fd return to echo, echo perofms write(fd, ...)</li>
             <li>Start a new transaction</li>
             <li>Write (update) contents into 1 or more buffers</li>
-            <li>End transaction</li>
-            <li>Transaction queued</li>
-            <li>Write to disk log</li>
-            <li>Write to disk</li>
-            <li>Erase log</li>
+            <li>End transaction and queue it</li>
+            <li>Exit transcation - Write to disk log, then to disk, erase log</li>
           </ul>
         </section>
 
@@ -511,7 +525,7 @@ function writeOutline() {
             <li>Uptime</li>
             <li>Network settings</li>
             <li>Set -- echo $VALUE &gt file</li>
-            <li>Rad -- cat file</li>
+            <li>Read -- cat file</li>
           </ul>
         </section>
 
@@ -535,12 +549,13 @@ function writeOutline() {
             <li>All writes should be written sequentially, like xv6 log</li>
             <li>Many writes can be issued together -- transaction</li>
           </ul> <br />
-          <img src="images/lfs.png"/>
+          <img width="700" src="images/lfs.png"/>
         </section>
 
         <section>
           <h3>Database</h3>
           <ul>
+            <li>Relational -- contents can easily be found by query -- not path</li>
             <li>What happens if we insert or delete content from the middle of a file?
               <span class="fragment">entire file must be updated from that point on</span></li>
             <li class="fragment">Databases can store large objects using B-tree: <br />
@@ -554,7 +569,7 @@ function writeOutline() {
         <section>
           <h3>Tape</h3>
           <ul>
-            <li>Wny tapes?
+            <li>Why tapes?
               <ul class="fragment">
                 <li>inherently hot-swappable</li>
                 <li>cooler</li>

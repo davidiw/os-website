@@ -504,15 +504,6 @@ and then checks that the output matches `fs/testshell.key`.
 Your code should pass all tests at this point. As usual, you can grade
 your submission with make grade and hand it in with make handin.
 
-> **Questions**
-
-> 2.  How long approximately did it take you to do this lab?
-
-> 3.  We simplified the file system this year with the goal of making
->     more time for the final project. Do you feel like you gained a
->     basic understanding of the file I/O in JOS? Feel free to suggest
->     things we could improve.
-
 **This completes the lab.**
 As usual, don't forget to run `make grade`
 and to write up your answers.
