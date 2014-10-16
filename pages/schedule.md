@@ -315,7 +315,7 @@ by Jason Brooks <br />
    <td>
     <span class="text-muted"><script type="text/javascript">getDate()</script></span><br />
     <span class="text-primary">
-      <b>Lecture <script type="text/javascript">lectnum()</script>: </b> 
+      <b>Lecture <script type="text/javascript">lectnum()</script>: </b>
       <a href="{{ urls.production_url }}/lectures/lec10.html">File systems</a>
     </span><br />
     <span class="text-success">
@@ -328,10 +328,11 @@ by Jason Brooks <br />
    <td>
     <span class="text-muted"><script type="text/javascript">getDate()</script></span><br />
     <span class="text-primary">
+      <b>Lecture <script type="text/javascript">lectnum()</script>: </b>
       <a href="{{ urls.production_url }}/lectures/lec11.html">File systems (2)</a>
     </span><br />
     <span class="text-success">
-      <b>Preparation: </b>xv6 book ch 3 Drivers, osc ch 13
+      <b>Preparation: </b>xv6 book ch 6, osc ch 10.5, 11, and 12
     </span><br />
     <span class="text-info">
       <b>Assignment: </b> <a href="{{ urls.production_url }}/lab/lab5">Lab 5</a>
@@ -351,7 +352,7 @@ by Jason Brooks <br />
    <td>
     <span class="text-muted"><script type="text/javascript">getDate()</script></span><br />
     <span class="text-primary">
-      <b>Lecture <script type="text/javascript">lectnum()</script>: </b> I/O and Drivers
+      <b>Lecture <script type="text/javascript">lectnum()</script>: </b> Devices and I/O
     </span><br />
     <span class="text-success">
       <b>Preparation: </b>xv6 book ch 3 Drivers, osc ch 13
