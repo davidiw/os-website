@@ -594,9 +594,9 @@ inl(0xc040 + 2); // read status from primary
           <section>
             <h3>Setting the Devices for DMA</h3>
             <ul>
-              <li>IDE devices use ATAPI interface for DMA</li>
               <li>Set DMA mode: out(dev + 1, 1)</li>
-              <li>Commands similar to PIO:
+              <li>IDE devices use SCSI Commands for DMA</li>
+              <li>Execution of Commands similar to PIO:
                 <ul>
                   <li>Write the number of sectors into dev + 2</li>
                   <li>Write address into dev + 3 to dev + 6</li>
@@ -611,12 +611,13 @@ inl(0xc040 + 2); // read status from primary
             <ul>
               <li>Allocate memory for the PRDT</li>
               <li>Install physical address into DMA Table</li>
-              <li>Set the drive to run in ATAPI mode</li>
-              <li>Issue an ATAPI read/write command</li>
+              <li>Set the drive to run in DMA mode</li>
+              <li>Issue an SCSI read/write command</li>
               <li>Prepare PRDT</li>
               <li>Set read/write bit on command register</li>
               <li>Set DMA bit on command register</li>
               <li>Wait for interrupt</li>
+              <li>After handling interrupt, execute EOI</li>
             </ul>
           </section>
         </section>
