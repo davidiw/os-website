@@ -1,0 +1,754 @@
+<!doctype html>
+<html lang="en">
+
+	<head>
+		<meta charset="utf-8">
+
+    <title>CS422/522 - Lecture 12 - Devices and I/O</title>
+
+    <meta name="description" content="Lecture 12 - Devices and I/O">
+    <meta name="author" content="David Wolinsky">
+
+		<meta name="apple-mobile-web-app-capable" content="yes" />
+		<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+		<link rel="stylesheet" href="reveal.js/css/reveal.min.css">
+		<link rel="stylesheet" href="reveal.js/css/theme/serif.css" id="theme">
+
+		<!-- For syntax highlighting -->
+		<link rel="stylesheet" href="reveal.js/lib/css/zenburn.css">
+
+		<!-- If the query includes 'print-pdf', include the PDF print sheet -->
+		<script>
+			if( window.location.search.match( /print-pdf/gi ) ) {
+				var link = document.createElement( 'link' );
+				link.rel = 'stylesheet';
+				link.type = 'text/css';
+				link.href = 'reveal.js/css/print/pdf.css';
+				document.getElementsByTagName( 'head' )[0].appendChild( link );
+			}
+		</script>
+
+    <script>
+var m_current = 0;
+
+var m_outline = [
+  "Recap",
+  "Devices and I/O",
+  "Processor I/O",
+  "Direct Memory Access",
+  "Discussion",
+  "Wrap-Up"
+  ];
+
+function writeOutline() {
+  var count = m_outline.length;
+  var trigger = m_current / count;
+
+  document.write("<section>");
+  document.write("<h3>Outline</h3>");
+  document.write("<ol>");
+  for(i = 0; i < count; i++, m_current++) {
+    var opacity = 0.4;
+    if (m_current % count == trigger) {
+      opacity = 1.0;
+    }
+    document.write("<li style=\"opacity: " + opacity + ";\">" + m_outline[i] + "</li>");
+  }
+  document.write("</ol>");
+  document.write("</section>");
+}
+    </script>
+
+    <style>
+      .reveal pre code { max-height: 700px; }
+      .reveal pre { font-size: 70%; }
+      .reveal p { text-align: left; }
+    </style>
+
+		<!--[if lt IE 9]>
+		<script src="reveal.js/lib/js/html5shiv.js"></script>
+		<![endif]-->
+	</head>
+
+	<body>
+
+		<div class="reveal">
+
+			<!-- Any section element inside of this container is displayed as a slide -->
+			<div class="slides">
+  <!--
+        <section>
+          <h3>Divided</h3>
+          <div style="width: 100%">
+            <div style="width: 50%; float: left;">
+            </div>
+            <div style="width: 50%; float: left;">
+            </div>
+          </div>
+        </section>
+
+        <script type="text/javascript">writeOutline()</script>
+
+        <section>
+          <h3></h3>
+          <pre><code class="cpp" data-noescape="true" data-trim="true">
+          </code></pre>
+        </section>
+  -->
+				<section>
+          <h2>Devices and I/O</h2>
+          <h3>CS422/522 Lecture 12</h3>
+          <h3>20 October 2014</h3>
+          <h4>Last updated: 20 October 2014</h4>
+				</section>
+
+        <script type="text/javascript">writeOutline()</script>
+
+        <section>
+          <h3>Recap</h3>
+          <h4>File System Overview</h4>
+          <img src="images/file-access.png" />
+        </section>
+
+        <section>
+          <h3>Network File Systems</h3>
+          <ul>
+            <li>Share folder / files across Network</li>
+            <li>Benefits:
+              <ul class="fragment">
+                <li>Deduplication of data</li>
+                <li>Shared home directories</li>
+                <li>Convenient access to common files</li>
+              </ul>
+            </li>
+            <li class="fragment">Challenges:
+              <ul class="fragment">
+                <li>Access permissions</li>
+                <li>Where to store state</li>
+                <li>Coherency</li>
+              </ul>
+            </li>
+          </ul>
+        </section>
+
+        <section>
+          <h3>FUSE</h3>
+          <ul>
+            <li>File-System in User-Space</li>
+            <li>Operations occur in a virtual file system</li>
+            <li>Redirected toward user-space handler</li>
+            <li>Able to write fully functional FS: NTFS, SSHFS</li>
+          </ul>
+        </section>
+
+        <section>
+          <h3>Fragmentation</h3>
+          <ul>
+            <li>Files can grow over time</li>
+            <li>How are blocks in FS allocated?</li>
+            <li>Performance issues?</li>
+          </ul>
+        </section>
+
+        <script type="text/javascript">writeOutline()</script>
+
+        <section>
+          <h3>PC Organization</h3>
+          <img width="300" src="images/layout.png" />
+        </section>
+
+        <section>
+          <h3>Different Types of Devices</h3>
+          <ul class="fragment">
+            <li>Video</li>
+            <li>Sound</li>
+            <li>Network</li>
+            <li>Persistent storage devices</li>
+            <li>Cameras</li>
+            <li>Keyboard, mouse, etc</li>
+            <li>Printers, scanners</li>
+            <li>Accelerator cards: physics, coprocessors, FPGAs</li>
+          </ul>
+        </section>
+
+        <section>
+          <h3>Connecting Devices</h3>
+          <ul>
+            <li>External:
+              <ul>
+                <li>Parallel</li>
+                <li>Serial</li>
+                <li>Game (controller)</li>
+                <li>USB</li>
+              </ul>
+            </li>
+            <li>Internal:
+              <ul>
+                <li>ISA, E-ISA</li>
+                <li>PCI, PCI-E, PCI-X</li>
+              </ul>
+            </li>
+          </ul>
+        </section>
+
+        <section>
+          <h3>Communicating with Devices</h3>
+          <ul class="fragment">
+            <li>I/O operations -- 65K ports
+              <ul>
+                <li>in data, src -- data = in(port)</li>
+                <li>out dst, data -- out(port, data)</li>
+              </ul>
+            </li>
+            <li>Memory operations</li>
+            <li>Both are address spaces and byte addressable</li>
+          </ul>
+        </section>
+
+        <section>
+          <h3>PIO vs DMA</h3>
+          <ul>
+            <li>PIO - Processor I/O: 
+              <ul>
+                <li>Application directly reads/writes to device</li>
+              </ul>
+            </li>
+            <li>DMA - Direct memory access:
+              <ul>
+                <li>Application has a read or write buffer</li>
+                <li>Directly informs device about buffers physical memory</li>
+                <li>Issues read / write command</li>
+                <li>Application yields until device interrupt</li>
+              </ul>
+            </li>
+          </ul>
+        </section>
+
+        <script type="text/javascript">writeOutline()</script>
+
+        <section>
+          <section>
+            <h3>PIO of ATA/IDE Disks</h3>
+            <ul>
+              <li>All computers come equipped with two ATA bus (channel)</li>
+              <li>Two drives per channel (master / slave)</li>
+              <li>Accessible on 0x1f0 to 0x1f7 and 0x170 to 0x177</li>
+              <li>Process:
+                <ul>
+                  <li>Detect disks</li>
+                  <li>Read from disk</li>
+                  <li>Write to disk</li>
+                </ul>
+              </li>
+            </ul>
+          </section>
+
+          <section>
+            <h3>ATA I/O Ports</h3>
+            <table style="font-size: 80%;">
+              <tr>
+                <th> Port Off. </th>
+                <th> Function </th>
+                <th> Description </th>
+              </tr>
+              <tr>
+                <td> 0 </td>
+                <td> Data Port </td>
+                <td> Read/Write PIO.  </td>
+              </tr>
+              <tr>
+                <td> 1 </td>
+                <td> Features / Error Information </td>
+                <td> Usually used for ATAPI devices.  </td>
+              </tr>
+              <tr>
+                <td> 2 </td>
+                <td> Sector Count </td>
+                <td> Number of sectors to read/write.  </td>
+              </tr>
+              <tr>
+                <td> 3 </td>
+                <td> LBAlo </td>
+                <td> Address 7..0. </td>
+              </tr>
+              <tr>
+                <td> 4 </td>
+                <td> LBAmid </td>
+                <td> Address 15..8. </td>
+              </tr>
+              <tr>
+                <td> 5 </td>
+                <td> LBAhi </td>
+                <td> Address 23..16. </td>
+              </tr>
+              <tr>
+                <td> 6 </td>
+                <td> Drive / Head Port </td>
+                <td> Drive select / Address 27..24. </td>
+              </tr>
+              <tr>
+                <td> 7 </td>
+                <td> Command / Status port </td>
+                <td> Send commands / read status. </td>
+              </tr>
+            </table>
+          </section>
+
+          <section>
+            <h3>Status</h3>
+            <table style="font-size: 80%;">
+              <tr>
+                <th> Bit </th>
+                <th> Abbreviation </th>
+                <th> Function </th>
+              </tr>
+              <tr>
+                <td> 0 </td>
+                <td> ERR </td>
+                <td> An error occurred. </td>
+              </tr>
+              <tr>
+                <td> 3 </td>
+                <td> DRQ </td>
+                <td> Drive ready for data transfer. </td>
+              </tr>
+              <tr>
+                <td> 4 </td>
+                <td> SRV </td>
+                <td> Overlapped Mode Service Request.
+              </td></tr>
+              <tr>
+                <td> 5 </td>
+                <td> DF </td>
+                <td> Drive Fault Error, ERR not set. </td>
+              </tr>
+              <tr>
+                <td> 6 </td>
+                <td> RDY </td>
+                <td> Bit is clear when drive is spun down. </td>
+              </tr>
+              <tr>
+                <td> 7 </td>
+                <td> BSY </td>
+                <td> Busy drive, wait. </td>
+              </tr>
+            </table>
+          </section>
+
+          <section>
+            <h3>Detecting Disks</h3>
+            <pre><code class="cpp" data-noescape="true" data-trim="true">
+ide_wait_ready() {
+  while (((r = inb(dev + 7)) &lt (BSY|RDY)) != RDY);
+}
+
+int check_disk(int8_t dev, int8_t slave) {
+  ide_wait_ready();
+  outb(dev + 6, 0xE0 | (slave&lt&lt4));
+  for (i=0; i&lt1000; i++)
+    if((inb(dev + 7) & ~(BSY | DF | ERR))  != 0)
+      return 1;
+  return 0;
+}
+
+ide0_master = check_disk(0x1f0, 0);
+ide0_slave = check_disk(0x1f0, 1);
+ide1_master = check_disk(0x170, 0);
+ide1_slave = check_disk(0x170, 1);
+            </code></pre>
+          </section>
+
+          <section>
+            <h3></h3>
+            <pre><code class="cpp" data-noescape="true" data-trim="true">
+int ide_read(int8_t dev, int8_t slave, uint32_t secno,
+               void *dst, size_t nsecs)
+{
+  ide_wait_ready();
+
+  outb(dev + 2, nsecs);
+  outb(dev + 3, secno & 0xFF);
+  outb(dev + 4, (secno >> 8) & 0xFF);
+  outb(dev + 5, (secno >> 16) & 0xFF);
+  outb(dev + 6, 0xE0 | ((slave)&lt&lt4) |
+                  ((secno>>24)&0x0F));
+  outb(dev7, 0x20);
+
+  for (; nsecs > 0; nsecs--, dst += SECTSIZE) {
+    ide_wait_ready();
+    insl(dev, dst, SECTSIZE/4);
+  }
+  return 0;
+}
+            </code></pre>
+          </section>
+
+          <section>
+            <h3></h3>
+            <pre><code class="cpp" data-noescape="true" data-trim="true">
+int ide_write(int8_t dev, int8_t slave, uint32_t secno,
+                const void *src, size_t nsecs)
+{
+  ide_wait_ready();
+
+  outb(dev + 2, nsecs);
+  outb(dev + 3, secno & 0xFF);
+  outb(dev + 4, (secno >> 8) & 0xFF);
+  outb(dev + 5, (secno >> 16) & 0xFF);
+  outb(dev + 6, 0xE0 | ((slave)&lt&lt4) |
+                  ((secno>>24)&0x0F));
+  outb(dev7, 0x30);
+
+  for (; nsecs > 0; nsecs--, src += SECTSIZE) {
+    ide_wait_ready();
+    outsl(dev, src, SECTSIZE/4);
+  }
+  return 0;
+}
+            </code></pre>
+          </section>
+        </section>
+
+        <script type="text/javascript">writeOutline()</script>
+
+        <section>
+          <section>
+            <h3>DMA of ATA Drives</h3>
+            <ul>
+              <li>Detect ATA Controller via PCI</li>
+              <li>Access base address registers</li>
+              <li>Setup DMA table</li>
+              <li>Read / Write</li>
+            </ul>
+          </section>
+
+          <section>
+            <h3>Finding Our Devices</h3>
+            In lab 6, we add PCI support to Jos, here's a sample output:
+            <pre style="font-size: 62%;"><code class="cpp" data-noescape="true" data-trim="true">
+PCI: 00:00.0: 8086:1237: class: 6.0 (Bridge device) irq: 0
+PCI: 00:01.0: 8086:7000: class: 6.1 (Bridge device) irq: 0
+PCI: 00:01.1: 8086:7010: class: 1.1 (Storage controller) irq: 0
+PCI: 00:01.3: 8086:7113: class: 6.80 (Bridge device) irq: 9
+PCI: 00:02.0: 1013:00b8: class: 3.0 (Display controller) irq: 0
+PCI: 00:03.0: 8086:100e: class: 2.0 (Network controller) irq: 11
+            </code></pre>
+          </section>
+
+          <section>
+            <h3>Scanning a PCI Bus</h3>
+            <ul>
+              <li>PCI bus consists of up to 32 devices</li>
+              <li>May have layered buses, starts at 0</li>
+              <li>Each device can support up to 8 different functions</li>
+              <li>Consists of a "unique" vendor and device ID</li>
+              <li>PCI: 00:01.1: 8086:7010: class: 1.1 (Storage controller) irq: 0</li>
+            </ul>
+          </section>
+
+          <section>
+            <h3>ATA I/O Ports</h3>
+            <table style="font-size: 80%;">
+              <tr>
+                <th> register </th>
+                <th> bits 31-24 </th>
+                <th> bits 23-16 </th>
+                <th> bits 15-8 </th>
+                <th> bits 7-0 </th>
+              </tr>
+              <tr>
+                <th> 00 </th>
+                <td colspan="2"> Device ID </td>
+                <td colspan="2"> Vendor ID </td></tr>
+              <tr>
+                <th> 04 </th>
+                <td colspan="2"> Status </td>
+                <td colspan="2"> Command </td></tr>
+              <tr>
+                <th> 08 </th>
+                <td> Class code </td>
+                <td> Subclass </td>
+                <td> Prog IF </td>
+                <td> Revision ID </td>
+              </tr>
+              <tr>
+                <th> 0C </th>
+                <td> BIST </td>
+                <td> Header type </td>
+                <td> Latency Timer </td>
+                <td> Cache Line Size </td>
+              </tr>
+              <tr>
+                <th> 10 </th>
+                <td colspan="4"> Base address #0 (BAR0) </td>
+              </tr>
+              <tr>
+                <th> 14 </th>
+                <td colspan="4"> Base address #1 (BAR1) </td>
+              </tr>
+              <tr>
+                <th> 18 </th>
+                <td colspan="4"> Base address #2 (BAR2) </td>
+              </tr>
+              <tr>
+                <th> 1C </th>
+                <td colspan="4"> Base address #3 (BAR3) </td>
+              </tr>
+              <tr>
+                <th> 20 </th>
+                <td colspan="4"> Base address #4 (BAR4) </td>
+              </tr>
+              <tr>
+                <th> 24 </th>
+                <td colspan="4"> Base address #5 (BAR5) </td>
+              </tr>
+              <tr>
+                ...
+              </tr>
+              <tr>
+                <th> 3C </th>
+                <td> Max latency </td>
+                <td> Min Grant </td>
+                <td> Interrupt PIN </td>
+                <td> Interrupt Line </td>
+              </tr>
+            </table>
+          </section>
+
+          <section>
+            <h3>Scanning in Action</h3>
+            Recall I/O Ports are byte addressed
+            <pre><code class="cpp" data-noescape="true" data-trim="true">
+offset = 0; // device:vendor
+
+uint32_t v = (1 &lt&lt 31) |    // config-space
+  ((bus & 0xff) &lt&lt 16) |
+  ((dev & 0x20) &lt&lt 11) |
+  ((func & 0x8) &lt&lt 8) |
+  (offset);
+outl(0x0cf8, v);
+
+uint32_t inl(0x0cfc); // if vendor == 0xffff, no device
+            </code></pre>
+          </section>
+
+          <section>
+            <h3>Learning About the Device</h3>
+            <ul>
+              <li>PCI: 00:01.1: 8086:7010: class: 1.1 (Storage controller) irq: 0</li>
+              <li>Each device has 6 base address registers (bars):
+                <ul>
+                  <li>At first read, contains address and a bit to define IO or memory</li>
+                  <li>Write 0xffffffff and read again to obtain size</li>
+                </ul>
+              </li>
+              <li>io region 4: 16 bytes at 0xc040</li>
+            </ul>
+          </section>
+
+          <section>
+            <h3>Talking to the Device</h3>
+            bar4 points to bus master register: <br />
+            <ul>
+              <li>0x0 -- Primary Command (byte)</li>
+              <li>0x2 -- Primary Status (byte)</li>
+              <li>0x4 -- Primary DMA Table (4 bytes)</li>
+              <li>0x8 -- Secondary Command (byte)</li>
+              <li>0xA -- Secondary Status (byte)</li>
+              <li>0xC -- Secondary DMA Table (4 bytes)</li>
+            </ul> <br />
+            <pre><code class="cpp" data-noescape="true" data-trim="true">
+inl(0xc040 + 2); // read status from primary
+            </code></pre>
+          </section>
+
+          <section>
+            <h3>Command and Status</h3>
+            <ul>
+              <li>Command byte:
+                <ul>
+                  <li>0x1 - Begin a DMA transfer</li>
+                  <li>0x8 - Read/Write, set only when DMA bit is 0</li>
+                </ul>
+              </li>
+              <li>Status byte:
+                <ul>
+                  <li>0x1 - Set when starting DMA, cleared DMA finished</li>
+                  <li>0x2 - DMA failure</li>
+                  <li>0x4 - IRQ, set to 0 to reset</li>
+                  <li>0x20 - Master device ready for DMA</li>
+                  <li>0x40 - Slave device ready for DMA</li>
+                </ul>
+              </li>
+            </ul>
+          </section>
+
+          <section>
+            <h3>DMA Tables</h3>
+            <img src="images/prdt.png" />
+          </section>
+
+          <section>
+            <h3>Setting the Devices for DMA</h3>
+            <ul>
+              <li>IDE devices use ATAPI interface for DMA</li>
+              <li>Set DMA mode: out(dev + 1, 1)</li>
+              <li>Commands similar to PIO:
+                <ul>
+                  <li>Write the number of sectors into dev + 2</li>
+                  <li>Write address into dev + 3 to dev + 6</li>
+                  <li>Specify command: 0xC8 - read, 0xCA - write</li>
+                </ul>
+              </li>
+            </ul>
+          </section>
+
+          <section>
+            <h3>Putting It Together</h3>
+            <ul>
+              <li>Allocate memory for the PRDT</li>
+              <li>Install physical address into DMA Table</li>
+              <li>Set the drive to run in ATAPI mode</li>
+              <li>Issue an ATAPI read/write command</li>
+              <li>Prepare PRDT</li>
+              <li>Set read/write bit on command register</li>
+              <li>Set DMA bit on command register</li>
+              <li>Wait for interrupt</li>
+            </ul>
+          </section>
+        </section>
+
+        <script type="text/javascript">writeOutline()</script>
+
+        <section>
+          <h3>PIO vs DMA</h3>
+          <ul class="fragment">
+            <li>PIO:
+              <ul>
+                <li>PIO is simpler</li>
+                <li>Not too inefficient for singe processes</li>
+                <li>Require 0 transitions between user / kernel</li>
+              </ul>
+            </li>
+            <li>DMA
+              <ul>
+                <li>Complex code</li>
+                <li>Must map contiguous memory</li>
+                <li>More difficult to make blocking</li>
+                <li>Enables achieving maximum performance of device</li>
+              </ul>
+            </li>
+          </ul>
+        </section>
+
+        <section>
+          <h3>Zero-Copy</h3>
+          <ul>
+            <li>Easy to have static memory for DMA</li>
+            <lI>Requires at least one copy, user memory to DMA memory</li>
+            <li>Issue: wasteful</li>
+            <li>what if we had the PRDT point to this memory:
+              <ul class="fragment">
+                <li>Each write must be in contiguous memory</li>
+                <li>The contents cannot be changed after a write command</li>
+                <li>The address to be read into must be in the applications space</li>
+              </ul>
+            </li>
+        </section>
+
+        <section>
+          <h3>Protection</h3>
+          <ul class="fragment">
+            <li>eflags has IOPL -- IO Privilege level</li>
+            <li>CPL &lt= IOPL</li>
+            <li>Task state segment has IO port permissions</li>
+            <li>What happens if we don't have permission?</li>
+          </ul>
+        </section>
+
+        <script type="text/javascript">writeOutline()</script>
+
+        <section>
+          <h3>Lab 4 Review</h3>
+        </section>
+
+        <section>
+          <h3>Midterm</h3>
+          <ul>
+            <li>Review labs, lecture notes, and assigned papers</li>
+            <li>Short answer questions based upon applying concepts learned</li>
+            <li>Use x86 concepts or define a pseudomachine interface: PTE_U vs PTE_S</li>
+            <li>No need to memorize unique addresses</li>
+            <li>No coding</li>
+            <li>Nothing overly specific about papers, understand the main concept</li>
+            <li>Background and hints will be provided</li>
+          </ul>
+        </section>
+
+        <section>
+          <h3>Next Time</h3>
+          <ul>
+            <li>22 Oct -- Recess</li>
+            <li>27 Oct -- Midterm</li>
+            <li>29 Oct -- Hack day</li>
+            <li>3 Nov -- Networking</li>
+            <li>Lab 5 due 30 Oct</li>
+            <li>Lab 6 is posted, due 13 Nov</li>
+          </ul>
+        </section>
+			</div>
+
+		</div>
+
+		<script src="reveal.js/lib/js/head.min.js"></script>
+		<script src="reveal.js/js/reveal.min.js"></script>
+
+		<script>
+
+			// Full list of configuration options available here:
+			// https://github.com/hakimel/reveal.js#configuration
+			Reveal.initialize({
+				controls: true,
+				progress: true,
+				history: true,
+				center: true,
+        slideNumber: true,
+        margin: 0.0,
+        minScale: 0.5,
+        maxScale: 5.0,
+
+				theme: Reveal.getQueryHash().theme, // available themes are in /css/theme
+				transition: Reveal.getQueryHash().transition || 'default', // default/cube/page/concave/zoom/linear/fade/none
+
+				// Parallax scrolling
+				// parallaxBackgroundImage: 'https://s3.amazonaws.com/hakim-static/reveal-js/reveal-parallax-1.jpg',
+				// parallaxBackgroundSize: '2100px 900px',
+
+				// Optional libraries used to extend on reveal.js
+				dependencies: [
+					{ src: 'reveal.js/lib/js/classList.js', condition: function() { return !document.body.classList; } },
+					{ src: 'reveal.js/plugin/markdown/marked.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+					{ src: 'reveal.js/plugin/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+					{ src: 'reveal.js/plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
+					{ src: 'reveal.js/plugin/zoom-js/zoom.js', async: true, condition: function() { return !!document.body.classList; } },
+					{ src: 'reveal.js/plugin/notes/notes.js', async: true, condition: function() { return !!document.body.classList; } }
+				]
+			});
+
+		</script>
+    <script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+          })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+      ga('create', 'UA-55655322-1', 'auto');
+        ga('send', 'pageview');
+
+    </script>
+
+	</body>
+</html>

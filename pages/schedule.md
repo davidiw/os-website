@@ -352,7 +352,8 @@ by Jason Brooks <br />
    <td>
     <span class="text-muted"><script type="text/javascript">getDate()</script></span><br />
     <span class="text-primary">
-      <b>Lecture <script type="text/javascript">lectnum()</script>: </b> Devices and I/O
+      <b>Lecture <script type="text/javascript">lectnum()</script>: </b>
+      <a href="{{ urls.production_url }}/lectures/lec12.html">Devices and I/O</a>
     </span><br />
     <span class="text-success">
       <b>Preparation: </b>xv6 book ch 3 Drivers, osc ch 13
@@ -384,12 +385,7 @@ by Jason Brooks <br />
    </td>
    <td>
     <span class="text-muted"><script type="text/javascript">getDate()</script></span><br />
-    <span class="text-primary">
-      <b>Lecture <script type="text/javascript">lectnum()</script>: </b> Networking
-    </span><br />
-    <span class="text-success">
-      <b>Preparation: </b> osc ch 17
-    </span><br />
+    <span class="text-warning">Hack Day</span><br />
     <span class="text-info">
       <b>Assignment: </b> <a href="{{ urls.production_url }}/lab/lab6">Lab 6a</a>
     </span><br />
@@ -408,7 +404,10 @@ by Jason Brooks <br />
    <td>
     <span class="text-muted"><script type="text/javascript">getDate()</script></span><br />
     <span class="text-primary">
-      <b>Lecture <script type="text/javascript">lectnum()</script>: </b> Distributed systems
+      <b>Lecture <script type="text/javascript">lectnum()</script>: </b> Networking
+    </span><br />
+    <span class="text-success">
+      <b>Preparation: </b> osc ch 17
     </span><br />
    </td>
    <td>
@@ -437,7 +436,7 @@ by Jason Brooks <br />
    <td>
     <span class="text-muted"><script type="text/javascript">getDate()</script></span><br />
     <span class="text-primary">
-      <b>Lecture <script type="text/javascript">lectnum()</script>: </b>OS Organization
+      <b>Lecture <script type="text/javascript">lectnum()</script>: </b> Distributed systems
     </span><br />
    </td>
    <td>
@@ -446,7 +445,7 @@ by Jason Brooks <br />
    <td>
     <span class="text-muted"><script type="text/javascript">getDate()</script></span><br />
     <span class="text-primary">
-      <b>Lecture <script type="text/javascript">lectnum()</script>: </b> Race conditions
+      <b>Lecture <script type="text/javascript">lectnum()</script>: </b> Security and Protection</b>
     </span><br />
     <span class="text-info">
       <b>Assignment: </b> <a href="{{ urls.production_url }}/lab/lab7">Lab 7</a>
@@ -524,7 +523,7 @@ by Seth Lifland <br />
    <td>
     <span class="text-muted"><script type="text/javascript">getDate()</script></span><br />
     <span class="text-primary">
-      <b>Lecture <script type="text/javascript">lectnum()</script>: </b> Language / OS co-design
+      <b>Lecture <script type="text/javascript">lectnum()</script>: </b>OS Organization
     </span><br />
    </td>
    <td>
