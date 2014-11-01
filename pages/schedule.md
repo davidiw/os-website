@@ -407,7 +407,7 @@ by Jason Brooks <br />
       <b>Lecture <script type="text/javascript">lectnum()</script>: </b> Networking
     </span><br />
     <span class="text-success">
-      <b>Preparation: </b> osc ch 17
+      <b>Preparation: </b> osc ch 3.6.[1, 2], 17.[3, 4, 5, 6]
     </span><br />
    </td>
    <td>
@@ -416,7 +416,7 @@ by Jason Brooks <br />
    <td>
     <span class="text-muted"><script type="text/javascript">getDate()</script></span><br />
     <span class="text-primary">
-      <b>Lecture <script type="text/javascript">lectnum()</script>: </b> Virtualization
+      <b>Lecture <script type="text/javascript">lectnum()</script>: </b> Networking (2)
     </span><br />
     <span class="text-info">
       <b>Assignment: </b> <a href="{{ urls.production_url }}/lab/lab6">Lab 6b</a>
@@ -436,7 +436,10 @@ by Jason Brooks <br />
    <td>
     <span class="text-muted"><script type="text/javascript">getDate()</script></span><br />
     <span class="text-primary">
-      <b>Lecture <script type="text/javascript">lectnum()</script>: </b> Distributed systems
+      <b>Lecture <script type="text/javascript">lectnum()</script>: </b> Virtualization
+    </span><br />
+    <span class="text-success">
+      <b>Preparation: </b> osc ch 16
     </span><br />
    </td>
    <td>
@@ -445,7 +448,7 @@ by Jason Brooks <br />
    <td>
     <span class="text-muted"><script type="text/javascript">getDate()</script></span><br />
     <span class="text-primary">
-      <b>Lecture <script type="text/javascript">lectnum()</script>: </b> Security and Protection</b>
+      <b>Lecture <script type="text/javascript">lectnum()</script>: </b> Multiprocessor coordination
     </span><br />
     <span class="text-info">
       <b>Assignment: </b> <a href="{{ urls.production_url }}/lab/lab7">Lab 7</a>
@@ -465,8 +468,7 @@ by Jason Brooks <br />
    <td>
     <span class="text-muted"><script type="text/javascript">getDate()</script></span><br />
     <span class="text-primary">
-      <b>Lecture <script type="text/javascript">lectnum()</script>: </b>
-        Multi-processor coordination: scalable locks
+      <b>Lecture <script type="text/javascript">lectnum()</script>: </b> Distributed systems
     </span><br />
    </td>
    <td>
@@ -475,8 +477,10 @@ by Jason Brooks <br />
    <td>
     <span class="text-muted"><script type="text/javascript">getDate()</script></span><br />
     <span class="text-primary">
-      <b>Lecture <script type="text/javascript">lectnum()</script>: </b>
-        Multi-processor coordination: lock free
+      <b>Lecture <script type="text/javascript">lectnum()</script>: </b> Protection and Security
+    </span><br />
+    <span class="text-success">
+      <b>Preparation: </b> osc ch 14 and 15
     </span><br />
    </td>
    <td>
