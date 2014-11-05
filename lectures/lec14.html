@@ -1,0 +1,648 @@
+<!doctype html>
+<html lang="en">
+
+	<head>
+		<meta charset="utf-8">
+
+    <title>CS422/522 - Lecture 13 - Networking</title>
+
+    <meta name="description" content="Lecture 13 - Networking">
+    <meta name="author" content="David Wolinsky">
+
+		<meta name="apple-mobile-web-app-capable" content="yes" />
+		<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+		<link rel="stylesheet" href="reveal.js/css/reveal.min.css">
+		<link rel="stylesheet" href="reveal.js/css/theme/serif.css" id="theme">
+
+		<!-- For syntax highlighting -->
+		<link rel="stylesheet" href="reveal.js/lib/css/zenburn.css">
+
+		<!-- If the query includes 'print-pdf', include the PDF print sheet -->
+		<script>
+			if( window.location.search.match( /print-pdf/gi ) ) {
+				var link = document.createElement( 'link' );
+				link.rel = 'stylesheet';
+				link.type = 'text/css';
+				link.href = 'reveal.js/css/print/pdf.css';
+				document.getElementsByTagName( 'head' )[0].appendChild( link );
+			}
+		</script>
+
+    <script>
+var m_current = 0;
+
+var m_outline = [
+  "Recap",
+  "Introduction",
+  "Application",
+  "Transport",
+  "Network / Data Link",
+  "Example",
+  "Wrap-Up"
+  ];
+
+function writeOutline() {
+  var count = m_outline.length;
+  var trigger = m_current / count;
+
+  document.write("<section>");
+  document.write("<h3>Outline</h3>");
+  document.write("<ol>");
+  for(i = 0; i < count; i++, m_current++) {
+    var opacity = 0.4;
+    if (m_current % count == trigger) {
+      opacity = 1.0;
+    }
+    document.write("<li style=\"opacity: " + opacity + ";\">" + m_outline[i] + "</li>");
+  }
+  document.write("</ol>");
+  document.write("</section>");
+}
+    </script>
+
+    <style>
+      .reveal pre code { max-height: 700px; }
+      .reveal pre { font-size: 70%; }
+      .reveal p { text-align: left; }
+    </style>
+
+		<!--[if lt IE 9]>
+		<script src="reveal.js/lib/js/html5shiv.js"></script>
+		<![endif]-->
+	</head>
+
+	<body>
+
+		<div class="reveal">
+
+			<!-- Any section element inside of this container is displayed as a slide -->
+			<div class="slides">
+  <!--
+        <section>
+          <h3>Divided</h3>
+          <div style="width: 100%">
+            <div style="width: 50%; float: left;">
+            </div>
+            <div style="width: 50%; float: left;">
+            </div>
+          </div>
+        </section>
+
+        <script type="text/javascript">writeOutline()</script>
+
+        <section>
+          <h3></h3>
+          <pre><code class="cpp" data-noescape="true" data-trim="true">
+          </code></pre>
+        </section>
+  -->
+				<section>
+          <h2>Networking</h2>
+          <h3>CS422/522 Lecture 13</h3>
+          <h3>5 November 2014</h3>
+          <h4>Last updated: 5 November 2014</h4>
+				</section>
+
+        <script type="text/javascript">writeOutline()</script>
+
+        <section>
+          <h3>Recap</h3>
+          <ul>
+            <li>DMA vs PIO</li>
+            <lI>IO Protection</li>
+            <li>File system caches: blocks and inodes</li>
+          </ul>
+        </section>
+
+        <script type="text/javascript">writeOutline()</script>
+
+        <section>
+          <h3>Case Study</h3>
+          What happens we we enter www.google.com in our browser's address bar?
+        </section>
+
+        <section>
+          <h3>Networking</h3>
+          <ul>
+            <li>Most common type of IPC</li>
+            <li>Simple, portable:
+              <ul>
+                <li>Works locally or across network</li>
+                <li>Compatible across almost all OS</li>
+              </ul>
+            </li>
+            <li>Naming</li>
+            <li>Routing</li>
+            <li>Stream vs datagram -- connection vs connectionless</li>
+            <li>Blocking vs non-blocking</li>
+            <li>Synchronous vs asynchronous</li>
+          </ul>
+        </section>
+
+        <section>
+          <h3>Network Layout</h3>
+          <img src="images/osi.png" />
+        </section>
+
+        <section>
+          <h3>Naming</h3>
+          Everything in a computer has a name. Examples?
+          <ul class="fragment">
+            <li>Application layer -- URL</li>
+            <li>Transport -- UDP / TCP Ports</li>
+            <li>Network -- Internet Protocol (IP) address</li>
+            <li>Data Link -- Ethernet / MAC (media access control) address</li>
+            <li>Each address must be unique at its layer</li>
+            <li>DNS converts IP to name and name to IP</li>
+          </ul>
+        </section>
+
+        <section>
+          <h3>Case Study</h3>
+          What happens we we enter www.google.com in our browser's address bar?
+          <ul>
+            <li>Translate www.google.com into network address</li>
+            <li>Connect to the service hosting www.google.com</li>
+            <li>Request file contents and display in browser</li>
+          </ul>
+        </section>
+
+        <script type="text/javascript">writeOutline()</script>
+
+        <section>
+          <h3>URLs</h3>
+          Example: http://www.example.com:80/index.html?query=hello&ampfoo=bar<br />
+          <ul>
+            <li>scheme: http</li>
+            <li>domain name: www.exmaple.com</li>
+            <li>port number: 80</li>
+            <li>path index.html</li>
+            <li>query string : query=hello&ampfoo=bar</li>
+          </ul>
+        </section>
+
+        <section>
+          <h3>Name Resolution</h3>
+          <ul>
+            <li>How do we know who to talk to?</li>
+            <li class="fragment">Convert www.google.com into an addressable machine</li>
+            <div class="fragment">
+              <li>Use the OS resolver library (gethostbyname)</li>
+              <li>Consult nsswitch.conf for resolving order:
+                <pre><code data-trim="true" data-noescape="true">
+hosts: files dns myhostname
+                </code></pre></li>
+              <li>Check the hosts file:
+                <pre><code data-trim="true" data-noescape="true">
+#&ltip-address>   &lthostname.domain.org>   &lthostname>
+127.0.0.1       localhost.localdomain   localhost
+                </code></pre></li>
+              <li>If not found, check via DNS server</li>
+              <li>Add the mapping to a cache</li>
+              <li>Return result</li>
+            </div>
+          </ul>
+        </section>
+
+        <section>
+          <h3>DNS -- Domain Name System</h3>
+          <ul>
+            <li>Name made up of several components or domains</li>
+            <li>Example: www.google.com:
+              <ul>
+                <li>Top-level domain: com</li>
+                <li>google is a subdomain of com</li>
+                <li>www is a subdomain of google.com</li>
+              </ul>
+            </li>
+            <li>Each (sub)domain is handled by a (set) name server(s): authorative name server</li>
+            <li>DNS name servers form a tree root servers delegate to top-level to subdomains, etc</li>
+            <li>Recursive vs iterative</li>
+          </ul>
+        </section>
+
+        <section>
+          <h3>Naming -- From Your Machine</h3>
+          <ul>
+            <li>You specify you want to access www.google.com</li>
+            <li>It checks the hosts file, no match</li>
+            <li>It scans your system for a list of DNS servers</li>
+            <li>Send a DNS request to a server</li>
+            <li>If server sends back a useful answer, stop, else repeat</li>
+            <li>We can talk to machine that owns that URL using HTTP</li>
+            <li>Difference between: recursive vs iterative</li>
+          </ul>
+        </section>
+
+        <section>
+          <h3>HTTP -- Hypertext Transfer Protocol</h3>
+          <ul>
+            <li>Used to communicate across the Web</li>
+            <li>Embeds the entire url: <br />
+              GET /index.html?query=hello&ampfoo=bar HTTP/1.1 <br />
+              Host: www.example.com
+            <li>The protocol itself is stateless</li>
+            <li>A session is maintained:
+              <ul>
+                <li>Client is either in cookies or a comonent of the URL</li>
+                <li>Server is in a database</li>
+              </ul>
+            </li>
+            <li>Not secure by default</li>
+          </ul>
+        </section>
+
+        <section>
+          <h3>Case Study</h3>
+          What happens we we enter www.google.com in our browser's address bar?
+          <ul>
+            <li>Use DNS to resolve www.google.com to an address</li>
+            <li>Send an HTTP message to that address of the form:
+              GET / <br />
+              Host: www.google.com
+            </li>
+            <li>We need to build DNS and HTTP on top of a transport...</li>
+          </ul>
+        </section>
+
+        <script type="text/javascript">writeOutline()</script>
+
+        <section>
+          <h3>Datagram -- UDP</h3>
+          <ul>
+            <li>User datagram protocol</li>
+            <li>Unconnected</li>
+            <li>Unreliable</li>
+            <li>Each message sent / received fully -- like a memory page</li>
+          </ul>
+        </section>
+
+        <section>
+          <h3>Stream -- TCP</h3>
+          <ul>
+            <li>Transmission Control Protocol</li>
+            <li>Establish an explicit connection to a remote peer</li>
+            <li>Reliable and ordered</li>
+            <li>Sends and receives come as segments</li>
+            <li>Stream oriented</li>
+          </ul>
+        </section>
+
+        <section>
+          <h3>TCP -- Connected</h3>
+          <ul>
+            <li>Server listens on a specific port</li>
+            <li>Client dynamically allocates a port</li>
+            <li>Picks a sequence number and sends a syn packet to server</li>
+            <li>Server picks a sequence number and syn-acks clients packet</li>
+            <li>Client acks servers syn-ack</li>
+            <li>Sequence numbers (bytes) are acked</li>
+          </ul>
+        </section>
+
+        <section>
+          <h3>TCP -- Reliable / Ordered</h3>
+          <ul>
+            <li>Segments 1, 2, 3 sent</li>
+            <li>Segments 1, 3 received, acks 1 and 3</li>
+            <li>Only segment 1 is delivered to application</li>
+            <li>Sender's stack resends 2</li>
+            <li>Segment 2 received</li>
+            <li>Segments 2 and 3 delivered to application</li>
+          </ul>
+        </section>
+
+        <section>
+          <h3>TCP -- Stream</h3>
+          <ul>
+            <li>Segments 1, 2, 3 sent</li>
+            <li>Segments need not be a fixed size</li>
+            <li>Receives read the next bytes available</li>
+            <li>There is no notion of packets</li>
+            <li>Must implemented your own mechanism</li>
+          </ul>
+        </section>
+
+        <section>
+          <h3>Application Usage</h3>
+          What type of applications would use TCP or UDP?
+          <ul>
+            <li>Real time applications</li>
+            <li>DNS</li>
+            <li>The Web</li>
+            <li>Skype</li>
+            <li>Games</li>
+            <li>BitTorrent</li>
+          </ul>
+        </section>
+
+        <section>
+          <h3>Case Study</h3>
+          What happens we we enter www.google.com in our browser's address bar?
+          <ul>
+            <li>DNS request using UDP to a server on port 53</li>
+            <li>Response containing the network address</li>
+            <li>Contact that server on port 80 using TCP</li>
+            <li>Perform TCP 3 way handshake</li>
+            <li>Perform an HTTP get request for /</li>
+            <li>HTTP response containing data for /</li>
+            <li>Next up ... network address and routing</li>
+          </ul>
+        </section>
+
+        <script type="text/javascript">writeOutline()</script>
+
+        <section>
+          <h3>Ethernet Routing</h3>
+          <ul>
+            <li>Ethernet device has address</li>
+            <li>No applications directly use Ethernet</li>
+            <li>IP builds on top of Ethernet</li>
+            <li>Broadcast Ethernet FF:FF:FF:FF:FF:FF</li>
+            <li>Machines route "directly" to each other in a LAN</li>
+          </ul>
+        </section>
+
+        <section>
+          <h3>IP within a LAN</h3>
+          <ul>
+            <li>LAN -- Local Area Network</li>
+            <li>LAN typically denotes within the same subnet</li>
+            <li>Subnet: 192.168.1.1-255, 192.168.1/24, netmask: 255.255.255.0</li>
+            <li>Find each other through ARP (address resolution protocol):
+              <ul>
+                <li>Send a broadcast Ethernet packet looking for IP</li>
+                <li>Owner of IP responds and embeds his Ethernet address</li>
+              </ul>
+            </li>
+            <li>Typically has a gateway (router) to other networks</li>
+          </ul>
+        </section>
+
+        <section>
+          <h3>IP within a WAN</h3>
+          <ul>
+            <li>WAN -- Wide Area Network -- The Internet</li>
+            <li>Why not ARP? <span class="fragment">broadcast scalability</span></li>
+            <li>Long distance routing protocols: BGP, OSPF:
+              <ul class="fragment">
+                <li>Dedicated service</li>
+                <li>Pre-configured with addresses within their LAN</li>
+                <li>Share these with other services</li>
+                <li>Each service produces an IP to next host (route) map</li>
+              </ul>
+            </li>
+          </ul>
+        </section>
+
+        <section>
+          <h3>Case Study</h3>
+          <ul>
+            <li>DNS request to a nameserver (8.8.8.8:53) using UDP</li>
+            <li>Cannot directly send to 8.8.8.8, redirect to gateway</li>
+            <li>Obtain gateway Ethernet via ARP</li>
+            <li>Forward packet through gateway: its Ethernet, but 8.8.8.8 IP Address</li>
+            <li>Gateway checks for next hop and forwards</li>
+            <li>Repeat until arrived</li>
+            <li>...</li>
+            <li>DNS receives request, sends back answer</li>
+            <li>It has no direct connection, sends to default gateway...</li>
+            <li>...</li>
+          </ul>
+        </section>
+
+        <section>
+          <h3>Case Study (2)</h3>
+          <ul>
+            <li>Web browser has IP</li>
+            <li>Web browser begins TCP connection to that IP at port 80, default http</li>
+            <li>Sends HTTP Get request</li>
+            <li>No direct connection...</li>
+            <li>...</li>
+          </ul>
+        </section>
+
+        <script type="text/javascript">writeOutline()</script>
+
+        <section>
+          <h3>Blocking vs Non-Blocking</h3>
+          <ul>
+            <lI>By default all calls are blocking</li>
+            <li>Receives only complete if data is available</li>
+            <li>Sends only complete if the data can be written to a socket buffer</li>
+            <li>Inefficient, when?</li>
+            <li>Can use poll / select on non-blocking sockets</li>
+            <li>Returns a list of sockets that may be available for performing an operation</li>
+          </ul>
+        </section>
+
+        <section>
+          <h3>Synchronous vs Asynchronous</h3>
+          <ul>
+            <li>Synchronous occur in the same execution context</li>
+            <li>Asynchronous occur in a callback</li>
+            <li>Asynchronous compares to Non-Blocking, main thread does not wait</li>
+            <li>Good for infrequent operations that might block main thread, such as?</li>
+          </ul>
+        </section>
+
+        <section>
+          <h3>Network Communication</h3>
+          <ul>
+            <li>Not all machines read integers from memory in the same order</li>
+            <li>Network order is defined to be big endian</li>
+            <li>Alternatively use serialization</li>
+          </ul>
+        </section>
+
+        <section>
+          <h3>UDP Client Example</h3>
+          <pre><code class="cpp" data-noescape="true" data-trim="true">
+struct sockaddr_in saddr;
+char buf[BUFSIZE];
+
+struct hostent *srv = gethostbyname(hostname);
+int sockfd = socket(AF_INET, SOCK_DGRAM, 0);
+
+saddr.sin_family = AF_INET;
+memcpy(srv->h_addr, saddr.sin_addr.s_addr, srv->h_length);
+saddr.sin_port = htons(portno);
+
+printf("Please enter msg: ");
+fgets(buf, BUFSIZE, stdin);
+
+int sl = sizeof(saddr);
+int n = sendto(sockfd, buf, strlen(buf), 0, &saddr, sl);
+n = recvfrom(sockfd, buf, strlen(buf), 0, &saddr, &sl);
+printf("Echo from server: %s", buf);
+          </code></pre>
+        </section>
+
+        <section>
+          <h3>UDP Server Example</h3>
+          <pre><code class="cpp" data-noescape="true" data-trim="true">
+struct sockaddr_in saddr, caddr;
+int clen = sizeof(caddr);
+char buf[BUFSIZE]; /* message buf */
+
+int sockfd = socket(AF_INET, SOCK_DGRAM, 0);
+saddr.sin_family = AF_INET;
+saddr.sin_addr.s_addr = htonl(INADDR_ANY);
+saddr.sin_port = htons(portno);
+bind(sockfd, (struct sockaddr *) &saddr, sizeof(saddr));
+          </code></pre>
+        </section>
+        
+
+        <section>
+          <h3>UDP Server Example (2)</h3>
+          <pre><code class="cpp" data-noescape="true" data-trim="true">
+while (1) {
+  int n = recvfrom(sockfd, buf, BUFSIZE, 0, &caddr, &clen);
+
+  struct hostent *hostp = gethostbyaddr(
+      (const char *)&caddr.sin_addr.s_addr, 
+      sizeof(caddr.sin_addr.s_addr), AF_INET);
+  char *hostaddrp = inet_ntoa(caddr.sin_addr);
+
+  printf("Datagram from %s (%s) %d/%d bytes: %s\n", 
+          hostp->h_name, hostaddrp, strlen(buf), n, buf);
+  
+  n = sendto(sockfd, buf, strlen(buf), 0, &caddr, clen);
+}
+          </code></pre>
+        </section>
+
+        <section>
+          <h3>TCP Client Example</h3>
+          <pre><code class="cpp" data-noescape="true" data-trim="true">
+struct sockaddr_in saddr;
+char buf[BUFSIZE];
+
+struct hostent *srv = gethostbyname(hostname);
+sockfd = socket(AF_INET, SOCK_STREAM, 0);
+
+saddr.sin_family = AF_INET;
+memcpy(srv->h_addr, &saddr.sin_addr.s_addr, srv->h_length);
+saddr.sin_port = htons(portno);
+
+printf("Please enter msg: ");
+fgets(buf, BUFSIZE, stdin);
+
+connect(sockfd, &saddr, sizeof(saddr));
+int n = send(sockfd, buf, strlen(buf), 0);
+n = recv(sockfd, buf, BUFSIZE, 0);
+printf("Echo from server: %s", buf);
+          </code></pre>
+        </section>
+
+        <section>
+          <h3>TCP Server Example</h3>
+          <pre><code class="cpp" data-noescape="true" data-trim="true">
+struct sockaddr_in saddr, caddr;
+int clen;
+char buf[BUFSIZE]; /* message buffer */
+
+int lfd = socket(AF_INET, SOCK_STREAM, 0);
+saddr.sin_family = AF_INET;
+saddr.sin_addr.s_addr = htonl(INADDR_ANY);
+saddr.sin_port = htons((unsigned short)portno);
+
+bind(lfd, (struct sockaddr *) &saddr, sizeof(saddr));
+listen(lfd, 5);
+          </code></pre>
+        </section>
+
+        <section>
+          <h3>TCP Server Example (2)</h3>
+          <pre><code class="cpp" data-noescape="true" data-trim="true">
+while (1) {
+  int afd = accept(lfd, (struct sockaddr *) &caddr, &clen);
+  
+  struct hostent *hostp = gethostbyaddr(
+      (const char *)&caddr.sin_addr.s_addr, 
+      sizeof(caddr.sin_addr.s_addr), AF_INET);
+  char *hostaddrp = inet_ntoa(caddr.sin_addr);
+
+  int n = recv(afd, buf, BUFSIZE, 0);
+
+  printf("Connection from %s (%s) %d/%d bytes: %s\n", 
+          hostp->h_name, hostaddrp, strlen(buf), n, buf);
+  
+  int n = send(afd, buf, strlen(buf), 0);
+  close(afd);
+}
+        </code></pre>
+      </section>
+
+        <script type="text/javascript">writeOutline()</script>
+
+        <section>
+          <h3>Labs</h3>
+          <ul>
+            <li>Lab 6b has been assigned</li>
+            <li>Lab 7</li>
+          </ul>
+        </section>
+
+        <section>
+          <h3>Next Time</h3>
+          Networking (2)<br />
+          Wednesday 1:00PM <br />
+        </section>
+			</div>
+
+		</div>
+
+		<script src="reveal.js/lib/js/head.min.js"></script>
+		<script src="reveal.js/js/reveal.min.js"></script>
+
+		<script>
+
+			// Full list of configuration options available here:
+			// https://github.com/hakimel/reveal.js#configuration
+			Reveal.initialize({
+				controls: true,
+				progress: true,
+				history: true,
+				center: true,
+        slideNumber: true,
+        margin: 0.0,
+        minScale: 0.5,
+        maxScale: 5.0,
+
+				theme: Reveal.getQueryHash().theme, // available themes are in /css/theme
+				transition: Reveal.getQueryHash().transition || 'default', // default/cube/page/concave/zoom/linear/fade/none
+
+				// Parallax scrolling
+				// parallaxBackgroundImage: 'https://s3.amazonaws.com/hakim-static/reveal-js/reveal-parallax-1.jpg',
+				// parallaxBackgroundSize: '2100px 900px',
+
+				// Optional libraries used to extend on reveal.js
+				dependencies: [
+					{ src: 'reveal.js/lib/js/classList.js', condition: function() { return !document.body.classList; } },
+					{ src: 'reveal.js/plugin/markdown/marked.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+					{ src: 'reveal.js/plugin/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+					{ src: 'reveal.js/plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
+					{ src: 'reveal.js/plugin/zoom-js/zoom.js', async: true, condition: function() { return !!document.body.classList; } },
+					{ src: 'reveal.js/plugin/notes/notes.js', async: true, condition: function() { return !!document.body.classList; } }
+				]
+			});
+
+		</script>
+    <script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+          })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+      ga('create', 'UA-55655322-1', 'auto');
+        ga('send', 'pageview');
+
+    </script>
+
+	</body>
+</html>

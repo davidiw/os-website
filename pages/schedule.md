@@ -404,11 +404,7 @@ by Jason Brooks <br />
    <td>
     <span class="text-muted"><script type="text/javascript">getDate()</script></span><br />
     <span class="text-primary">
-      <b>Lecture <script type="text/javascript">lectnum()</script>: </b>
-      <a href="{{ urls.production_url }}/lectures/lec13.html">Networking</a>
-    </span><br />
-    <span class="text-success">
-      <b>Preparation: </b> osc ch 3.6.[1, 2], 17.[3, 4, 5, 6]
+      <b>Lecture <script type="text/javascript">lectnum()</script>: </b> Test Review
     </span><br />
    </td>
    <td>
@@ -417,7 +413,11 @@ by Jason Brooks <br />
    <td>
     <span class="text-muted"><script type="text/javascript">getDate()</script></span><br />
     <span class="text-primary">
-      <b>Lecture <script type="text/javascript">lectnum()</script>: </b> Networking (2)
+      <b>Lecture <script type="text/javascript">lectnum()</script>: </b>
+      <a href="{{ urls.production_url }}/lectures/lec14.html">Networking</a>
+    </span><br />
+    <span class="text-success">
+      <b>Preparation: </b> osc ch 3.6.[1, 2], 17.[3, 4, 5, 6]
     </span><br />
     <span class="text-info">
       <b>Assignment: </b> <a href="{{ urls.production_url }}/lab/lab6">Lab 6b</a>
