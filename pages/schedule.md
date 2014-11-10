@@ -437,7 +437,8 @@ by Jason Brooks <br />
    <td>
     <span class="text-muted"><script type="text/javascript">getDate()</script></span><br />
     <span class="text-primary">
-      <b>Lecture <script type="text/javascript">lectnum()</script>: </b> Virtualization
+      <b>Lecture <script type="text/javascript">lectnum()</script>: </b>
+      <a href="{{ urls.production_url }}/lectures/lec15.html">Virtualization</a>
     </span><br />
     <span class="text-success">
       <b>Preparation: </b> osc ch 16

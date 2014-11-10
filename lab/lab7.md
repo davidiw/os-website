@@ -9,7 +9,7 @@ Introduction
 For the final project,
 you should explore an interesting,
 not necessarily novel topic in operating systems
-not already covered in the labs.
+that has not already covered in the labs.
 The project may be completed independently or in groups of two.
 The challenge / work load should be commensurate to group size.
 
@@ -22,6 +22,7 @@ that exercises your code on a zoo machiens.
 This should demonstrate your implementation.
 Each group member must submit a copy in their repository
 and the documentation must list each group members name.
+Only (ascii) text files and PDFs will be accepted.
 
 If you are in doubt about your project,
 please e-mail us or visit during office hours.
