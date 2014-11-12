@@ -104,13 +104,13 @@ function writeOutline() {
           <h2>Multiprocessor Coordination</h2>
           <h3>CS422/522 Lecture 16</h3>
           <h3>12 November 2014</h3>
-          <h4>Last updated: 10 November 2014</h4>
+          <h4>Last updated: 12 November 2014</h4>
 				</section>
 
         <script type="text/javascript">writeOutline()</script>
 
         <section>
-          <h3>Recap: Locks in xv6</h3>
+          <h3>Recap: Locks in xv6 (and JOS)</h3>
           <pre><code data-noescape="true" data-trim="true">
 acquire(struct spinlock *lk)
  {
@@ -122,6 +122,9 @@ release(struct spinlock *lk)
    xchg(&lk−>locked, 0);
  }
           </code></pre>
+          <div class="fragment">
+            Question: Why XCHG in release()?
+          </div>
         </section>
 
         <section>
@@ -196,10 +199,10 @@ acquire(struct spinlock *lk)
             <li><b>Only</b> if succeeds move on to expensive XCHG</li>
           </ul>
           <ul class="fragment">
-            <li>Example: 8 CPUs</li>
-            <li>1 gets lock, 7 calls to XCHG</li>
+            <li>Example: 8 CPUs all want lock</li>
+            <li>1 gets lock, 7 others call XCHG once</li>
             <li>spin on LOAD, S in caches so <b>no bus</b></li>
-            <li>release lock; 1 gets lock, 6 calls to XCHG</li>
+            <li>release lock; 1 gets lock, 6 call XCHG once</li>
             <li>8 + 7 + ... = O(n^2) bus lockings</li>
           </ul>
         </section>
@@ -229,6 +232,7 @@ release(struct lock *lk)
         <section>
           <h3>Ticket Locks</h3>
           <ul>
+            <li>Single atomic instruction (no spinning)</li>
             <li>Still O(n^2) bus transactions. Why?</li>
             <li class="fragment">release() invalidates lk->serving in all
               caches
@@ -243,19 +247,19 @@ release(struct lock *lk)
           <pre><code data-noescape="true" data-trim="true">
 struct lock {
   int next = 0;
-  int slots[LEN] = {0};
+  int slots[LEN] = {1}; // 1 = has_lock, 0 = must_wait
 }
 
 acquire(struct lock *lk)
   {
     int mine = fetch_and_increment(&lock->next);
-    slots[mine % LEN] = 1;
-    while(slots[mine % LEN] == 1);
+    while(slots[mine % LEN] == 0);
+    slots[mine % LEN] = 0; // reset for next time
   }
 
 release(struct lock *lk)
   {
-    slots[mine + 1] = 0;
+    slots[(mine + 1) % LEN] = 1;
   }
           </code></pre>
         </section>
@@ -377,6 +381,7 @@ elem *pop() {
         <section>
           <h3>Read-Copy Update</h3>
           <ul>
+            <li>Extends the swapping idea of lock-free</li>
             <li>Two goals:</li>
             <ul>
               <li>Make updates appear atomic to readers</li>
@@ -387,6 +392,35 @@ elem *pop() {
             <ul>
               <li>Update by copying data, atomically swapping pointers</li>
             </ul>
+          </ul>
+        </section>
+
+        <section>
+          <h3>Asynchronous Free</h3>
+          When is it safe to free the old data?
+          <div class="fragment">
+            Simple answer: After everyone is done using it.
+            <img width="600" src="images/rcu-min.png" />
+          </div>
+        </section>
+
+        <section>
+          <h3>Detecting "Quiescent" States</h3>
+          One approach: CPU hopping
+          <div>
+            <img width="600" src="images/rcu-simple.png" />
+          </div>
+        </section>
+
+        <section>
+          <h3>RCU in Practice</h3>
+          <ul>
+            <li>Kernel module unloading</li>
+            <ul>
+              <li>Anyone already using module can continue</li>
+              <li>Any new attempt to use will fail</li>
+            </ul><br />
+            <li>See paper for more details</li>
           </ul>
         </section>
 
