@@ -450,7 +450,14 @@ by Jason Brooks <br />
    <td>
     <span class="text-muted"><script type="text/javascript">getDate()</script></span><br />
     <span class="text-primary">
-      <b>Lecture <script type="text/javascript">lectnum()</script>: </b> Multiprocessor coordination
+      <b>Lecture <script type="text/javascript">lectnum()</script>: </b>
+      <a href="{{ urls.production_url }}/lectures/lec16.html">Multiprocessor coordination</a>
+    </span><br />
+    <span class="text-success">
+     <b>Preparation: </b>
+     <a href="{{ urls.production_url }}/readings/papers/mcs91algorithms.pdf">MCS Locks</a>,
+     <a href="{{ urls.production_url }}/readings/papers/mckenney01read.pdf">
+     Read-Copy Update</a>
     </span><br />
     <span class="text-info">
       <b>Assignment: </b> <a href="{{ urls.production_url }}/lab/lab7">Lab 7</a>
