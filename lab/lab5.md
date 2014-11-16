@@ -27,7 +27,7 @@ Total 0 (delta 0), reused 0 (delta 0)
 To /c/cs422/SUBMIT/lab/netid.git
  * [new branch]      lab5 -> lab5
 Branch lab5 set up to track remote branch refs/remotes/origin/lab5.
-$ git merge lab5
+$ git merge lab4
 Merge made by recursive.
 ...
 $

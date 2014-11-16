@@ -18,11 +18,12 @@ however, you will be graded upon the difficulty of your project,
 how much you were able to complete,
 and your documentation.
 Your documentation should include a single command
-that exercises your code on a zoo machiens.
+that exercises your code on a zoo machines.
 This should demonstrate your implementation.
 Each group member must submit a copy in their repository
 and the documentation must list each group members name.
 Only (ascii) text files and PDFs will be accepted.
+The due date is firm, there will be no late days and no extensions.
 
 If you are in doubt about your project,
 please e-mail us or visit during office hours.

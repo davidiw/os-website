@@ -454,10 +454,9 @@ by Jason Brooks <br />
       <a href="{{ urls.production_url }}/lectures/lec16.html">Multiprocessor coordination</a>
     </span><br />
     <span class="text-success">
-     <b>Preparation: </b>
-     <a href="{{ urls.production_url }}/readings/papers/mcs91algorithms.pdf">MCS Locks</a>,
-     <a href="{{ urls.production_url }}/readings/papers/mckenney01read.pdf">
-     Read-Copy Update</a>
+      <b>Preparation: </b>
+      <a href="{{ urls.production_url }}/readings/papers/mcs91algorithms.pdf">MCS Locks</a>,
+      <a href="{{ urls.production_url }}/readings/papers/mckenney01read.pdf">Read-Copy Update</a>
     </span><br />
     <span class="text-info">
       <b>Assignment: </b> <a href="{{ urls.production_url }}/lab/lab7">Lab 7</a>
@@ -478,6 +477,12 @@ by Jason Brooks <br />
     <span class="text-muted"><script type="text/javascript">getDate()</script></span><br />
     <span class="text-primary">
       <b>Lecture <script type="text/javascript">lectnum()</script>: </b> Distributed systems
+    </span><br />
+    <span class="text-success">
+      <b>Preparation: </b>
+      <a href="{{ urls.production_url }}/readings/papers/shvachko10hdfs.pdf">HDFS</a>,
+      <a href="{{ urls.production_url }}/readings/papers/dean04mapreduce.pdf">MapReduce</a>
+      <a href="{{ urls.production_url }}/readings/papers/stoica01chord.pdf">Chord</a>
     </span><br />
    </td>
    <td>
