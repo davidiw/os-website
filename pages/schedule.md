@@ -476,7 +476,8 @@ by Jason Brooks <br />
    <td>
     <span class="text-muted"><script type="text/javascript">getDate()</script></span><br />
     <span class="text-primary">
-      <b>Lecture <script type="text/javascript">lectnum()</script>: </b> Distributed systems
+      <b>Lecture <script type="text/javascript">lectnum()</script>: </b>
+      <a href="{{ urls.production_url }}/lectures/lec17.pdf">Distributed systems</a>
     </span><br />
     <span class="text-success">
       <b>Preparation: </b>
