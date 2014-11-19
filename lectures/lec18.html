@@ -1,0 +1,434 @@
+<!doctype html>
+<html lang="en">
+
+	<head>
+		<meta charset="utf-8">
+
+    <title>CS422/522 - Lecture 18 - Protection and Security</title>
+
+    <meta name="description" content="Lecture 18 - Protection and Security">
+    <meta name="author" content="David Wolinsky">
+
+		<meta name="apple-mobile-web-app-capable" content="yes" />
+		<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+		<link rel="stylesheet" href="reveal.js/css/reveal.min.css">
+		<link rel="stylesheet" href="reveal.js/css/theme/serif.css" id="theme">
+
+		<!-- For syntax highlighting -->
+		<link rel="stylesheet" href="reveal.js/lib/css/zenburn.css">
+
+		<!-- If the query includes 'print-pdf', include the PDF print sheet -->
+		<script>
+			if( window.location.search.match( /print-pdf/gi ) ) {
+				var link = document.createElement( 'link' );
+				link.rel = 'stylesheet';
+				link.type = 'text/css';
+				link.href = 'reveal.js/css/print/pdf.css';
+				document.getElementsByTagName( 'head' )[0].appendChild( link );
+			}
+		</script>
+
+    <script>
+var m_current = 0;
+
+var m_outline = [
+  "Recap",
+  "Protection",
+  "Security",
+  "Wrap-Up"
+  ];
+
+function writeOutline() {
+  var count = m_outline.length;
+  var trigger = m_current / count;
+
+  document.write("<section>");
+  document.write("<h3>Outline</h3>");
+  document.write("<ol>");
+  for(i = 0; i < count; i++, m_current++) {
+    var opacity = 0.4;
+    if (m_current % count == trigger) {
+      opacity = 1.0;
+    }
+    document.write("<li style=\"opacity: " + opacity + ";\">" + m_outline[i] + "</li>");
+  }
+  document.write("</ol>");
+  document.write("</section>");
+}
+    </script>
+
+    <style>
+      .reveal pre code { max-height: 700px; }
+      .reveal pre { font-size: 70%; }
+      .reveal p { text-align: left; }
+    </style>
+
+		<!--[if lt IE 9]>
+		<script src="reveal.js/lib/js/html5shiv.js"></script>
+		<![endif]-->
+	</head>
+
+	<body>
+
+		<div class="reveal">
+
+			<!-- Any section element inside of this container is displayed as a slide -->
+			<div class="slides">
+  <!--
+        <section>
+          <h3>Divided</h3>
+          <div style="width: 100%">
+            <div style="width: 50%; float: left;">
+            </div>
+            <div style="width: 50%; float: left;">
+            </div>
+          </div>
+        </section>
+
+        <script type="text/javascript">writeOutline()</script>
+
+        <section>
+          <h3></h3>
+          <pre><code class="cpp" data-noescape="true" data-trim="true">
+          </code></pre>
+        </section>
+  -->
+				<section>
+          <h2>Protection and Security</h2>
+          <h3>CS422/522 Lecture 18</h3>
+          <h3>19 November 2014</h3>
+          <h4>Last updated: 19 November 2014</h4>
+				</section>
+
+        <script type="text/javascript">writeOutline()</script>
+
+        <section>
+          <h3>Recap</h3>
+          <ul>
+            <li>Networking -- how do we talk to google.com</li>
+            <li>Virtualization -- trap and emulate vs binary translation</li>
+            <li>Locking -- locking vs lock-free data structures</li>
+            <li>Distributed computing -- hadoop and chord</li>
+          </ul>
+        </section>
+
+        <script type="text/javascript">writeOutline()</script>
+
+        <section>
+          <h3>Protecting What</h3>
+          <ul class="fragment">
+            <li>Processes</li>
+            <li>User data</li>
+            <li>Hardware</li>
+          </ul>
+        </section>
+
+        <section>
+          <h3>Protection from What</h3>
+          <ul class="fragment">
+            <li>Processes shouldn't bother other processes</li>
+            <li>Users' files and processes from other users</li>
+            <li>Applications accessing personal content</li>
+            <li>Certain processes / users shouldn't have access to hardware</li>
+          </ul>
+        </section>
+
+        <section>
+          <h3>Protection vs Security</h3>
+          <ul class="fragment">
+            <li>Internal -- Both internal and external</li>
+            <li>Normal operation -- Forcing normal operation</li>
+            <li>Design of an API -- Ensuring that an API cannot be abused</li>
+          </ul>
+        </section>
+
+        <section>
+          <h3>Principle of Least Privileged</h3>
+          <ul>
+            <li>Limit every objects access to the information and resources strictly necessary for its legtimate purpose</li>
+            <li>What are types of objects? <span class="fragment">users, processes, groups</span></li>
+            <li>What are types of resources? <span class="fragment">processes, files, devices</span></li>
+            <li>What are types of access? <span class="fragment">read, write, execute</span></li>
+          </ul>
+        </section>
+
+        <script type="text/javascript">writeOutline()</script>
+
+        <section>
+          <h3>Mechanisms for Enforcing Protection</h3>
+          <ul>
+            <li>Process Separation</li>
+            <li>Login / Users</li>
+            <li>File permissions</li>
+            <li>Access control lists</li>
+            <li>Capabilities</li>
+            <li>(Programming) language-based</li>
+          </ul>
+        </section>
+
+        <section>
+          <h3>Process Separation</h3>
+          <ul class="fragment">
+            <li>Virtual memory as defined by page tables</li>
+            <li>CPU time as defined by the scheduler</li>
+            <li>Access to hardware, processes, files O/S interface</li>
+          </ul>
+        </section>
+
+        <section>
+          <h3>Login / Users</h3>
+          <ul>
+            <li>Access limited to those with a username / password</li>
+            <li>Each user has their own unique account</li>
+            <li>Record logins, exceptional activity, etc</li>
+            <li>Login information stored in /etc/passwd, now /etc/shadow</li>
+            <li>Issues?</li>
+          </ul> <br />
+          <pre><code class="cpp" data-noescape="true" data-trim="true">
+# /etc/passwd
+# name : ps : user id : group id : comment : home : shell
+davidiw:x:1000:1001::/home/davidiw:/bin/bash
+# x implies encrypted password in /etc/shadow
+
+# /etc/shadow
+# name : ps : ps changed : change allowed : change req : ...
+davidiw:abcdefgh:16224:0:99999:7:::
+          </code></pre>
+        </section>
+
+        <section>
+          <h3>Files Revisited</h3>
+          <ul>
+            <li>In UNIX (Linux), (almost) everything is a file</li>
+            <li>Files can be used:
+              <ul class="fragment">
+                <li>Store data</li>
+                <li>Print</li>
+                <li>IPC -- Unix Sockets</li>
+                <li>Execute applications</li>
+                <li>Read keyboard, mouse</li>
+                <li>Write to console</li>
+              </ul>
+            </li>
+          </ul>
+        </section>
+
+        <section>
+          <h3>Permissions</h3>
+          <ul>
+            <li>User, group, everybody</li>
+            <li>Read, write, execute</li>
+            <li>Files - read, written, or executed</li>
+            <li>Directories - listed (read), written, or contents read (execute)</li>
+            <li>Groups defined in /etc/group</li>
+            <li>Issues?</li>
+          </ul>
+          <pre><code class="cpp" data-noescape="true" data-trim="true">
+# /etc/group
+# name : password : group ID : user list
+network:x:90:davidiw
+video:x:91:davidiw
+audio:x:92:davidiw
+# x no password
+          </code></pre>
+        </section>
+
+        <section>
+          <h3>Elevating Permissions</h3>
+          <ul>
+            <li>User is bob in group users</li>
+            <li>App is owned by root users admin</li>
+            <li>everybody is listed as read and exec</li>
+            <li>What happens when we execute this file?
+              <span class="fragment">We run it at our permission level</span></li>
+            <li class="fragment">Any method to run at root permission level?
+              <span class="fragment">setuid or setgid</span></li>
+          </ul>
+        </section>
+
+        <section>
+          <h3>Access Control List</h3>
+          <ul>
+            <li>User / process performs action on file resource</li>
+            <li>ACL is associated with resource</li>
+            <li>OS checks if user has ability to perform action on resource</li>
+            <li>Commonly used to offer fine grained file system access</li>
+          </ul>
+        </section>
+
+        <section>
+          <h3>Confused Deputy Problem</h3>
+          <ul>
+            <li>Compiler (by default) generates debug at /var/debug</li>
+            <li>User can send output anywhere</li>
+            <li>User can only rw /home/user</li>
+            <li>Website stored in /var/www</li>
+            <li>Compiler has ability to write to /var to access /var/debug</li>
+            <li>User instructs compiler to write debug to /var/www</li>
+            <li>It works, compiler elevates permissions, /var/www lost</li>
+          </ul>
+          <span class="fragment">Genralization -- computer program fooled into misusing its authority</span>
+        </section>
+
+        <section>
+          <h3>Confused Deputy Issues</h3>
+          <ul class="fragment">
+            <li>File permissions -- create new user / group</li>
+            <li>ACL -- file / resource centric -- what happens if app changes</li>
+            <li>What if permissions allow but ACLs do not or vice-versa</li>
+          </ul>
+        </section>
+
+        <section>
+          <h3>Capabilities</h3>
+          <ul>
+            <li>User / process performs action on file / resource</li>
+            <li>Capability is associated with the user / process</li>
+            <li>User / process is given ability to perform action on specific file</li>
+            <li>Confused deputies: <span class="fragment">
+                Compiler has no file permission to write to var
+                but has capability to write to /var/debug
+                and can inherit user capabilities (write to /home/user)
+              </span>
+            </li>
+          </ul>
+        </section>
+
+        <section>
+          <h3>Language-Based Protection</h3>
+          <ul>
+            <li>Parameterized code specifying capabilities</li>
+            <li>Function can / cannot do</li>
+            <li>Acceptable inputs / outputs</li>
+            <li>Singularity -- Software-Isolated Processes</li>
+            <li>Invariants evaluated by static analysis</li>
+          </ul>
+        </section>
+
+        <script type="text/javascript">writeOutline()</script>
+
+        <section>
+          <h3>Security Issues</h3>
+          <ul>
+            <li>Direct hardware access, access to all data</li>
+            <li>Applications with elevated permissions can be tricked to run malicious code</li>
+            <li>Third-party apps can access private data / read your keyboard input</li>
+            <li>Third-parties can read network data</li>
+          </ul>
+        </section>
+
+        <section>
+          <h3>Direct Disk Access</h3>
+          <ul class="fragment">
+            <li>Attempt to brute force password</li>
+            <li>Take disk drive out and install in another machine</li>
+            <li>Use specialized hardware to read residual data stored in RAM</li>
+            <li span="fragment">What can we do to protect us?
+              <ul class="fragment">
+                <li>Encrypt the disk</li>
+                <li>Reduce our working set size (contents in RAM)</li>
+                <li>Design new hardware with support for encrypted memory</li>
+              </ul>
+            </li>
+          </ul>
+        </section>
+
+        <section>
+          <h3>Root Exploits</h3>
+          <pre><code class="cpp" data-noescape="true" data-trim="true">
+int main(void) {
+    char buff[15];
+    int pass = 0;
+
+    printf("\n Enter the password : \n");
+    gets(buff);
+
+    if(strcmp(buff, "thegeekstuff"))
+        printf ("\n Wrong Password \n");
+    else {
+        printf ("\n Correct Password \n");
+        pass = 1;
+    }
+
+    if(pass)
+        printf ("\n Root privileges given to the user \n");
+          </code></pre>
+        </section>
+
+        <section>
+          <h3>Lifetime of an Application</h3>
+          <ul>
+            <li>Application installed by user X</li>
+            <li>Application runs with permissions of user X</li>
+            <li>Application can do anything user X can do</li>
+            <li>What can the application do?</li>
+            <li>What are some practical examples of this?</li>
+            <li>What are some examples of systems that protect against this?</li>
+          </ul>
+        </section>
+
+        <section>
+          <h3>Communicating across a Network</h3>
+          <ul>
+            <li>UDP and TCP transmit data as plaintext</li>
+            <li>A malicious third-party (say your ISP) can read all messages</li>
+            <li>What can we do to fix this?</li>
+          </ul>
+        </section>
+
+			</div>
+
+		</div>
+
+		<script src="reveal.js/lib/js/head.min.js"></script>
+		<script src="reveal.js/js/reveal.min.js"></script>
+
+		<script>
+
+			// Full list of configuration options available here:
+			// https://github.com/hakimel/reveal.js#configuration
+			Reveal.initialize({
+				controls: true,
+				progress: true,
+				history: true,
+				center: true,
+        slideNumber: true,
+        margin: 0.0,
+        minScale: 0.5,
+        maxScale: 5.0,
+
+				theme: Reveal.getQueryHash().theme, // available themes are in /css/theme
+				transition: Reveal.getQueryHash().transition || 'default', // default/cube/page/concave/zoom/linear/fade/none
+
+				// Parallax scrolling
+				// parallaxBackgroundImage: 'https://s3.amazonaws.com/hakim-static/reveal-js/reveal-parallax-1.jpg',
+				// parallaxBackgroundSize: '2100px 900px',
+
+				// Optional libraries used to extend on reveal.js
+				dependencies: [
+					{ src: 'reveal.js/lib/js/classList.js', condition: function() { return !document.body.classList; } },
+					{ src: 'reveal.js/plugin/markdown/marked.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+					{ src: 'reveal.js/plugin/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+					{ src: 'reveal.js/plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
+					{ src: 'reveal.js/plugin/zoom-js/zoom.js', async: true, condition: function() { return !!document.body.classList; } },
+					{ src: 'reveal.js/plugin/notes/notes.js', async: true, condition: function() { return !!document.body.classList; } }
+				]
+			});
+
+		</script>
+    <script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+          })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+      ga('create', 'UA-55655322-1', 'auto');
+        ga('send', 'pageview');
+
+    </script>
+
+	</body>
+</html>
