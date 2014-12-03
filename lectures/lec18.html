@@ -36,8 +36,10 @@ var m_current = 0;
 
 var m_outline = [
   "Recap",
+  "Overview",
   "Protection",
   "Security",
+  "Kernels",
   "Wrap-Up"
   ];
 
@@ -340,22 +342,45 @@ audio:x:92:davidiw
           <h3>Root Exploits</h3>
           <pre><code class="cpp" data-noescape="true" data-trim="true">
 int main(void) {
-    char buff[15];
-    int pass = 0;
+  char buff[15];
+  int pass = 0;
 
-    printf("\n Enter the password : \n");
-    gets(buff);
+  printf("\n Enter the password : \n");
+  gets(buff);
 
-    if(strcmp(buff, "thegeekstuff"))
-        printf ("\n Wrong Password \n");
-    else {
-        printf ("\n Correct Password \n");
-        pass = 1;
-    }
+  if(strcmp(buff, "thegeekstuff"))
+    printf ("\n Wrong Password \n");
+  else {
+    printf ("\n Correct Password \n");
+    pass = 1;
+  }
 
-    if(pass)
-        printf ("\n Root privileges given to the user \n");
+  if(pass)
+    printf ("\n Root privileges given to the user \n");
           </code></pre>
+        </section>
+
+        <section>
+          <h2>GCC calling convention</h2>
+          example: cprintf(char *fmt, ...)
+          <pre>
+          +------------+
+          | arg 2      |
+          +------------+
+          | arg 1      |
+          +------------+
+          | ret %eip   |
+          +------------+
+          | saved %ebp |
+%ebp-&gt  +------------+
+          |            |
+          |            |
+          |   local    |
+          | variables  |
+          |            |
+          |            |
+%esp-&gt  +------------+
+          </pre>
         </section>
 
         <section>
@@ -364,9 +389,9 @@ int main(void) {
             <li>Application installed by user X</li>
             <li>Application runs with permissions of user X</li>
             <li>Application can do anything user X can do</li>
-            <li>What can the application do?</li>
-            <li>What are some practical examples of this?</li>
-            <li>What are some examples of systems that protect against this?</li>
+            <li class="fragment">What can the application do?</li>
+            <li class="fragment">What are some practical examples of this?</li>
+            <li class="fragment">What are some examples of systems that protect against this?</li>
           </ul>
         </section>
 
@@ -379,6 +404,70 @@ int main(void) {
           </ul>
         </section>
 
+        <script type="text/javascript">writeOutline()</script>
+
+        <section>
+          <h3>Types of Kernels?</h3>
+          <ul>
+            <li>Monolithic -- Linux, xv6</li>
+            <li>Microkernel -- Mach (basis for Mac OS X), L4</li>
+            <li>Hybrid kernels -- Windows, XNU (Mac OS X)</li>
+            <li>Exokernels -- JOS, Aegis, Dune</li>
+            <li>Language-based kernels -- Singularity, JX</li>
+          </ul>
+        </section>
+
+        <section>
+          <h3>Monolithic Kernels</h3>
+          <ul class="fragment">
+            <li>All OS and services runs in the same space</li>
+            <li>Good performance -- less transitions</li>
+            <li>Conceptually simpler</li>
+            <li>Bug in module? <span class="fragment">crash system</span></li>
+          </ul>
+        </section>
+
+        <section>
+          <h3>Microkernels</h3>
+          <ul class="fragment">
+            <li>Separation of core OS and services</li>
+            <li>Drivers run outside the kernel</li>
+            <li>Each device interaction may require a context switch</li>
+            <li>Bug in module? <span class="fragment">crash module</span></li>
+          </ul>
+        </section>
+
+        <section>
+          <h3>Hybrid</h3>
+          <ul class="fragment">
+            <li>When beneficial move outside / inside kernel space</li>
+            <li>Performance vs Stability</li>
+            <li>Windows moved graphical driver out of kernel</li>
+          </ul>
+        </section>
+
+        <section>
+          <h3>Exokernel</h3>
+          Difference between exokernel and microkernel?
+        </section>
+
+        <script type="text/javascript">writeOutline()</script>
+
+        <section>
+          <h3>Lab 7</h3>
+          Officially due 12/4 at 11:59 PM<br />
+          Friday at 1:30 PM review begins<br />
+          If and only if you attend review, can you keep working until then<br />
+        </section>
+
+        <section>
+          <h3>Final Exam</h3>
+          12/16 at 7 PM in this room<br />
+          2 hour exam, everyone out by 9:30 PM<br />
+          Goal: 1 hour exam<br />
+          OS is largely cumulative<br />
+          Exam will emphasize concepts discussed in the second half<br />
+        </section>
 			</div>
 
 		</div>
