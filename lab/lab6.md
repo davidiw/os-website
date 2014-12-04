@@ -1016,8 +1016,8 @@ waiting for a packet.
 > If you don't, after returning from your interrupt handler,
 > the CPU will jump back into it again.
 > In addition to clearing the interrupts on the E1000 card,
-> interrupts also need to be cleared on the LAPIC.
-> Use `lapic_eoi` to do so.
+> interrupts also need to be cleared on the PIC.
+> Use `irq_eoi` to do so.
 
 ### Receiving Packets: Network Server
 
